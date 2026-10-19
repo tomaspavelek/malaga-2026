@@ -1,0 +1,275 @@
+/* Obecné tipy. Zdroj: research/06-tipy-letani-fora.md (+ 01, 02, 04). Stav k 19.10.2026. */
+
+const PHRASES = [
+  ['¿Tienen trona?', 'tjénen tróna', 'Máte dětskou židličku?'],
+  ['¿Tienen menú infantil?', 'tjénen menú infantíl', 'Máte dětské menu?'],
+  ['Media ración de croquetas, por favor.', 'médja rasjón de krokétas, por fabór', 'Poloviční porci kroket, prosím.'],
+  ['Sin sal y sin picante, es para el bebé.', 'sin sal i sin pikánte, es pára el bebé', 'Bez soli a nepálivé, je to pro miminko.'],
+  ['¿Me puede calentar el biberón?', 'me pwéde kalentár el biberón', 'Můžete mi ohřát lahvičku?'],
+  ['¿Hay cambiador en el baño?', 'aj kambjadór en el báňo', 'Je na toaletě přebalovací pult?'],
+  ['¿A qué hora abre la cocina?', 'a ke óra ábre la kosína', 'V kolik otevírá kuchyně?'],
+  ['La cuenta, por favor. ¿Con tarjeta?', 'la kwénta, por fabór. kon tarchéta', 'Účet, prosím. Kartou?'],
+  ['¿Puedo subir con el carrito?', 'pwédo subír kon el karíto', 'Můžu nastoupit s kočárkem?'],
+  ['¿Me avisa en la parada de…?', 'me abísa en la paráda de', 'Řeknete mi, kde vystoupit u…?'],
+  ['¿Dónde está el parque infantil?', 'dónde está el párke infantíl', 'Kde je dětské hřiště?'],
+  ['¿Dónde hay una farmacia de guardia?', 'dónde aj úna farmásja de gwárdja', 'Kde je pohotovostní lékárna?'],
+  ['Mi hijo tiene fiebre. Le duele el oído.', 'mi ícho tjéne fjébre. le dwéle el oído', 'Syn má horečku. Bolí ho ucho.'],
+  ['Necesito un pediatra, es urgente.', 'nesesíto un pedjátra, es urchénte', 'Potřebuji dětského lékaře, je to naléhavé.'],
+  ['Pañales de la talla cuatro.', 'paňáles de la tája kwátro', 'Pleny velikosti 4.'],
+  ['Perdón, ¿me deja pasar?', 'perdón, me décha pasár', 'Promiňte, pustíte mě?'],
+];
+
+const TIPS = [
+  {
+    icon: '🗓️', title: 'Návrh týdne a hotové plány', sub: 'Kostra pobytu podle zavíracích dnů a autobusů',
+    items: [
+      { h: 'Jak s tím pracovat', p: 'Kostra počítá se zavíracími dny, svátkem 2. 11. a s tím, že bus 40 jezdí jen Po–Pá. Dny přehazujte podle počasí: záložka Dnes doporučí, co se na daný den hodí. Výlety s plánem dne (Bioparc, Benalmádena, Torremolinos, Nerja) najdete v kartách v sekci „Otevírací doba, ceny, zázemí“.' },
+      { h: 'Den po dni', ul: [
+        '<b>So 31. 10. (přílet):</b> nákup rovnou na tři dny (v neděli i ve svátečním pondělí je zavřeno), pak pláž Misericordia a západ slunce.',
+        '<b>Ne 1. 11.:</b> dopoledne Parque del Oeste, nebo dětské divadlo „Péťa a vlk“ v Teatro Echegaray v 11:00. Odpoledne Muelle Uno s nedělním trhem El Zoco. Obchody zavřené, bus 40 nejede.',
+        '<b>Po 2. 11. (svátek):</b> botanická zahrada La Concepción taxíkem, nebo Pompidou s Casa Mágica (12:30) a Limón Loco od 10:00. Tržnice zavřené.',
+        '<b>Út 3. 11.:</b> Bioparc Fuengirola, ve všední den je tam méně lidí. Pompidou má zavřeno.',
+        '<b>St 4. 11.:</b> historický půlden busem 40 (Alcazaba, římské divadlo, tržnice Atarazanas). Odpoledne Parque del Oeste.',
+        '<b>Čt 5. 11.:</b> ústí Guadalhorce s plameňáky a Parque Litoral, nebo Benalmádena (park Paloma, Sea Life).',
+        '<b>Pá 6. 11.:</b> Torremolinos po moři, nebo Pedregalejo s obědem na pláži.',
+        '<b>So 7. 11.:</b> workshop Picasso en familia v 11:00 (ověřit) a MIMMA, nebo trh a park v Huelinu. Gibralfaro busem 35 od 11:02.',
+        '<b>Ne 8. 11.:</b> divadlo beze slov „Nera“ v Echegaray v 11:00 nebo Dadadá pro miminka. Pak oblíbená místa.',
+        '<b>Po 9. 11. (odlet):</b> Parque del Oeste a Misericordia, check-out ve 12:00.',
+      ] },
+      { h: 'Když prší', ul: [
+        'Pompidou a Casa Mágica (ne v úterý), MIMMA, tržnice Atarazanas (ne v neděli), Museo de Málaga zdarma (ne v pondělí kromě 2. 11.).',
+        'Blízko bytu: automuzeum (7 min), Museo Ruso s kavárnou a dětským patiem, herna Limón Loco (ve všední den od 15:00).',
+        'Mimo město: Sea Life Benalmádena (odpoledne, dopoledne fronty) a motýlí skleník Monowa.',
+      ] },
+      { h: 'Historický půlden (St–Pá, kdy jede bus 40)', ul: [
+        '8:58 odchod, 9:07 bus 40 ze zastávky Pacífico – Carril de la Chupa (č. 3954), 9:23 vystoupit Paseo de los Curas (č. 9903).',
+        '9:27 tunel v Calle Guillén Sotelo za radnicí, výtahem nahoru. Lístky v automatu: 2× 7 €, děti zdarma.',
+        '9:35–10:45 Alcazaba. Jeden rodič s kočárkem u paláce, druhý obejde hradby s předškolákem. WC v půlce trasy.',
+        '10:55–11:20 římské divadlo (zdarma) a skleněné pyramidy s římskými kádemi.',
+        '11:20–12:15 podle počasí: v dešti Museo de Málaga (zdarma, kavárna Bloom), za sucha Paseo del Parque a Pompidou, kde v 12:30 otevírá Casa Mágica.',
+        '12:30 oběd v tržnici Atarazanas, pak hřiště na Plaza Enrique García-Herrera.',
+        '13:33 bus 40 z Paseo de los Curas (č. 3901), doma ve 13:50. Děti usnou cestou.',
+      ] },
+    ],
+  },
+  {
+    icon: '🎃', title: 'Akce v termínu', sub: 'Halloween, nedělní divadla, vstupy zdarma, trhy',
+    items: [
+      { h: 'So 31. 10.: Halloween', ul: [
+        'Muelle Uno 17:30–21:00: Halloween v mexickém stylu, sladkosti v obchodech, fotokoutek, soutěž kostýmů i pro rodiny. Pravděpodobně zdarma. V den příletu spíš jen pro silné povahy.',
+        'Calle Larios: večer se tu procházejí rodiny v kostýmech.',
+        'Nevhodné pro malé: Noche del Terror v Churrianě, noční strašidelná prohlídka botanické zahrady, prohlídky Cementerio Inglés.',
+      ], links: [['Muelle Uno: Halloween', 'https://www.muelleuno.com/eventos/cielito-lindo-halloween/']] },
+      { h: 'Ne 1. 11. (Všech svatých)', ul: [
+        'Teatro Echegaray: „Pedro y el lobo“ (Péťa a vlk) v 11:00 a 13:00, od 3 let, 8 €.',
+        'La Cochera Cabaret (17 min pěšky): rodinné představení ve 12:00.',
+        'Zdarma odpoledne: Alcazaba a Gibralfaro od 14:00, botanická zahrada 14:00–17:30, Pompidou, Museo Ruso a Thyssen od 16:00, Picasso 16–18, rodný dům Picassa 16–20.',
+        'Trh El Zoco na Muelle Uno bývá první tři neděle v měsíci 11–19 (ověřit).',
+        'Tradice: kaštany ze stánků, v cukrárnách huesos de santo a buñuelos.',
+      ] },
+      { h: 'Po 2. 11. (svátek)', p: 'Otevřeno: Pompidou s Casa Mágica, Picasso, rodný dům Picassa, Museo Ruso, Museo de Málaga 9–15, Alcazaba, automuzeum, MIMMA do 19, Limón Loco od 10, botanická zahrada. Zavřeno: Thyssen, Aeromuseo, tržnice, většina obchodů. Bus 40 nejede.' },
+      { h: 'Všední dny 3.–6. 11.', ul: [
+        'Út 3. 11.: Pompidou zavřeno. Začíná Málaga Jazz Festival (večer, spíš pro dospělé).',
+        'St 4. 11.: trh v Huelinu 9–14. Museo de la Imaginación zavřeno.',
+        'Čt a Pá: nic speciálního pro malé děti, nejlepší dny na výlety a historické centrum.',
+      ] },
+      { h: 'So 7. a Ne 8. 11.', ul: [
+        'So 7. 11.: Picasso en familia v 11:00 (zdarma, od 3 let, registrace, téma zatím nevypsané). Trh v Huelinu 9–14.',
+        'Ne 8. 11.: Teatro Echegaray „Nera. Viaje a Isla Madre“ v 11:00 a 13:00, beze slov, pro všechny věky, 8 €.',
+        'Ne 8. 11.: Dadadá v Teatro Cánovas, divadlo pro děti 0–3 roky, 8 €, čas ověřit.',
+        'Ne 8. 11.: La Cochera Cabaret „Beatelitis“ ve 12:00. Odpoledne vstupy zdarma jako 1. 11.',
+      ], links: [['Divadla v Málaze: program', 'https://teatromalaga.com/cartelera']] },
+      { h: 'Celý pobyt', p: 'Podzimní trh Mercado de Otoño na Muelle Uno denně 10–22 až do 9. 11. Stánky s pečenými kaštany v ulicích centra. Vánoční světla na Calle Larios se rozsvítí až koncem listopadu, ta nestihnete.' },
+    ],
+  },
+  {
+    icon: '✈️', title: 'Létání s dětmi', sub: 'Uši, spaní, zábava na 3,5 hodiny, Ryanair',
+    items: [
+      { h: 'Uši: nejhorší je klesání, ne vzlet', p: 'Krmit nezačínejte při zavírání dveří, ale až když letadlo stojí na začátku dráhy a motory zesílí. Pak prs, lahev nebo dudlík asi 10 minut stoupání. Klesání začíná zhruba 30 minut před přistáním (tam kolem 13:55, zpátky kolem 20:00): krmení nebo dudlík držte až do dosednutí. Dítě má být vzhůru, ve spánku polyká méně. Předškolák: pití brčkem, lízátko, hra „kdo víc zívne“.' },
+      { h: 'Jak se posadit', p: 'V trojsedadle rodič s miminkem u okna (nad oknem je extra kyslíková maska pro infanta), předškolák uprostřed, druhý rodič na uličce. Rodiny s místy zdarma bývají vzadu, což je výhoda: přebalovací pult je na zadní toaletě.' },
+      { h: 'Načasování spánku', ul: [
+        'Tam: v autě jen krátký šlofík, hlavní dopolední spánek nechte na dobu po vzletu.',
+        'Zpátky: odpolední spánek v kočárku cestou na letiště, v letištní rodinné zóně převléct děti do pyžama a přes něj teplou vrstvu. Doma je pak rovnou uložíte.',
+        'Předškolák pravděpodobně spát nebude. Na Mumsnetu to shodně radí čtyři rodiče: nepočítat s tím.',
+      ] },
+      { h: 'Zábava pro předškoláka', ul: [
+        'Tablet se staženými pohádkami (Ryanair nemá Wi-Fi) a dětská sluchátka s omezením hlasitosti.',
+        'Bloky po 20–30 minutách: samolepková knížka, vodní omalovánky, magnetická tabulka, malířská páska na stolek, figurky zvířat z Bioparku.',
+        'Každých 30–45 minut zabalené levné „překvapení“.',
+        'Svačinový box s mnoha přihrádkami: jí se pomalu a zabaví.',
+        'Doma si předem zahrajte „na letadlo“ a vysvětlete praskání v uších.',
+      ] },
+      { h: 'Batole, které chce lézt', p: 'Na zem ho nepouštějte. Ať stojí a „chodí“ na klíně, a když nesvítí pásy, projděte se s ním uličkou. Hračky na klipu, aby nepadaly: kelímky na skládání, kousátko, knížka z tvrdého papíru, gelové samolepky na okno. Bílý šum motorů miminka často uspí.' },
+      { h: 'Mléko a jídlo', p: 'Ryanair lahve ani jídlo neohřívá a dětské menu nemá. Vezměte prázdnou termosku a za kontrolou si ji nechte v kavárně naplnit horkou vodou. Dětská výživa, mléko a voda pro miminko jdou přes kontrolu mimo sáček, ale pití pro předškoláka kupte až za kontrolou (výjimka platí jen do 2 let).' },
+      { h: 'Na co se připravit', ul: [
+        'Kočárek často nečeká u schůdků, ale až na pásu v hale. Miminko proto do nosítka.',
+        'Přebalovací pult je malý. Přebalte těsně před nástupem a předškoláka vezměte na WC ještě před klesáním: po rozsvícení pásů se toalety zavírají.',
+        'Pleny: 10–12 kusů na cestu tam (7–8 hodin dveře ke dveřím) a zásoba jídla na +4 hodiny pro případ zpoždění.',
+        'Náhradní tričko i pro oba rodiče.',
+        'Při zpoždění přes 3 hodiny máte nárok na jídlo a pití, při zpoždění příletu přes 3 hodiny na odškodné 400 € na osobu (EU 261). Schovávejte účtenky.',
+      ] },
+      { h: 'Léky na cestu', p: 'Paralen nebo Nurofen sirup se stříkačkou, nosní kapky podle věku (pro 10 měsíců Nasivin Sensitive 0,01 %), mořská voda, odsávačka. Když dítě uši při letu bolívají, lék proti bolesti asi 30 minut před vzletem nebo přistáním. Nic „na uspání“.' },
+    ],
+  },
+  {
+    icon: '🍽️', title: 'Jídlo s dětmi', sub: 'Kdy se jí, co objednat, jak si říct o kávu',
+    items: [
+      { h: 'Hlavní jídlo v poledne', p: 'Španělé obědvají 14–16, večeří 21–23. S dětmi se osvědčilo dát si hlavní jídlo kolem 13:30 (budete mezi prvními hosty) a večer tapas venku nebo večeři doma. Mezi 17. a 20. hodinou mívají kuchyně restaurací zavřeno.' },
+      { h: 'Menú del día', p: 'Ve všední dny tři chody, chléb a nápoj obvykle za 12–16 €. Nejlevnější teplé jídlo dne, děti se mohou podělit. Dětem v barech objednávejte poloviční porci (media ración).' },
+      { h: 'Co dětem chutná', ul: [
+        'Tortilla de patatas (bramborová omeleta), croquetas, albóndigas (masové kuličky), pollo a la plancha.',
+        'Pescaíto frito (smažené rybičky a kalamáry). Espetos (sardinky na špízu): dětem vykostit.',
+        'Snídaně: pitufo nebo mollete s olejem a rajčetem, Cola Cao, čerstvý pomerančový džus.',
+        'Churros s čokoládou v Casa Aranda, zmrzlina v Casa Mira, pečené kaštany ze stánku.',
+        'Gazpacho a salmorejo mají česnek a ocet, malým dětem bývají moc výrazné. Šunka a tapas jsou slané: pro miminko „sin sal“.',
+      ] },
+      { h: 'Dětská židlička', p: 'Trona je v restauracích běžná, ale ne všude. Látková cestovní sedačka, která se připevní na židli, se vyplatí.' },
+      { h: 'Káva po malagsku', p: 'Podle poměru kávy a mléka: solo (černá), largo (s kapkou mléka), semilargo, mitad (půl na půl), entrecorto, corto, sombra, nube (skoro jen mléko). Bezkofeinová z kávovaru: „descafeinado de máquina“.' },
+      { h: 'Placení a dýško', p: 'Kartou zaplatíte skoro všude. Dýško není povinné, zaokrouhluje se nebo se nechávají drobné, v lepší restauraci 5–10 %. Hotovost se hodí na stánky s kaštany a kiosky.' },
+      { h: 'Voda', p: 'Voda z kohoutku je v Málaze pitná a měkká. Na kojenecké mléko kupte balenou vodu s nízkou mineralizací („agua de mineralización débil“).' },
+    ],
+  },
+  {
+    icon: '🌦️', title: 'Počasí a co sbalit', sub: 'Listopad v Málaze, déšť, výstrahy',
+    items: [
+      { h: 'Jaký bývá začátek listopadu', p: 'Dlouhodobý listopadový průměr (AEMET, letiště Málaga): přes den 20 °C, v noci 11 °C, déšť 5–6 dní v měsíci. Začátek měsíce bývá teplejší, v roce 2025 bylo 2. 11. přes 25 °C. Moře má 18–20 °C: na čvachtání dost, na koupání málo, pro miminko studené. UV index kolem 3, na pláž a kolem poledne krém SPF 50 a kšiltovky.' },
+      { h: 'Déšť chodí v dávkách', p: 'Prší krátce a vydatně, ne celý den. Místní liják přečkají u kávy. Výjimkou jsou bouře DANA (13. 11. 2024 povodeň, v říjnu 2026 bouře Adam). Při oranžové nebo červené výstraze zůstaňte doma, vyhněte se korytům řek a podzemním garážím. Výstrahy chodí přes ES-Alert i na zahraniční telefony.', links: [['Výstrahy AEMET', 'https://www.aemet.es/es/eltiempo/prediccion/avisos']] },
+      { h: 'Kluzká dlažba', p: 'Leštěný mramor na Calle Larios a ve starém městě za mokra hodně klouže, stejně jako kamenné rampy na Alcazabu a Gibralfaro. Boty s protiskluzovou podrážkou, za deště nenechte předškoláka běhat a u kočárku používejte brzdu.' },
+      { h: 'Sbalit pro děti', ul: [
+        'Krátké i dlouhé kalhoty, trička, mikina nebo fleece, lehká nepromokavá bunda.',
+        'Pláštěnka na kočárek a pro předškoláka nepromokavé boty.',
+        'Plavky, kšiltovka, krém, repelent podle věku (komár tygrovaný je v Málaze aktivní do poloviny listopadu), síť na kočárek.',
+        'Hračky na písek kupte až na místě.',
+        'Na Ostravu zimní bundy a čepice.',
+      ] },
+      { h: 'Večerní vlna u pláže', p: 'Když večer připlouvá trajekt z Melilly (kolem 19:30, jízdní řád se mění), na pláži Misericordia a Huelin přijdou 3–4 větší vlny. Večer držte batole dál od vody.' },
+    ],
+  },
+  {
+    icon: '🚌', title: 'Doprava po Málaze', sub: 'Které autobusy jezdí od nás, jízdné, vlak, taxi',
+    items: [
+      { h: 'Hned první den: karta Consorcio', p: 'Kiosek na C/ Pacífico 59, 75 m od ubytka. Karta stojí 1,50 € plus dobití (min. 5 €). Jednou kartou zaplatí celá rodina a platí v autobusech EMT (0,83 €), metru (0,49 €), vlaku C1 i meziměstských autobusech. Výlet do Torremolinos busem pro 3 platící vyjde kartou na 4,26 € místo 10,50 € v hotovosti.' },
+      { h: 'Kdo platí', p: 'Autobus EMT a metro: miminko zdarma, předškolák (3,5 roku) už platí jako dospělý. Vlak Cercanías C1: obě děti zdarma (do 6 let, max. 2 na dospělého).' },
+      { h: 'Autobus 7: hlavní linka do centra', p: 'Zastávka Parque Mediterráneo (č. 1555) na Av. Sor Teresa Prat, 200 m od ubytka. Na Alameda Principal (centrum) za 20 minut. Ve všední den každých 10 minut, o víkendu a ve svátek každých 15. Zpátky ze zastávky Alameda Principal – Sur (č. 791), vystoupit na Parque Mediterráneo (č. 1522).' },
+      { h: 'Autobus 40: přímo k přístavu, jen Po–Pá', p: 'Zastávka Pacífico – Carril de la Chupa (č. 3954) na C/ Pacífico, 250 m. Jede jednou za hodinu v xx:07, Plaza de la Marina za 14 minut, Malagueta a Muelle Uno (zastávka Paseo de Melilla – Farola) za 20 minut. Zpátky v xx:30. O víkendu, 1. 11. a 2. 11. nejede.' },
+      { h: 'Autobus 3: pláže na východ', p: 'Zastávka Paloma – Girón (č. 357), 920 m. Malagueta (Plaza de Toros) za 21 minut, Pedregalejo za 33, El Palo za 40.' },
+      { h: 'Metro a vlak C1 s kočárkem', p: 'Nejbližší stanice vlaku Victoria Kent (1,6 km) má s kočárkem špatný přístup. Lepší je metro L2 ze stanice El Torcal (920 m, výtah) do El Perchel (5 minut) a tam vlak C1 ze stanice María Zambrano. C1 jede každých 20 minut: Torremolinos asi 18 minut, Benalmádena 25, Fuengirola 42. U turniketů pípnout kartou i při výstupu, jinak se strhne nejvyšší cena.' },
+      { h: 'Jak v autobuse s kočárkem', p: 'Nastupuje se předními dveřmi. EMT doporučuje kočárek složit, nebo ho postavit proti směru jízdy, zabrzdit a připoutat pásem autobusu. Nejjistější: miminko v nosítku, předškolák v kočárku. Bezkontaktní kartou zaplatíte u řidiče až 10 jízdenek najednou, držitel karty vystupuje poslední.' },
+      { h: 'Taxi a autosedačky', p: 'Taxi smí ve městě vézt děti do 135 cm bez autosedačky na zadním sedadle. Uber, Cabify a transfery sedačky mít musí; Cabify Kids má jen jednu sedačku pro děti nad 9 kg, vajíčko ne. Orientační ceny: do centra asi 7 €, z centra 5–6 €, na letiště 15–17 €, z letiště 18–22,50 € (o víkendu víc), plus 0,58 € za kufr. Unitaxi 952 333 333, Taxi Unión 952 04 04 04.' },
+      { h: 'Aplikace', ul: ['EMT Málaga: příjezdy autobusů v reálném čase a QR jízdenky.', 'Google Maps: jízdní řády EMT i vlaku jsou v nich.', 'Uber, Cabify, Bolt a FreeNow jako záloha k taxi.'] },
+    ],
+  },
+  {
+    icon: '🛒', title: 'Nákupy a dětské potřeby', sub: 'Svátek 2. 11., obchody kolem nás, ceny plen',
+    items: [
+      { h: 'Neděle 1. 11. a pondělí 2. 11.', p: 'V neděli jsou velké obchody zavřené, pondělí 2. 11. je v Andalusii svátek (Všech svatých přesunuté z neděle). Na 2. 11. obchody otevřít smí, ale nemusí. Velký nákup proto v sobotu 31. 10. do 21:30. Stejně zavřeno bude v neděli 8. 11.' },
+      { h: 'Supermarkety kolem nás', ul: [
+        'Mas, Carril de la Chupa 9: 170 m. Možná má otevřeno i v neděli (ověřit na místě).',
+        'Mercadona, Av. Velázquez 43: 850 m. Po–So 9:00–21:30.',
+        'Supeco (Carrefour), Héroe de Sostoa 188: 1,1 km. Po–So 9–22.',
+        'Lidl, Av. Velázquez 60: 1,2 km. Po–So 9:00–21:30.',
+      ] },
+      { h: 'Lékárna hned u domu', p: 'Farmacia Pacífico, C/ Pacífico 34, 150 m. Otevřeno denně včetně neděle (zhruba 9:30–21:30). Dětský paracetamol se ve Španělsku prodává jen v lékárně.' },
+      { h: 'Ceny v Mercadoně (říjen 2026)', ul: [
+        'Pleny Deliplus vel. 4 (10–15 kg): 6,55 €, velké balení 19 €. Dodot vel. 4: 16,75 €.',
+        'Vlhčené ubrousky Deliplus: 1 €.',
+        'Kapsičky Hacendado 0,85–0,90 €, skleničky Hero Solo 1,80 €.',
+        'Kojenecké mléko Nestlé Nativa 12,95 €, Nidina 14,95–17,95 €.',
+        'Kaše Hero Solo 8 cereales 3,90 €.',
+      ] },
+      { h: 'Malé obchody', p: 'Obvykle 9–14 a 17–20:30, mezi tím siesta. Nákupní centra jedou bez přestávky.' },
+    ],
+  },
+  {
+    icon: '🏠', title: 'Okolí ubytka', sub: 'Pláž, hřiště, zmrzlina, pekárna, kde se najíst',
+    items: [
+      { h: 'Pláž a promenáda', p: 'Playa de la Misericordia je 550 m (7 minut pěšky). Rovná promenáda Antonio Banderas je ideální na kočárek a odrážedlo, po cestě jsou hřiště, sprchy a WC (u komína La Chimenea, 11–20 h).' },
+      { h: 'Hřiště', p: 'Nejbližší hřiště je do 300 m od domu, další na promenádě u pláže a v parku Chiquito de la Calzada (400 m). Parque del Oeste (680 m, 9 minut) má přes 400 m² dětských zón, jezírko, sochy a toalety.' },
+      { h: 'Zmrzlina a pekárny', ul: [
+        'Zmrzlina: Marcello (120 m), Perlatto na C/ Pacífico 19 (190 m), DeLuque na Carril de la Chupa (210 m).',
+        'Pekárna La Canasta, Av. Sor Teresa Prat 61 (320 m).',
+        'Churros: Bar Mercado de Huelin (1,3 km, káva s churrem kolem 1,70 €), v centru Casa Aranda.',
+      ] },
+      { h: 'Kde se najíst poblíž', ul: [
+        'Chiringuito La Campana, Paseo Marítimo Antonio Banderas 9: espetos kolem 4,90 €, 10:30–18:00.',
+        'Litoral Pacífico, Paseo Marítimo Antonio Banderas 5: espetos, Po–So 13–17 a 21–24, Ne 13–17. Doporučená rezervace.',
+        'La Famiglia Pacífico, C/ Pacífico 5: italská, velká terasa, o víkendu kuchyně 13:30–23:30.',
+      ] },
+      { h: 'Lékař', p: 'Zdravotní středisko Centro de Salud Las Delicias, C/ Frigiliana 21 (asi 550 m). Do dětské nemocnice Materno-Infantil jede přímo autobus 7 ze zastávky u domu (33 minut).' },
+    ],
+  },
+  {
+    icon: '🩺', title: 'Zdraví a bezpečnost', sub: 'Pohotovost, lékárny, léky, kapsáři',
+    items: [
+      { h: 'Když je dítě nemocné', ul: [
+        'Nejdřív volejte asistenci pojišťovny Global Assistance +420 266 799 788 (nonstop, česky). Nasměruje vás a zaplatí ošetření.',
+        'Veřejná dětská pohotovost: Hospital Materno-Infantil, Av. Arroyo de los Ángeles (asi 5 km). Tady platí modrá kartička EHIC; řekněte, že chcete veřejnou péči.',
+        'Soukromá: Quirónsalud Málaga, Av. Imperio Argentina 1 (asi 2 km), pohotovost 24 h i pro děti. EHIC tam neplatí, jen cestovní pojištění.',
+        'Zdravotní informační linka Salud Responde 955 545 060, záchranka 061, vše 112.',
+        'Schovejte si účty, lékařské zprávy a recepty s razítkem lékárny.',
+      ] },
+      { h: 'Pohotovostní lékárna', p: 'Na dveřích každé lékárny visí adresa té, která má zrovna službu (farmacia de guardia). Online je seznam na farmaceuticos.com.', links: [['Lékárny se službou', 'https://www.farmaceuticos.com/farmacias-de-guardia/malaga/']] },
+      { h: 'Pozor na sílu španělských sirupů', p: 'Apiretal má 100 mg paracetamolu v 1 ml, český Paralen 24 mg/ml. Dávka v ml se liší zhruba čtyřikrát. Vždy čtěte mg/ml na obalu a dávkujte podle hmotnosti.' },
+      { h: 'Kapsáři', p: 'Hlavně na Calle Larios, u katedrály a v davech, ve vlacích i „objímači“ převlečení za turisty. Tašku noste vepředu, nic cenného do koše kočárku, mobil nenechávejte na stolku v kavárně.' },
+      { h: 'Toalety a přebalování', p: 'Veřejných toalet je málo. Použijte kavárny, nákupní centra (Muelle Uno 10–22 h) a muzea. Toalety zdarma jsou v podzemním parkingu u Pompidou (patro −1). Noste skládací přebalovací podložku.' },
+    ],
+  },
+  {
+    icon: '🗣️', title: 'Španělské fráze', sub: 'Pro rodiče s výslovností',
+    html: () => PHRASES.map(([es, pr, cz]) => `<div class="phrase"><b>${es}</b><span>${cz}</span><i>[${pr}]</i></div>`).join('') +
+      '<p class="muted" style="font-size:14px;margin-top:6px">Výslovnost: j = ch, ll = j, ñ = ň, h se nevyslovuje, v = b. Andalusané často polykají koncové s.</p>',
+  },
+  {
+    icon: '💬', title: 'Co radí rodiče z fór', sub: 'TripAdvisor, Mumsnet, české blogy a diskuze',
+    items: [
+      { h: 'Nejčastěji doporučované', ul: [
+        'Bioparc Fuengirola: 7 doporučení ve 4 vláknech, „ideální s malými dětmi“, celý přístupný s kočárkem, děti do 3 let zdarma.',
+        'Mijas pueblo (6), Parque de la Paloma (4), Alcazaba (4), MIMMA hudební muzeum („fantastické místo s batoletem“, 3), Gibralfaro (3), tržnice Atarazanas (3).',
+        'Promenády a pláže s plážovými bary: 5 zmínek.',
+      ] },
+      { h: 'Přeceňované nebo zklamání', ul: [
+        'Tivoli World je od roku 2020 zavřený, i když ho staré tipy stále uvádějí.',
+        'Nové mořské muzeum Alborán otevře až začátkem roku 2027.',
+        'Alcazaba a Gibralfaro s kočárkem: schody a kluzké rampy, miminko do nosítka.',
+        'Výlet do Tangeru s batoletem „rozhodně ne“, Caminito del Rey až od 8 let.',
+        'Po jednom hlasu: Sea Life, méně zvířat v Parque de la Paloma, Bioparc „není levný“, Picasso pro děti.',
+      ] },
+      { h: 'Skryté tipy', ul: [
+        'Druhý kočárek pro unaveného předškoláka si jde půjčit s doručením do apartmánu (Babonbo, od 18 € na 2 dny).',
+        'Vstupy zdarma v neděli odpoledne: Alcazaba a Gibralfaro od 14:00, Picasso poslední 2 hodiny, Pompidou od 16:00. Museo de Málaga je pro občany EU zdarma vždy.',
+        'Kryté herny („parques de bolas“) jsou mezi místními dětmi oblíbené, hodí se na déšť.',
+        'Outlet u letiště (Plaza Mayor) s hřištěm a půjčovnou kočárků, vlakem C1.',
+        'Ryby z tržnice Atarazanas a večeře v apartmánu: ať si děti vyberou samy.',
+      ] },
+      { h: 'Jak to vypadá s kočárkem', p: 'Historické centrum se s kočárkem zvládne. Autobusy s rozloženým kočárkem jezdí, jen v plném je někdy potřeba ho složit. Na Alcazabu vede od května 2025 výtah z ulice Guillén Sotelo, na Gibralfaro se vyplatí jet nahoru autobusem 35 a dolů jít pěšky.' },
+      { h: 'Kde to nešlo dohledat', p: 'Reddit, emimino.cz a facebookové skupiny („Češi v Malaze“, „Češi na Costa del Sol“) automatické hledání blokují. Když budete chtít, zeptejte se tam ručně.' },
+    ],
+  },
+  {
+    icon: '🚫', title: 'Co vynechat', sub: 'Zavřené, přeceňované nebo nevhodné pro tenhle věk',
+    items: [
+      { h: 'V roce 2026 neexistuje nebo je zavřené', ul: [
+        'Mořské muzeum Aula del Mar: nové Museo Alborán otevře až začátkem roku 2027.',
+        'Vyhlídkové kolo v přístavu je pryč od roku 2019, koňské povozy město zrušilo v říjnu 2025.',
+        'Tivoli World je zavřený od roku 2020, Aqualand v listopadu nejede.',
+        'Pláž Baños del Carmen je od září 2026 staveniště.',
+        'Muzeum současného umění CAC je v přestavbě, otevření nejisté.',
+      ] },
+      { h: 'Pro miminko a předškoláka nevhodné', ul: [
+        'Caminito del Rey: děti pod 8 let nesmí. Aventura Amazonia: od 4 let a v listopadu jen o víkendu.',
+        'IKEA Småland: jen Pá a So, od 3 let a jen dítě, které samo zvládne toaletu.',
+        'OXO muzeum videoher (6+), vědecké centrum Principia, muzea skla a Thyssen, kino (dabing).',
+        'Střechy katedrály: prohlídky jsou pozastavené a děti v náručí ani v nosítku tam stejně nesmí.',
+        'Pěšky na Gibralfaro s kočárkem: strmá dlážděná cesta. Nahoru busem 35.',
+      ] },
+      { h: 'Přeceňované nebo moc daleko', ul: [
+        'Mijas: oslí taxi má na krku trestní oznámení za týrání zvířat, vesnice je v kopci a se schody.',
+        '„Delfíní“ plavby: delfíny nikdo nezaručí, specializované výlety berou děti až od 5 let.',
+        'Selwo Marina: hlavní bazén je bez programu a delfíni nejspíš nebudou. Jen po ověření kalendáře.',
+        'Selwo Aventura, Lobo Park, El Torcal, Ronda, Granada: bez auta 2 a více hodin jednu cestu.',
+        'Frigiliana (schody, bez kočárku) a ptačí park Loro Sexi (prázdné klece podle recenzí).',
+        'Nedělní odpoledne zdarma: davy a kolize se spánkem. Děti mají vstup zdarma tak jako tak, ušetříte jen za rodiče.',
+      ] },
+    ],
+  },
+];

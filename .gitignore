@@ -1,0 +1,15 @@
+# Do veřejného repa jde jen web. Podklady a poznámky zůstávají lokálně.
+research/
+tasks/
+CLAUDE.md
+CONTEXT.md
+PRD.md
+
+public/
+node_modules/
+.env*
+*.log
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
