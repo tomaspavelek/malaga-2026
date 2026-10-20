@@ -22,11 +22,29 @@ const CUISINES = {
   zmrzlina: { label: 'Zmrzlina', emoji: '🍦' },
 };
 
+/* Štítky kuchyně (tags): na kartě jako chipy a ve filtru, podnik jich má víc. Pořadí = pořadí ve filtru. */
+const FOOD_TAGS = {
+  ryby: { label: 'Ryby a plody moře', emoji: '🐟' },
+  espetos: { label: 'Espetos', emoji: '🍢' },
+  paella: { label: 'Paella a rýže', emoji: '🥘' },
+  tapas: { label: 'Tapas', emoji: '🫒' },
+  andaluska: { label: 'Andaluská', emoji: '🍲' },
+  maso: { label: 'Maso a gril', emoji: '🥩' },
+  italska: { label: 'Italská', emoji: '🍝' },
+  pizza: { label: 'Pizza', emoji: '🍕' },
+  burger: { label: 'Burgery', emoji: '🍔' },
+  kavarna: { label: 'Kavárna', emoji: '☕' },
+  brunch: { label: 'Brunch', emoji: '🥞' },
+  cukrarna: { label: 'Cukrárna', emoji: '🥐' },
+  churros: { label: 'Churros', emoji: '🍫' },
+  zmrzlina: { label: 'Zmrzlina', emoji: '🍦' },
+};
+
 const FOOD = [
   /* ---------- Okolí ubytka (západně od řeky Guadalmedina), research/07 ---------- */
   {
     id: 'litoral-pacifico', name: 'Litoral Pacífico', area: 'Misericordia', cuisine: 'ryby', emoji: '🐟', price: 2, kids: 'ok',
-    meals: ['obed'], closed: [1],
+    tags: ['ryby', 'espetos'], meals: ['obed'], closed: [1],
     lat: 36.69618, lon: -4.43794, gq: 'Chiringuito Litoral Pacífico, Málaga',
     what: 'Espetos de sardinas, calamar espetado a smažené rybky (calamaritos, boquerones, adobo), chanquetes s vejci, domácí dezerty. Pro dítě mají hamburger nebo hranolky s vejcem či plátkem masa.',
     kidsWhy: 'TripAdvisor uvádí dětské židličky. Hamburger a hranolky s vejcem nebo masem jsou přímo v nabídce (salir.com, duben 2026). Velký vnitřní sál, terasa a stoly v písku, od bytu 5 min po rovné promenádě. Kuchyně běží od 13:00.',
@@ -41,7 +59,7 @@ const FOOD = [
   },
   {
     id: 'gutierrez-playa', name: 'Gutiérrez Playa', area: 'Misericordia', cuisine: 'ryby', emoji: '🦐', price: 3, kids: 'part',
-    meals: ['obed', 'vecere'], closed: [],
+    tags: ['ryby', 'espetos', 'paella'], meals: ['obed', 'vecere'], closed: [],
     lat: 36.69451, lon: -4.43901, gq: 'Chiringuito Gutiérrez Playa, Calle Pacífico 29, Málaga',
     what: 'Rybí a mořská klasika: espetos de sardinas, smažený i grilovaný kalamár, pulpo, paella s plody moře, gazpachuelo malagueño. Dítěti objednejte calamares fritos nebo paellu, nemají samostatné dětské menu.',
     kidsWhy: 'TripAdvisor uvádí dětské židličky a venkovní posezení, dětské menu jsem nenašel. Od bytu 3 min, veřejné WC 70 m, nejbližší hřiště 300 m. Jako jeden z mála blízkých chiringuitos vaří i večeři, ale až od 20:00.',
@@ -56,7 +74,7 @@ const FOOD = [
   },
   {
     id: 'chiringuito-maria', name: 'Chiringuito María', area: 'Misericordia', cuisine: 'ryby', emoji: '🐟', price: 3, kids: 'ok',
-    meals: ['obed'], closed: [1],
+    tags: ['ryby', 'espetos', 'paella'], meals: ['obed'], closed: [1],
     lat: 36.69132, lon: -4.4411, gq: 'Chiringuito María, Playa de la Misericordia, Málaga',
     what: 'Jeden z nejstarších chiringuitos ve Španělsku, skoro 90 let ho vede rodina Manzano. Espetos de sardinas pečené nad uhlím z olivového dřeva, smažené rybky, ensalada a paella. Dítěti calamares nebo boquerones fritos.',
     kidsWhy: 'Dětské hřiště na promenádě je 50 m od chiringuita a TripAdvisor uvádí dětské židličky. Sedí se na terase přímo u pláže, od bytu 7 min pěšky. Dvě recenze ze srpna 2024 ale popisují, že obsluha nepustila hosty s pískem na nohou k barovým stolům.',
@@ -71,7 +89,7 @@ const FOOD = [
   },
   {
     id: 'casa-lucas', name: 'Casa Lucas', area: 'Misericordia', cuisine: 'ryby', emoji: '🥘', price: 3, kids: 'ok',
-    meals: ['obed'], closed: [1],
+    tags: ['ryby', 'espetos', 'paella', 'maso'], meals: ['obed'], closed: [1],
     lat: 36.68801, lon: -4.44306, gq: 'Restaurante Casa Lucas, Paseo Marítimo Antonio Banderas, Málaga',
     what: 'Chiringuito u komína La Chimenea. Arroces a paella, espetos, boquerones, pulpo, ensaladilla rusa, a pro toho, kdo nechce rybu, cachopo nebo hovězí. Na dezert torrija se zmrzlinou.',
     kidsWhy: 'Dvě dětská hřiště jsou do 60 m od restaurace a veřejné WC 70 m (OSM). TripAdvisor uvádí dětské židličky. Rodina z července 2025 strávila u Casa Lucas s dětmi celý den na lehátkách. Recenze z července 2026 si naopak stěžuje na nevlídné jednání s vnoučaty.',
@@ -86,7 +104,7 @@ const FOOD = [
   },
   {
     id: 'vicen-playa', name: 'Vicen Playa', area: 'Sacaba / La Térmica', cuisine: 'ryby', emoji: '🐟', price: 3, kids: 'ok',
-    meals: ['snidane', 'obed'], closed: [1, 2],
+    tags: ['ryby', 'espetos', 'paella'], meals: ['snidane', 'obed'], closed: [1, 2],
     lat: 36.68321, lon: -4.44596, gq: 'Restaurante Vicen Playa, Málaga',
     what: 'Rodinný podnik, který má vlastní rybárnu. Espetos, boquerones al limón, calamaritos, fritura variada, paella de marisco nebo arroz negro (32–34 € pro dva), berenjenas con miel de caña. Dopoledne snídaně.',
     kidsWhy: 'Lístek má oddíl Para los niños: kuřecí lagrimitas, řízek, burger, omeleta nebo flamenquín, vše s hranolky, 7–14 €. TripAdvisor uvádí dětské židličky, web nabízí velké stoly na rodinné obědy. Terasa u moře, WC na promenádě 115 m, hřiště Parque de Agua 300 m.',
@@ -101,7 +119,7 @@ const FOOD = [
   },
   {
     id: 'rocamar', name: 'Chiringuito Rocamar', area: 'Huelin', cuisine: 'ryby', emoji: '🐟', price: 3, kids: 'ok',
-    meals: ['obed'], closed: [],
+    tags: ['ryby', 'espetos', 'paella'], meals: ['obed'], closed: [],
     lat: 36.7035, lon: -4.43247, gq: 'Chiringuito Rocamar, Paseo Marítimo Antonio Machado, Málaga',
     what: 'Chiringuito na pláži Huelin: espetos z velkých sardinek, talíř smažených ryb, paella, arroz caldoso s humrem nebo carabineros, gazpachuelo malagueño. Dítěti calamares fritos nebo paella.',
     kidsWhy: 'Velká terasa je podle salir.com (duben 2026) udělaná tak, aby si děti mohly hrát pod dohledem rodičů. TripAdvisor uvádí dětské židličky a stoly na písku. Dětské hřiště je 60 m na promenádě. Otevřeno od 10:00, jíst se dá už ve 12:30.',
@@ -116,7 +134,7 @@ const FOOD = [
   },
   {
     id: 'casa-ovi', name: 'Casa Ovi', area: 'Pacífico', cuisine: 'andaluska', emoji: '🥘', price: 2, kids: 'ok',
-    meals: ['obed', 'vecere'], closed: [1],
+    tags: ['andaluska', 'ryby', 'paella'], meals: ['obed', 'vecere'], closed: [1],
     lat: 36.69319, lon: -4.44404, gq: 'Casa Ovi, Avenida Sor Teresa Prat 72, Málaga',
     what: 'Domácí andaluská kuchyně: pescaíto frito (boquerones, calamares, adobo), domácí krokety, berenjenas con miel de caña, ensaladilla rusa, paella z ryb a mořských plodů (13,90 € za osobu, min. 2). Většina jídel jde i jako media ración (krokety 4,20 €, boquerones 6,10 €), pro dítě se hodí miniburguer (5,75 €), kuřecí špíz (3,20 €) a domácí zmrzlina (2,50 €).',
     kidsWhy: 'TripAdvisor uvádí dětské židličky (tronas) a styl „family style“, rodinné recenze z června až srpna 2026 píšou o rodinné atmosféře a nealko nápojích pro děti. Terasa je upravená na celý rok. Kuchyně podle TripAdvisoru jede bez přestávky 12:00–23:00, takže se dá jíst ve 12:30 i v 19:00. Dětské menu nemá, děti dostanou poloviční porce.',
@@ -131,7 +149,7 @@ const FOOD = [
   },
   {
     id: 'el-pescaito-de-nicolas', name: 'El Pescaito de Nicolás', area: 'Cruz de Humilladero', cuisine: 'ryby', emoji: '🐟', price: 2, kids: 'ok',
-    meals: ['obed', 'vecere'], closed: [],
+    tags: ['ryby', 'tapas'], meals: ['obed', 'vecere'], closed: [],
     lat: 36.7102, lon: -4.44542, gq: 'El Pescaito de Nicolás, Avenida Juan XXIII 45, Málaga',
     what: 'Sousedská freiduría: fritura de pescado (boquerones, calamares, adobo), parrillada z ryb, chobotnice z plotny, gambas, coquinas a berenjenas. Tapas od 2 €. Pro dítě smažené kalamáry, boquerones nebo patatas.',
     kidsWhy: 'Podle InTravel (atributy z Googlu) je podnik vhodný pro děti a má dětské židličky. Většina míst je venku na terase, kam se vejde kočárek. Rodinné recenze z února 2026 a z roku 2025 chválí rychlou obsluhu, ve špičce se ale čeká asi 15 minut a je tam rušno.',
@@ -146,7 +164,7 @@ const FOOD = [
   },
   {
     id: 'el-botijo', name: 'El Botijo', area: 'Carretera de Cádiz', cuisine: 'andaluska', emoji: '🍖', price: 3, kids: 'part',
-    meals: ['obed'], closed: [],
+    tags: ['andaluska', 'maso'], meals: ['obed'], closed: [],
     lat: 36.6904, lon: -4.4456, gq: 'El Botijo, Avenida de los Guindos 33, Málaga',
     what: 'Rodinný asador z roku 1987 naproti La Térmica: pečené jehněčí (paletilla, pierna, chuletas), plněné žampiony, krokety, svíčková a na závěr leche frita. Dítě sní jehněčí s hranolky nebo krokety.',
     kidsWhy: 'TripAdvisor uvádí dětské židličky a rodinný styl, Gastroranking ho popisuje jako vhodný na rodinné obědy. Terasa ani venkovní sezení uvedené nejsou, sedí se uvnitř. Recenze z let 2025–2026 opakovaně píšou o pomalé obsluze, s batoletem to může být dlouhé.',
@@ -161,7 +179,7 @@ const FOOD = [
   },
   {
     id: 'meson-cortijo-cristobal', name: 'Mesón Cortijo Cristóbal', area: 'Pacífico', cuisine: 'andaluska', emoji: '🥩', price: 3, kids: 'part',
-    meals: ['obed'], closed: [2],
+    tags: ['andaluska', 'maso'], meals: ['obed'], closed: [2],
     lat: 36.69538, lon: -4.44123, gq: 'Mesón Cortijo Cristóbal, Calle Amalia Heredia 2, Málaga',
     what: 'Malý masový mesón kousek od bytu: carrillada (vepřové líčko), rabo de toro, torreznos, entrecot, svíčková, plněné žampiony a provolone, domácí hranolky. Dítěti se hodí hranolky, torreznos nebo kousek masa.',
     kidsWhy: 'Recenze ze srpna 2026: s 11letým synem, kuchař mu sám přinesl čerstvé torreznos. Personál recenze popisují jako rodinný a ochotný, přijali hosty i v 16:00. Dětské židličky, dětské menu ani terasa ale nikde uvedené nejsou a jde o malý podnik, s kočárkem NEOVĚŘENO.',
@@ -176,7 +194,7 @@ const FOOD = [
   },
   {
     id: 'la-famiglia-pacifico', name: 'La Famiglia Pacífico', area: 'Pacífico', cuisine: 'pizza', emoji: '🍝', price: 3, kids: 'ok',
-    meals: ['obed', 'vecere'], closed: [],
+    tags: ['italska', 'pizza'], meals: ['obed', 'vecere'], closed: [],
     lat: 36.69865, lon: -4.43677, gq: 'La Famiglia se sienta a la mesa, Calle Pacífico 5, Málaga',
     what: 'Italský řetězec (dřív La Mafia se sienta a la mesa): pizza, těstoviny dělané denně v kuchyni, lasagne, rizota, saláty, na závěr tiramisu. Pro dítě pizza margherita nebo těstoviny s rajčatovou omáčkou.',
     kidsWhy: 'TripAdvisor uvádí dětské židličky a rodinný styl. Terasa pro 140 lidí u promenády, kam se vejde kočárek. Těstoviny a pizza jsou jistota pro předškoláka. Recenze z let 2025–2026 si ale opakovaně stěžují na čekání 45–60 minut na první jídlo.',
@@ -191,7 +209,7 @@ const FOOD = [
   },
   {
     id: 'nomadas-burguer', name: 'Nómadas Burguer Company', area: 'Carretera de Cádiz', cuisine: 'burger', emoji: '🍔', price: 2, kids: 'ok',
-    meals: ['obed', 'vecere'], closed: [],
+    tags: ['burger'], meals: ['obed', 'vecere'], closed: [],
     lat: 36.69056, lon: -4.44723, gq: 'Nómadas Burguer Company, Camino de la Térmica 2, Málaga',
     what: 'Burgery z čerstvého masa, patatas gajo s omáčkou a „patatas cochinas“ (hranolky se sýrem a slaninou), nachos, chipotle salát. Bezlepkové a vegetariánské varianty. Pro dítě obyčejný burger nebo hranolky.',
     kidsWhy: 'TripAdvisor uvádí dětské židličky a venkovní terasu, recenze z února 2026 zmiňuje plynová topidla na terase. Rodinné recenze z března a května 2026 chválí obsluhu. Uvnitř je podle recenze z ledna 2026 v zimě chladno a ve špičce bývá fronta.',
@@ -206,7 +224,7 @@ const FOOD = [
   },
   {
     id: 'la-scala-litoral', name: 'La Scala Ristorante', area: 'Parque Litoral', cuisine: 'pizza', emoji: '🍕', price: 2, kids: 'ok',
-    meals: ['obed', 'vecere'], closed: [],
+    tags: ['italska', 'pizza'], meals: ['obed', 'vecere'], closed: [],
     lat: 36.68337, lon: -4.45587, gq: 'La Scala Ristorante, Avenida Imperio Argentina 7, Málaga',
     what: 'Italská restaurace s dětským koutkem s míčky: pizza, těstoviny (carbonara, lasagne), calzone, rizoto, saláty, česnekový chléb. Ve všední den polední menu (podle starší recenze 11 €). Pro dítě dětské menu.',
     kidsWhy: 'Bazén s míčky (parque de bolas) zdarma, rodiče sedí u stolu vedle. O víkendu animátorka a malování na obličej. Má dětské menu a dětské židličky (TripAdvisor) i terasu. Recenze ze září a října 2026 ho doporučují pro malé děti. Jedna recenze z března 2026 ale upozorňuje na lištu s hřebíky, kterou dítě vytáhlo ze zdi u koutku, a starší recenze píšou o pomalé obsluze ve špičce.',
@@ -221,7 +239,7 @@ const FOOD = [
   },
   {
     id: 'barenostrum', name: 'Barenostrum (brunch & cervecería)', area: 'Pacífico', cuisine: 'kavarna', emoji: '☕', price: 1, kids: 'ok',
-    meals: ['snidane'], closed: [],
+    tags: ['kavarna', 'brunch', 'tapas'], meals: ['snidane'], closed: [],
     lat: 36.69424, lon: -4.43973, gq: 'Barenostrum, Calle Pacífico 31, Málaga',
     what: 'Snídaně a brunch na rohu Calle Pacífico a promenády: tostady, bocadillos, churros, pomerančový džus, mají i bezlepkový chléb. Přes den a večer tapas a pivo. Dítěti se hodí tostada nebo croissant.',
     kidsWhy: 'TripAdvisor u podniku uvádí dětské židličky (tronas). Venkovní stolky stojí u promenády, kočárek zaparkujete vedle stolu a po rovné promenádě se dá hned vyrazit dál. Obsluha bývá podle recenzí z let 2025–2026 pomalá, s hladovým dítětem objednejte hned při příchodu.',
@@ -236,7 +254,7 @@ const FOOD = [
   },
   {
     id: 'mediterraneo-playa', name: 'Mediterráneo Playa Café & Bar', area: 'Pacífico', cuisine: 'kavarna', emoji: '☕', price: 1, kids: 'part',
-    meals: ['snidane'], closed: [2],
+    tags: ['kavarna', 'tapas'], meals: ['snidane'], closed: [2],
     lat: 36.69551, lon: -4.43892, gq: 'Mediterráneo Playa Café & Bar, Calle Pacífico 23, Málaga',
     what: 'Kavárna u promenády s výhledem na moře: tostada s rajčetem a olivovým olejem, pitufos (malé bagetky) s tortillou, croissanty, pomerančový džus. Večer funguje jako bar s tapas.',
     kidsWhy: 'Venkovní stolky na slunci u promenády, kočárek se vejde k terase. Dětské židličky ani dětské menu žádný zdroj neuvádí. Recenze z let 2025–2026 si stěžují na pomalou obsluhu.',
@@ -251,7 +269,7 @@ const FOOD = [
   },
   {
     id: 'confiteria-avila', name: 'Confitería Ávila', area: 'Pacífico', cuisine: 'kavarna', emoji: '🥐', price: 1, kids: 'part',
-    meals: ['snidane'], closed: [],
+    tags: ['kavarna', 'cukrarna'], meals: ['snidane'], closed: [],
     lat: 36.69472, lon: -4.44215, gq: 'Confitería Ávila, Carril de la Chupa 8, Málaga',
     what: 'Cukrárna s kavárnou: croissant s medem, empanadas (kuřecí, s tuňákem), malé palmeras, borrachuelos, dorty a čokoládová zmrzlina. Dítěti stačí palmerita nebo kousek čokoládového dortu.',
     kidsWhy: 'Venkovní stolky před cukrárnou, kočárek se vejde vedle. O víkendu se podle recenzí čeká na stůl i na kávu, rodina v květnu 2024 čekala na stůl přes 45 minut. Dětské židličky žádný zdroj neuvádí. Cukrárna je 2 minuty od bytu, pečivo jde vzít i s sebou.',
@@ -266,7 +284,7 @@ const FOOD = [
   },
   {
     id: 'tejeringos-la-paloma', name: 'Tejeringo\'s Coffee La Paloma', area: 'Carretera de Cádiz', cuisine: 'churros', emoji: '🍫', price: 1, kids: 'part',
-    meals: ['snidane'], closed: [],
+    tags: ['churros', 'kavarna'], meals: ['snidane'], closed: [],
     lat: 36.70226, lon: -4.44591, gq: 'Tejeringo\'s Coffee, Avenida de la Paloma 45, Málaga',
     what: 'Pobočka malagské sítě churrerií: tejeringos (tenké churros smažené na objednávku) s horkou čokoládou, k tomu tostady, molletes, croissanty, pitufos a bocadillos. Předškolák si namáčí churros do čokolády.',
     kidsWhy: 'Venkovní stolky stojí na Avenida de la Paloma, hlavní ulici s provozem. Ve špičce se čeká, majitel v odpovědích na recenze přiznává přetížení obsluhy. Dětské židličky žádný zdroj neuvádí.',
@@ -281,7 +299,7 @@ const FOOD = [
   },
   {
     id: 'bar-mercado-huelin', name: 'Bar Mercado de Huelin', area: 'Huelin', cuisine: 'churros', emoji: '☕', price: 1, kids: 'part',
-    meals: ['snidane', 'obed'], closed: [0],
+    tags: ['churros', 'kavarna'], meals: ['snidane', 'obed'], closed: [0],
     lat: 36.70254, lon: -4.4381, gq: 'Bar Mercado de Huelin, Calle Emilio de la Cerda 35, Málaga',
     what: 'Rodinný bar v tržnici Huelin: ráno káva s churros (1,70 € v prosinci 2025), tortilla a tostady. Od 13:30 polední menu (předkrm, hlavní jídlo, dezert, pití), třeba makarony s tuňákem, pollo al ajillo, hamburguesa nebo jurel a la plancha.',
     kidsWhy: 'Uvnitř je 12 stolů a venku 4, místa pro kočárek je málo. Polední menu je jednoduché domácí jídlo, podle reportáže ho matky a babičky objednávají dětem po škole. Dětské židličky žádný zdroj neuvádí, podle recenze na TripAdvisoru se domluvíte hlavně španělsky.',
@@ -296,7 +314,7 @@ const FOOD = [
   },
   {
     id: 'maitehn-pacifico', name: 'Maitehn Helados & Café (dříve Perlatto)', area: 'Pacífico', cuisine: 'zmrzlina', emoji: '🍦', price: 1, kids: 'ok',
-    meals: [], closed: [1],
+    tags: ['zmrzlina', 'kavarna'], meals: [], closed: [1],
     lat: 36.69591, lon: -4.43863, gq: 'Maitehn, Calle Pacífico 19, Málaga',
     what: 'Zmrzlinárna a kavárna u promenády: kopečková zmrzlina, mléčné koktejly (batidos), horká čokoláda s churros, káva. Večer se z ní stává koktejlový bar.',
     kidsWhy: 'Zmrzlina 3 minuty od bytu, venkovní stolky s výhledem na moře, kočárek stojí u stolu. Večer se podnik mění v koktejlový bar (recenze ze září 2026), s dětmi tedy chodit odpoledne. Dětské židličky žádný zdroj neuvádí.',
@@ -311,7 +329,7 @@ const FOOD = [
   },
   {
     id: 'kalua-moliere', name: 'Kalúa Moliere', area: 'Carretera de Cádiz', cuisine: 'zmrzlina', emoji: '🍨', price: 1, kids: 'ok',
-    meals: [], closed: [],
+    tags: ['zmrzlina'], meals: [], closed: [],
     lat: 36.68679, lon: -4.45228, gq: 'Kalúa Moliere, Avenida Molière 25, Málaga',
     what: 'Pobočka malagské sítě řemeslné zmrzliny (první obchod v Málaze 2003, přes 40 příchutí): kopečky, kelímky i vaničky s sebou. Podle recenzí mají i veganské příchutě a příchutě bez cukru, chválí se pistáciová.',
     kidsWhy: 'Obsluha u pultu, kelímek si vezmete ven a na stůl se nečeká. Recenze zmiňují velké porce a málo míst k sezení. Dětské židličky žádný zdroj neuvádí.',
@@ -327,7 +345,7 @@ const FOOD = [
   /* ---------- Centrum, přístav a pláže na východ, research/08 ---------- */
   {
     id: 'casa-aranda', name: 'Casa Aranda', area: 'Centro', cuisine: 'churros', emoji: '🍫', price: 1, kids: 'ok',
-    meals: ['snidane'], closed: [0], near: 'atarazanas',
+    tags: ['churros'], meals: ['snidane'], closed: [0], near: 'atarazanas',
     lat: 36.71895, lon: -4.42314, gq: 'Casa Aranda, Calle Herrería del Rey, Málaga',
     what: 'Churrería z roku 1932 v pěší uličce u trhu Atarazanas. Churros po 0,80 € za kus a hustá horká čokoláda na namáčení (2,30 €), k tomu káva. Dětem stačí pár churros a jedna čokoláda na sdílení.',
     kidsWhy: 'Stolky stojí venku v pěší uličce Herrería del Rey, nejezdí tu auta a kočárek zůstane u stolu. Obsluha je rychlá, churros jsou na stole za pár minut. Uvnitř je těsno a jedna recenze ze 4/2026 si stěžuje na nepořádek, seďte venku. Dětské židličky NEOVĚŘENO.',
@@ -342,7 +360,7 @@ const FOOD = [
   },
   {
     id: 'churreria-la-malaguena', name: 'Churrería La Malagueña', area: 'Centro', cuisine: 'churros', emoji: '🍫', price: 1, kids: 'ok',
-    meals: ['snidane'], closed: [0], near: 'atarazanas',
+    tags: ['churros', 'kavarna'], meals: ['snidane'], closed: [0], near: 'atarazanas',
     lat: 36.71932, lon: -4.42364, gq: 'Churrería La Malagueña, Calle Sebastián Souvirón 6, Málaga',
     what: 'Tejeringos, tenké málagské churros smažené na místě, a hustá čokoláda. Ke snídani i mollete nebo tostada s rajčetem a šunkou, pro děti Cola-Cao.',
     kidsWhy: 'Venkovní stolky v pěší ulici 100 m od Casa Aranda a sezení uvnitř. Recenzent z 10/2026 píše, že dítě bylo nadšené. Kolem 11:00 je plno, ale stoly se rychle střídají a porce se dá vzít s sebou od pultu. Dětské židličky NEOVĚŘENO.',
@@ -357,7 +375,7 @@ const FOOD = [
   },
   {
     id: 'brunchit-alhondiga', name: 'Brunchit Alhóndiga', area: 'Centro', cuisine: 'kavarna', emoji: '🥞', price: 2, kids: 'ok',
-    meals: ['snidane', 'obed'], closed: [], near: 'atarazanas',
+    tags: ['brunch', 'kavarna'], meals: ['snidane', 'obed'], closed: [], near: 'atarazanas',
     lat: 36.71878, lon: -4.42355, gq: 'Brunchit, Calle Alhóndiga 2, Málaga',
     what: 'Brunch celý den: lívance (hotcakes), avokádový toast, vejce, sendviče a smoothie, porce jsou velké. Dítěti lívance nebo toast, k pití čerstvý džus.',
     kidsWhy: 'TripAdvisor uvádí dětské židličky a venkovní stolky. Otevírá v 9:00 a vaří nonstop do 16:00, takže pozdní snídaně i oběd ve 13:00 jdou bez čekání na kuchyni. Rodina v 8/2026 si stěžovala na sezení ve sklepní místnosti, chtějte stůl nahoře nebo venku.',
@@ -372,7 +390,7 @@ const FOOD = [
   },
   {
     id: 'casa-mira', name: 'Casa Mira', area: 'Centro', cuisine: 'zmrzlina', emoji: '🍦', price: 1, kids: 'ok',
-    meals: [], closed: [], near: 'larios',
+    tags: ['zmrzlina'], meals: [], closed: [], near: 'larios',
     lat: 36.71956, lon: -4.42147, gq: 'Casa Mira, Calle Marqués de Larios 5, Málaga',
     what: 'Zmrzlinárna a výrobna turrónu z roku 1890. Kolem 20 příchutí: místní „Málaga“ (sladké víno s rozinkami), turrón, pistácie, citronový sorbet. Dětem kornout nebo kelímek s čokoládou.',
     kidsWhy: 'Zmrzlina se bere jen s sebou, stolky nemají. Larios je pěší zóna a 100 m odtud jsou lavičky na Plaza de la Constitución. Fronta jde přes pořadová čísla z automatu u vchodu a podle recenzí z 9–10/2026 rychle ubývá.',
@@ -387,7 +405,7 @@ const FOOD = [
   },
   {
     id: 'el-pimpi', name: 'El Pimpi', area: 'Centro', cuisine: 'andaluska', emoji: '🍷', price: 3, kids: 'ok',
-    meals: ['obed', 'vecere'], closed: [], near: 'alcazaba',
+    tags: ['andaluska', 'tapas'], meals: ['obed', 'vecere'], closed: [], near: 'alcazaba',
     lat: 36.7218, lon: -4.41804, gq: 'Bodega Bar El Pimpi, Calle Granada 62, Málaga',
     what: 'Málagská bodega z roku 1971 se sudy podepsanými známými hosty. Vaří andaluskou klasiku: berenjenas con miel (smažený lilek s melasou), boquerones al limón, croquetas, ensaladilla, flamenquín, rabo de toro. Dětem croquetas, boquerones nebo flamenquín (smažená roláda ze šunky).',
     kidsWhy: 'Kuchyně vaří nonstop od 12:00 do 23:30, najíte se v 13:00 i v 18:00. TripAdvisor uvádí dětské židličky. Terasa a patio s fontánou leží u římského divadla pod Alcazabou, uvnitř jsou úzké chodbičky a o víkendu plno. Hřiště na Cortina del Muelle je asi 300 m.',
@@ -402,7 +420,7 @@ const FOOD = [
   },
   {
     id: 'casa-lola', name: 'Casa Lola', area: 'Centro', cuisine: 'tapas', emoji: '🍢', price: 2, kids: 'part',
-    meals: ['obed', 'vecere'], closed: [], near: 'museo-picasso',
+    tags: ['tapas'], meals: ['obed', 'vecere'], closed: [], near: 'museo-picasso',
     lat: 36.722, lon: -4.41898, gq: 'Casa Lola, Calle Granada 46, Málaga',
     what: 'Tapas bar s pinchos od 2 €: pepito Casa Lola, patatas bravas, croquetas de jamón, pinchito de gambas, jamón ibérico a vermut z kohoutku. Dětem bravas a croquetas.',
     kidsWhy: 'Kuchyně jede nonstop 12:00–23:30, ale rezervace neberou a před vchodem se čeká 15–20 minut. Rodina s dětmi v 7/2026 čekala na jídlo přes hodinu, recenze z 8–9/2026 si stěžují na hlasitou hudbu. Uvnitř je těsno, s kočárkem je lepší venkovní stolek v pěší Calle Granada. Dětské židličky NEOVĚŘENO.',
@@ -417,7 +435,7 @@ const FOOD = [
   },
   {
     id: 'bar-mercado-atarazanas', name: 'Bar Mercado Atarazanas', area: 'Centro', cuisine: 'ryby', emoji: '🐟', price: 2, kids: 'part',
-    meals: ['obed'], closed: [0], near: 'atarazanas',
+    tags: ['ryby', 'tapas'], meals: ['obed'], closed: [0], near: 'atarazanas',
     lat: 36.71841, lon: -4.42406, gq: 'Bar Mercado Atarazanas, Calle Atarazanas 10, Málaga',
     what: 'Barový pult přímo v tržnici, smaží ryby ze stánků za rohem: boquerones al limón, chopitos (malé chobotničky), salmonetes a fritura malagueña, k tomu pinchitos de gambas. Dítěti smažené boquerones, jedí se rukama.',
     kidsWhy: 'Jí se hlavně na stojáka u baru, venku je pár vysokých stolů pod slunečníky u rušné silnice. V poledne je plno a čeká se 10 minut i déle. Na rychlé pinchito s předškolákem to jde, na klidný oběd s miminkem v kočárku ne.',
@@ -432,7 +450,7 @@ const FOOD = [
   },
   {
     id: 'terra-mia', name: 'Terra Mia', area: 'Centro', cuisine: 'pizza', emoji: '🍕', price: 2, kids: 'ok',
-    meals: ['obed', 'vecere'], closed: [], near: 'katedrala',
+    tags: ['italska', 'pizza'], meals: ['obed', 'vecere'], closed: [], near: 'katedrala',
     lat: 36.72121, lon: -4.42007, gq: 'Terra Mia, Calle Molina Lario 3, Málaga',
     what: 'Neapolská pizza, čerstvé těstoviny (ravioli capresi) a tiramisu. Dětem margherita nebo těstoviny s rajčatovou omáčkou.',
     kidsWhy: 'TripAdvisor uvádí dětské židličky a venkovní stolky v pěší ulici u katedrály. Kuchyně vaří nonstop od 12:30 do půlnoci. Uvnitř bývá hlučno a v létě 2026 rodiny čekaly na jídlo až hodinu. Hřiště na Cortina del Muelle je asi 260 m.',
@@ -447,7 +465,7 @@ const FOOD = [
   },
   {
     id: 'tgb-larios', name: 'TGB The Good Burger Larios', area: 'Centro', cuisine: 'burger', emoji: '🍔', price: 2, kids: 'part',
-    meals: ['obed', 'vecere'], closed: [], near: 'larios',
+    tags: ['burger'], meals: ['obed', 'vecere'], closed: [], near: 'larios',
     lat: 36.72049, lon: -4.42132, gq: 'TGB The Good Burger, Calle Moreno Monroy 1, Málaga',
     what: 'Španělský řetězec s burgery, hranolky, loaded fries a saláty, má i vegetariánský burger. Záchrana, když tapas neprojdou: dítěti hranolky a obyčejný cheeseburger.',
     kidsWhy: 'Kuchyně jede nonstop od 12:00 do půlnoci a venku jsou stolky v pěší uličce hned vedle Larios. Interiér recenze hodnotí slabě (atmosféra 2,8 z 5), dětské menu ani židličky TripAdvisor neuvádí. Hřiště na Cortina del Muelle je asi 270 m.',
@@ -462,7 +480,7 @@ const FOOD = [
   },
   {
     id: 'cambara', name: 'Cambara', area: 'Muelle Uno', cuisine: 'mezinarodni', emoji: '🥘', price: 3, kids: 'ok',
-    meals: ['obed', 'vecere'], closed: [], near: 'muelle-uno',
+    tags: ['paella', 'ryby', 'maso'], meals: ['obed', 'vecere'], closed: [], near: 'muelle-uno',
     lat: 36.71479, lon: -4.41462, gq: 'Cambara, Muelle Uno, Málaga',
     what: 'Rýže a paelly z pánve (od 14 € za osobu, minimálně pro dva), arroz negro, croquetas, ryby a maso z grilu. Dítěti arroz con pollo (rýže s kuřetem) nebo grilované kuře.',
     kidsWhy: 'TripAdvisor uvádí dětské židličky, kuchyně vaří nonstop od 12:00. Velká terasa stojí na rovném molu bez aut, dětské hřiště je podle OSM 20 m od restaurace a veřejné WC Muelle Uno s přebalovacím pultem 50 m. Na zimní verandě bývá chladno (recenze 3/2026).',
@@ -477,7 +495,7 @@ const FOOD = [
   },
   {
     id: 'el-cachalote', name: 'Chiringuito El Cachalote', area: 'Malagueta', cuisine: 'ryby', emoji: '🐟', price: 3, kids: 'ok',
-    meals: ['obed'], closed: [1, 2], near: 'malagueta',
+    tags: ['ryby', 'espetos'], meals: ['obed'], closed: [1, 2], near: 'malagueta',
     lat: 36.72001, lon: -4.40525, gq: 'Chiringuito El Cachalote, Paseo Marítimo Pablo Ruiz Picasso, Málaga',
     what: 'Plážový chiringuito s ohništěm v loďce: espetos de sardinas, grilovaná dorada a lubina, pescaíto frito, gambas, calamares. Dítěti smažené calamares nebo kousek grilované ryby, kterou vykostí u stolu.',
     kidsWhy: 'Terasa stojí na písku, děti si hrají u stolu. TripAdvisor uvádí dětské židličky. Hřiště na promenádě je asi 250 m východně a veřejné WC s přebalovacím pultem asi 280 m (OSM). Plážové toalety přímo u podniku mu nepatří a recenze si na ně stěžují.',
@@ -492,7 +510,7 @@ const FOOD = [
   },
   {
     id: 'el-cabra', name: 'El Cabra Ovidio Playa', area: 'Pedregalejo', cuisine: 'ryby', emoji: '🐟', price: 3, kids: 'part',
-    meals: ['obed', 'vecere'], closed: [], near: 'pedregalejo',
+    tags: ['ryby', 'espetos', 'paella', 'maso'], meals: ['obed', 'vecere'], closed: [], near: 'pedregalejo',
     lat: 36.72097, lon: -4.37691, gq: 'El Cabra, Paseo Marítimo El Pedregal 17, Málaga',
     what: 'Merendero z roku 1965, od 4/2025 ho vede skupina Asador Ovidio. Espetos de sardinas na olivovém dřevě, fritura malagueña (boquerones, adobo), sedm druhů rýže a maso z grilu. Dítěti smažené boquerones nebo rýže.',
     kidsWhy: 'Vaří nonstop 12:00–23:00, takže oběd ve 13:00 i brzká večeře jdou. Terasa ve dvou patrech je kousek od písku. Promenáda před ní se přestavuje do konce roku 2026 (recenze 4/2026: „tienen obras delante“), dětské židličky NEOVĚŘENO.',
@@ -507,7 +525,7 @@ const FOOD = [
   },
   {
     id: 'andres-maricuchi', name: 'Andrés Maricuchi', area: 'Pedregalejo', cuisine: 'ryby', emoji: '🐟', price: 3, kids: 'ok',
-    meals: ['obed', 'vecere'], closed: [1], near: 'pedregalejo',
+    tags: ['ryby', 'espetos'], meals: ['obed', 'vecere'], closed: [1], near: 'pedregalejo',
     lat: 36.72096, lon: -4.37719, gq: 'Andrés Maricuchi, Paseo Marítimo El Pedregal 14, Málaga',
     what: 'Rybí restaurace na promenádě: espetos de sardinas, grilovaná lubina a chobotnice, coquinas, boquerones al limón, domácí croquetas a pollo con aceitunas. Dítěti croquetas nebo boquerones.',
     kidsWhy: 'Dětské židličky uvádí TripAdvisor i planomato a podle Gastroranking sem chodí hodně rodin. Terasa s výhledem na moře je bezbariérová. Promenáda před ní se do konce roku 2026 přestavuje a ve špičce se na jídlo čeká (recenze 5/2026).',
@@ -522,7 +540,7 @@ const FOOD = [
   },
   {
     id: 'el-tintero-rest', name: 'El Tintero', area: 'El Palo', cuisine: 'ryby', emoji: '🐟', price: 3, kids: 'ok',
-    meals: ['obed', 'vecere'], closed: [], near: 'el-tintero',
+    tags: ['ryby', 'espetos'], meals: ['obed', 'vecere'], closed: [], near: 'el-tintero',
     lat: 36.71689, lon: -4.34809, gq: 'El Tintero, Avenida Salvador Allende 340, Málaga',
     what: 'Rybí „aukce“: číšníci nosí talíře po sále, vyvolávají jídlo a kdo zvedne ruku, dostane. Platí se podle talířů na stole. Espetos, boquerones, calamares, chopitos, gambas, almejas. Dítěti smažené calamares nebo boquerones.',
     kidsWhy: 'TripAdvisor uvádí dětské židličky, terasa je u pláže a podle OSM je dětské hřiště 50 m od vchodu. Rodina v 9/2026 píše, že dceru vyvolávání jídel bavilo. Je tu hluk a chaos, miminko může být neklidné.',
@@ -538,7 +556,7 @@ const FOOD = [
   /* ---------- U výletů mimo Málagu, research/08 ---------- */
   {
     id: 'toro-puerto-marina', name: 'TORO Puerto Marina', area: 'Benalmádena', cuisine: 'tapas', emoji: '🥩', price: 3, kids: 'ok',
-    meals: ['obed', 'vecere'], closed: [], out: true, near: 'sea-life',
+    tags: ['tapas', 'maso'], meals: ['obed', 'vecere'], closed: [], out: true, near: 'sea-life',
     lat: 36.59791, lon: -4.51298, gq: 'TORO Puerto Marina, Benalmádena',
     what: 'Španělská kuchyně přímo v přístavu Puerto Marina: domácí croquetas, gambas al pil-pil, jamón a sýry, k tomu steaky z hovězího Angus. S dětmi se hodí sdílené croquetas a hranolky.',
     kidsWhy: 'TripAdvisor uvádí dětské židličky a bezbariérový přístup. Rodina v recenzi z dubna 2026 píše, že jídlo pro děti přišlo rychle a obsluha se ptala, jestli dětem na terase nebude zima. Terasa je na rovném molu u přístavu a kuchyně jede bez polední pauzy, takže se dá jíst i po odpoledním spaní.',
@@ -553,7 +571,7 @@ const FOOD = [
   },
   {
     id: 'santa-ana-denis', name: 'Restaurante Santa Ana Denis', area: 'Benalmádena', cuisine: 'ryby', emoji: '🥘', price: 2, kids: 'ok',
-    meals: ['obed', 'vecere'], closed: [4], out: true, near: 'paloma',
+    tags: ['ryby', 'espetos', 'paella'], meals: ['obed', 'vecere'], closed: [4], out: true, near: 'paloma',
     lat: 36.59089, lon: -4.52634, gq: 'Restaurante Santa Ana Denis, Benalmádena',
     what: 'Rybí restaurace na promenádě u pláže Santa Ana, kousek pod parkem Paloma. Espeto de sardinas stojí 7,50 €, boquerones fritos 13 €, calamares 15,50 € a paella mixta pro dva 30 €; dětské menu za 8,50 € nabízí hamburger, obalované kuře s hranolky, špagety, krokety nebo pizzu se šunkou a sýrem.',
     kidsWhy: 'Dětské menu za 8,50 € má na webu, TripAdvisor uvádí dětské židličky. Stojí v první linii u pláže a podle recenze rodiny ze září 2026 se obsluha dítěti věnovala. Otevírá v 11:00 a otvíračka nemá polední pauzu (hodiny kuchyně web neuvádí).',
@@ -568,7 +586,7 @@ const FOOD = [
   },
   {
     id: 'los-leones-carihuela', name: 'Chiringuito Los Leones', area: 'Torremolinos', cuisine: 'ryby', emoji: '🐟', price: 2, kids: 'ok',
-    meals: ['obed', 'vecere'], closed: [2], out: true, near: 'torremolinos',
+    tags: ['ryby', 'espetos', 'paella'], meals: ['obed', 'vecere'], closed: [2], out: true, near: 'torremolinos',
     lat: 36.60457, lon: -4.50711, gq: 'Chiringuito Los Leones, Torremolinos',
     what: 'Rodinný chiringuito na promenádě Carihuely, vede ho už čtvrtá generace. Griluje espetos (sardinky na špízu 8,50 €), smaží boquerones (13 €), calamares a adobo (16,50 €), paellu dělá na objednávku pro dva (35 €); pro děti jsou v lístku vejce s hranolky (9 €), hamburger s hranolky (9 €) a obalované kuře.',
     kidsWhy: 'TripAdvisor uvádí dětské židličky (tronas). Terasa stojí na rovné promenádě a pláž je hned vedle, takže starší dítě si může mezi chody hrát v písku. V lístku jsou jednoduchá jídla (vejce s hranolky, hamburger, kuře) a otevírá se už v 11:00.',
@@ -583,7 +601,7 @@ const FOOD = [
   },
   {
     id: 'casa-juan-los-mellizos', name: 'Casa Juan Los Mellizos', area: 'Torremolinos', cuisine: 'ryby', emoji: '🍤', price: 3, kids: 'part',
-    meals: ['obed', 'vecere'], closed: [], out: true, near: 'torremolinos',
+    tags: ['ryby', 'paella'], meals: ['obed', 'vecere'], closed: [], out: true, near: 'torremolinos',
     lat: 36.61268, lon: -4.50202, gq: 'Casa Juan Los Mellizos, Torremolinos',
     what: 'Velká rybí restaurace na náměstí San Ginés v Carihuele. Známá je fritura malagueña (boquerones, adobo, kalamáry), boquerones al limón a přes deset druhů rýže včetně paelly; dětem se dají objednat smažené kalamáry nebo paella.',
     kidsWhy: 'TripAdvisor uvádí dětské židličky. Terasa je uprostřed náměstí a uvnitř je několik sálů zhruba pro 600 lidí, takže se vejde kočárek a za větru se dá sednout dovnitř. Recenze z 16. 10. 2026 si ale stěžují na hodinové čekání na jídlo, dlouho čekala i rodina se dvěma dětmi, a kuchyně otevírá až ve 13:00.',
@@ -598,7 +616,7 @@ const FOOD = [
   },
   {
     id: 'bioparc-cafe', name: 'BIOPARC Café', area: 'Fuengirola', cuisine: 'burger', emoji: '🍔', price: 2, kids: 'ok',
-    meals: ['obed'], closed: [], out: true, near: 'bioparc',
+    tags: ['burger', 'pizza'], meals: ['obed'], closed: [], out: true, near: 'bioparc',
     lat: 36.53707, lon: -4.62745, gq: 'Bioparc Fuengirola',
     what: 'Burgery (14,50 €), pizza margherita (12,50 €), bagety, saláty, poke misky a hot dog. Pro děti nuggety (12 ks, 9,50 €) a hranolky (7,50 €), na dezert vafle, ovoce nebo flan.',
     kidsWhy: 'Kavárna stojí ve stínu stromů hned u dětského hřiště se skluzavkami, provazovým stromem a sítěmi (oficiální web). Kuchyně vaří nonstop 11:30–17:00 a na lístku jsou nuggety, pizza, hranolky, ovoce a flan. Vlastní jídlo se do parku nesmí, výjimkou je strava pro miminko a svačina pro malé děti (nahlásit na pokladně); tronas a přebalovací pult NEOVĚŘENO.',
@@ -613,7 +631,7 @@ const FOOD = [
   },
   {
     id: 'la-cepa-playa', name: 'Chiringuito La Cepa Playa', area: 'Fuengirola', cuisine: 'ryby', emoji: '🐟', price: 2, kids: 'ok',
-    meals: ['obed'], closed: [3], out: true, near: 'bioparc',
+    tags: ['ryby', 'espetos', 'paella'], meals: ['obed'], closed: [3], out: true, near: 'bioparc',
     lat: 36.54359, lon: -4.61792, gq: 'Chiringuito La Cepa Playa, Fuengirola',
     what: 'Rodinný chiringuito od roku 1959, specialita espeto sardinek nad žhavým olivovým dřevem (7 €, cena publika na Ruta del Espeto 2022). Dál smažené boquerones (13 €), fritura variada (23 €) a paella pro dva (32 €); dětem kuřecí lagrimitas nebo tortillitas de camarones (2,50 €).',
     kidsWhy: 'Kuchyně otvírá už ve 12:00, dřív než většina podniků, a na promenádě 30 m od vchodu je dětské hřiště (OSM). Sedí se uvnitř i venku u pláže (recenze 2/2026) a Restaurant Guru uvádí bezbariérový přístup. Tronas NEOVĚŘENO.',
@@ -628,7 +646,7 @@ const FOOD = [
   },
   {
     id: 'chiringuito-ayo', name: 'Chiringuito Ayo', area: 'Nerja', cuisine: 'andaluska', emoji: '🥘', price: 2, kids: 'ok',
-    meals: ['obed'], closed: [], out: true, near: 'nerja',
+    tags: ['paella', 'espetos'], meals: ['obed'], closed: [], out: true, near: 'nerja',
     lat: 36.75121, lon: -3.86589, gq: 'Chiringuito Ayo, Playa Burriana, Nerja',
     what: 'Paella vařená na dřevěném ohni přímo na pláži, zakladatel Ayo ji tu vaří od roku 1969, talíř za 11 €. Dál grilované sardinky (10 €), gambas pil pil (14,75 €) a pečené kuře (13 €); dětem špagety boloňské (11 €), omeleta (10 €) nebo hranolky (5,75 €).',
     kidsWhy: 'Stoly stojí pod velkou doškovou střechou u písku, předškolák si může hrát na pláži vedle. Kuchyně vaří nonstop 12:00–17:30 a paella je hotová hned, pro děti jsou na lístku špagety, omeleta a kuře. V poledne bývá fronta a obsluha je podle TripAdvisoru rychlá, ale hrubší a chaotická; tronas NEOVĚŘENO, z centra vede na Burrianu strmý sestup.',
@@ -643,7 +661,7 @@ const FOOD = [
   },
   {
     id: 'el-pulguilla', name: 'El Pulguilla', area: 'Nerja', cuisine: 'ryby', emoji: '🦑', price: 2, kids: 'ok',
-    meals: ['obed'], closed: [1], out: true, near: 'nerja',
+    tags: ['ryby', 'paella', 'tapas'], meals: ['obed'], closed: [1], out: true, near: 'nerja',
     lat: 36.74661, lon: -3.87551, gq: 'El Pulguilla, Nerja',
     what: 'Smažené ryby a mořské plody: boquerones, calamares, puntillitas, k tomu paella a grilované gambas. U baru dostanete k nápoji tapu, kterou si vyberete z 10–12 druhů; dětem půlporce smažených kalamárů nebo boquerones.',
     kidsWhy: 'TripAdvisor uvádí tronas a za úzkým barem je velká zahradní terasa (recenze 5–7/2026). Dají se objednat půlporce, takže předškolák dostane malý talíř. V poledne bývá plno: v dubnu 2026 se na terasu čekalo 30 min a jedna recenze to přirovnala ke školní jídelně.',

@@ -5,7 +5,7 @@
 const ACTIVITIES = [
   /* ---------- Pěšky od ubytka ---------- */
   {
-    id: 'parque-oeste', name: 'Parque del Oeste: klokánci a emu', area: 'Pacífico', cat: 'zvirata', emoji: '🦘', must: 5,
+    id: 'parque-oeste', name: 'Parque del Oeste: klokánci a emu', area: 'Pacífico', cat: 'zvirata', emoji: '🦘', must: 5, kids: 'ok',
     wx: ['slunce', 'oblacno'], wind: false, dur: '1–2 h, nebo 45 min mezi spánky', durKind: 'kratke', nearby: true,
     lat: 36.69245, lon: -4.44460, gq: 'Parque del Oeste, Málaga',
     about: 'Městský park o rozloze asi 7,4 ha z 90. let, který navrhl architekt Eduardo Serrano. Uprostřed je jezero o ploše 1,1 ha a po parku stojí 45 soch bájných bytostí od sochaře Stefana von Reiswitze.',
@@ -29,7 +29,7 @@ const ACTIVITIES = [
     src: [['Limposam', 'https://limposam.es/fauna-y-flora/'], ['In Your Pocket', 'https://inyourpocket.com/spain/malaga/venues/parque-del-oeste'], ['Planomato', 'https://planomato.com/es/malaga/n/planes-ninos-animales-talleres'], ['Limposam: Parque del Oeste', 'https://limposam.es/servicios/parque-del-oeste/']],
   },
   {
-    id: 'misericordia', name: 'Pláž Misericordia a promenáda', area: 'Pacífico', cat: 'more', emoji: '🏖️', must: 5,
+    id: 'misericordia', name: 'Pláž Misericordia a promenáda', area: 'Pacífico', cat: 'more', emoji: '🏖️', must: 5, kids: 'ok',
     wx: ['slunce', 'oblacno'], wind: true, dur: '1–3 h, klidně každý den', durKind: 'kratke', nearby: true,
     lat: 36.69280, lon: -4.44010, gq: 'Playa de la Misericordia, Málaga',
     about: 'Městská pláž s tmavým pískem na západě Málagy, dlouhá asi 1,2 km a široká kolem 30 m. Podél ní vede promenáda Paseo Marítimo Antonio Banderas s hřišti a chiringuity.',
@@ -53,7 +53,7 @@ const ACTIVITIES = [
     src: [['Málaga Guru', 'https://malagaguru.com/what-to-do/playa-de-la-misericordia-playa-de-huelin/'], ['Guide to Málaga', 'https://www.guidetomalaga.com/do/kids-in-malaga/things-to-do-in-malaga-with-a-toddler/'], ['Spain.info: pláž Misericordia', 'https://www.spain.info/es/playa/misericordia/']],
   },
   {
-    id: 'parque-chiquito', name: 'Parčík Chiquito de la Calzada', area: 'Pacífico', cat: 'park', emoji: '🛝', must: 3,
+    id: 'parque-chiquito', name: 'Parčík Chiquito de la Calzada', area: 'Pacífico', cat: 'park', emoji: '🛝', must: 3, kids: 'ok',
     wx: ['slunce', 'oblacno'], wind: false, dur: '20–60 min', durKind: 'kratke', nearby: true,
     lat: 36.69337, lon: -4.44247, gq: 'Parque Chiquito de la Calzada, Málaga',
     about: 'Malý sousedský park Gregorio Sánchez, pojmenovaný po málažském komikovi Chiquito de la Calzada, jak se Gregorio Sánchez proslavil. Má dvě okrasné fontány s dřevěnou lávkou a od prosince 2021 i bronzovou sochu komika v životní velikosti.',
@@ -73,7 +73,7 @@ const ACTIVITIES = [
     src: [['OpenStreetMap', 'https://www.openstreetmap.org/?mlat=36.69337&mlon=-4.44247#map=18/36.69337/-4.44247'], ['Město Málaga: oprava parku 2023', 'https://www.malaga.eu/visorcontenido/ANUDocumentDisplayer/171902/NOTAINFORMATIVA.pdf'], ['El Español: socha Chiquita', 'https://elespanol.com/malaga/malaga-ciudad/20211211/nuevo-homenaje-chiquito-malaga-escultura-inaugurada-diciembre/633936799_0.html']],
   },
   {
-    id: 'parque-litoral', name: 'Parque Litoral: kopec se skluzavkami', area: 'Sacaba', cat: 'park', emoji: '🛝', must: 4,
+    id: 'parque-litoral', name: 'Parque Litoral: kopec se skluzavkami', area: 'Sacaba', cat: 'park', emoji: '🛝', must: 4, kids: 'ok',
     wx: ['slunce', 'oblacno'], wind: true, dur: '1–2 h', durKind: 'kratke',
     lat: 36.68471, lon: -4.45402, gq: 'Parque Litoral, Málaga',
     about: 'Novější městský park u západního konce promenády Antonio Banderas, kousek od pláže Sacaba. Hlavní atrakcí je umělý kopec se skluzavkami a dřevěným altánem, od roku 2022 tu je i dětské hřiště, které je celé bezbariérové.',
@@ -95,7 +95,7 @@ const ACTIVITIES = [
     src: [['Infotour Málaga', 'https://infotourmalaga.com/los-mejores-parques-infantiles-para-ninos-en-malaga/'], ['Explora Málaga', 'https://exploramalaga.com/?p=7136']],
   },
   {
-    id: 'guadalhorce', name: 'Ústí Guadalhorce: plameňáci a volavky', area: 'Sacaba', cat: 'zvirata', emoji: '🦩', must: 4,
+    id: 'guadalhorce', name: 'Ústí Guadalhorce: plameňáci a volavky', area: 'Sacaba', cat: 'zvirata', emoji: '🦩', must: 4, kids: 'part',
     wx: ['slunce', 'oblacno'], wind: true, dur: '1,5–3 h včetně cesty', durKind: 'pulden',
     lat: 36.67880, lon: -4.45570, gq: 'Paraje Natural Desembocadura del Guadalhorce',
     about: 'Chráněná přírodní oblast (Paraje Natural) o rozloze 67 ha v ústí řeky Guadalhorce na západním okraji Málagy, vyhlášená v roce 1989. Laguny vznikly v bývalých štěrkovnách a dva značené okruhy vedou k pěti dřevěným pozorovatelnám.',
@@ -120,7 +120,7 @@ const ACTIVITIES = [
     src: [['Málaga Top', 'https://www.malagatop.com/es/senderismo/ruta-de-la-desembocadura-del-guadalhorce/'], ['Concha de viaje', 'https://conchadeviaje.es/desembocadura-del-guadalhorce-malaga-y-su-puente-de-madera/'], ['Birding Places', 'https://www.birdingplaces.eu/es/birdingplaces/spain/parque-del-guadalhorce'], ['Junta de Andalucía: Desembocadura del Guadalhorce', 'https://www.juntadeandalucia.es/medioambiente/portal/web/ventanadelvisitante/detalle-buscador-mapa/-/asset_publisher/Jlbxh2qB3NwR/content/desembocadura-del-guadalhorce/255035']],
   },
   {
-    id: 'parque-huelin', name: 'Parque de Huelin a pláž', area: 'Huelin', cat: 'park', emoji: '🏝️', must: 3,
+    id: 'parque-huelin', name: 'Parque de Huelin a pláž', area: 'Huelin', cat: 'park', emoji: '🏝️', must: 3, kids: 'ok',
     wx: ['slunce', 'oblacno'], wind: false, dur: '1–1,5 h', durKind: 'kratke',
     lat: 36.70575, lon: -4.43262, gq: 'Parque de Huelin, Málaga',
     about: 'Městský park mezi čtvrtěmi Huelin a Jardín de la Abadía, kousek od pláže. Na 32 000 m² roste přes 700 stromů, uprostřed je jezírko s ostrůvkem a malým majákem, dál dětské hřiště a výběh pro psy.',
@@ -139,7 +139,7 @@ const ACTIVITIES = [
     src: [['Planomato', 'https://www.planomato.com/es/malaga/v/parque-huelin'], ['Málaga Guru', 'https://malagaguru.com/what-to-do/playa-de-la-misericordia-playa-de-huelin/'], ['Wikipedie (es): Parque de Huelin', 'https://es.wikipedia.org/wiki/Parque_de_Huelin']],
   },
   {
-    id: 'mercado-huelin', name: 'Mercado de Huelin: levný místní oběd', area: 'Huelin', cat: 'jidlo', emoji: '🐟', must: 3,
+    id: 'mercado-huelin', name: 'Mercado de Huelin: levný místní oběd', area: 'Huelin', cat: 'jidlo', emoji: '🐟', must: 3, kids: 'part',
     wx: ['dest', 'oblacno', 'slunce'], wind: false, dur: '45–75 min', durKind: 'kratke', nearby: true,
     lat: 36.70222, lon: -4.43785, gq: 'Mercado de Huelin, Málaga',
     about: 'Městská tržnice z roku 1974, jedna z největších v Málaze. Uvnitř jsou pulty s rybami, masem a ovocem a bar, kde místní snídají a obědvají.',
@@ -160,7 +160,7 @@ const ACTIVITIES = [
     src: [['Directo al Paladar', 'https://www.directoalpaladar.com/viajes/menu-dia-barato-espana-esta-malaga-cuesta-cinco-euros-hemos-probado'], ['Mercadillos.org', 'https://mercadillos.org/es/malaga/mercadillo-huelin'], ['Město Málaga: Mercado de Huelin', 'https://malaga.eu/visorcontenido/ANUDocumentDisplayer/174584/COMUNICADO.pdf']],
   },
   {
-    id: 'automuzeum', name: 'Automuzeum v Tabacaleře', area: 'Pacífico', cat: 'indoor', emoji: '🚗', must: 3,
+    id: 'automuzeum', name: 'Automuzeum v Tabacaleře', area: 'Pacífico', cat: 'indoor', emoji: '🚗', must: 3, kids: 'ok',
     wx: ['dest', 'oblacno'], wind: false, dur: '1–1,5 h', durKind: 'kratke', nearby: true,
     lat: 36.69918, lon: -4.43837, gq: 'Museo Automovilístico y de la Moda, Málaga',
     about: 'Muzeum otevřené v roce 2010 v bývalé tabákové továrně Tabacalera. Vystavuje sbírku portugalského sběratele João Manuela Magalhãese: přes 90 aut z let 1898–2008 a 200 modelů haute couture.',
@@ -180,7 +180,7 @@ const ACTIVITIES = [
     src: [['Museo Automovilístico', 'https://museoautomovilmoda.com/contacto'], ['Automuseums.info', 'https://automuseums.info/museum/malaga-automobile-and-fashion-museum/'], ['TripAdvisor', 'https://www.tripadvisor.com/ShowTopic-g187438-i333-k7470004-1_2_days_in_Malaga_with_a_2_5_toddler-Malaga_Costa_del_Sol_Province_of_Malaga_Andalucia.html'], ['Barceló: o sbírce', 'https://www.barcelo.com/guia-turismo/es/espana/malaga/que-ver/museo-del-automovil-malaga/']],
   },
   {
-    id: 'museo-ruso', name: 'Museo Ruso: kavárna s dětským patiem', area: 'Pacífico', cat: 'indoor', emoji: '🪆', must: 2,
+    id: 'museo-ruso', name: 'Museo Ruso: kavárna s dětským patiem', area: 'Pacífico', cat: 'indoor', emoji: '🪆', must: 2, kids: 'no',
     wx: ['dest', 'oblacno'], wind: false, dur: '45–60 min a kavárna', durKind: 'kratke', nearby: true,
     lat: 36.69918, lon: -4.43837, gq: 'Colección del Museo Ruso, Málaga',
     about: 'Městské muzeum v bývalé tabákové továrně Tabacalera, otevřené v roce 2015 jako pobočka petrohradského Státního ruského muzea. Ukazuje dočasné výstavy, na podzim 2026 díla Valeryho Katsuby (do 15. 11.) a výstavu o skladateli Glinkovi a romantické Andalusii.',
@@ -201,7 +201,7 @@ const ACTIVITIES = [
     src: [['Museo Ruso: návštěva', 'https://www.coleccionmuseoruso.es/visita/'], ['Museo Ruso: program', 'https://www.coleccionmuseoruso.es/mediacion/']],
   },
   {
-    id: 'cochera-cabaret', name: 'La Cochera Cabaret: nedělní představení', area: 'Los Guindos', cat: 'indoor', emoji: '🎵', must: 3,
+    id: 'cochera-cabaret', name: 'La Cochera Cabaret: nedělní představení', area: 'Los Guindos', cat: 'indoor', emoji: '🎵', must: 3, kids: 'part',
     wx: ['dest', 'oblacno', 'slunce'], wind: false, dur: '1–1,5 h', durKind: 'kratke', nearby: true,
     lat: 36.69232, lon: -4.45096, gq: 'La Cochera Cabaret, Málaga',
     about: 'Soukromý sál pro divadlo, koncerty, stand-up a magii v Los Guindos, části čtvrti Carretera de Cádiz. O nedělích ve 12:00 hraje představení pro rodiny s dětmi.',
@@ -221,7 +221,7 @@ const ACTIVITIES = [
     src: [['Teatro Málaga: program', 'https://teatromalaga.com/cartelera'], ['La Cochera: vstupenky Beatelitis', 'https://lacocheraentradas.com/shows/details/2671/beatelitis'], ['La Cochera: Beatelitis', 'https://lacocheracabaret.com/evento/beatelitis-3/'], ['La Cochera: o sále', 'https://lacocheracabaret.com/quienes-somos/']],
   },
   {
-    id: 'knihovna', name: 'Knihovna: dětská sekce', area: 'Avenida de Europa', cat: 'indoor', emoji: '📚', must: 2,
+    id: 'knihovna', name: 'Knihovna: dětská sekce', area: 'Avenida de Europa', cat: 'indoor', emoji: '📚', must: 2, kids: 'part',
     wx: ['dest'], wind: false, dur: '45–60 min', durKind: 'kratke', nearby: true,
     lat: 36.70257, lon: -4.44468, gq: 'Biblioteca Provincial de Málaga, Avenida de Europa 49',
     about: 'Státní veřejná knihovna (Biblioteca Pública del Estado) na Avenida de Europa, hlavní veřejná knihovna provincie Málaga. Má dětské a mládežnické oddělení Sala Infantil/Juvenil, kde občas pořádá rodinné dílny.',
@@ -239,7 +239,7 @@ const ACTIVITIES = [
     src: [['Junta de Andalucía: program 2026', 'https://www.juntadeandalucia.es/sites/default/files/inline-files/2026/05/M%C3%A1laga.pdf'], ['Knihovna: otvírací doba', 'https://www.bibliotecasdeandalucia.es/web/biblioteca-del-estado-publica-provincial-de-malaga/informacion/datos-practicos/horario']],
   },
   {
-    id: 'limon-loco', name: 'Limón Loco: krytá herna', area: 'Héroe de Sostoa', cat: 'indoor', emoji: '🤸', must: 4,
+    id: 'limon-loco', name: 'Limón Loco: krytá herna', area: 'Héroe de Sostoa', cat: 'indoor', emoji: '🤸', must: 4, kids: 'ok',
     wx: ['dest', 'oblacno'], wind: false, dur: '1–2 h', durKind: 'kratke',
     lat: 36.70702, lon: -4.43666, gq: 'Limón Loco, Calle Héroe de Sostoa 92, Málaga',
     about: 'Krytá dětská herna o rozloze 700 m² s bludištěm, skluzavkami, bazénem s míčky a zónou pro nejmenší. Patří do malé španělské sítě heren, další má v Barakaldu a Seville.',
@@ -263,7 +263,7 @@ const ACTIVITIES = [
 
   /* ---------- Centrum a přístav ---------- */
   {
-    id: 'muelle-uno', name: 'Přístav Muelle Uno, Palmeral a maják', area: 'Přístav', cat: 'more', emoji: '⚓', must: 4,
+    id: 'muelle-uno', name: 'Přístav Muelle Uno, Palmeral a maják', area: 'Přístav', cat: 'more', emoji: '⚓', must: 4, kids: 'ok',
     wx: ['slunce', 'oblacno'], wind: true, dur: '1,5–3 h', durKind: 'pulden',
     lat: 36.71683, lon: -4.41367, gq: 'Muelle Uno, Málaga',
     about: 'Přístavní molo, které se v roce 2011 změnilo v promenádu s obchody, restauracemi a hřišti, na konci stojí maják La Farola. Navazuje na Palmeral de las Sorpresas, palmovou promenádu s pergolami na sousedním molu Muelle Dos.',
@@ -288,7 +288,7 @@ const ACTIVITIES = [
     src: [['Guide to Málaga', 'https://www.guidetomalaga.com/do/kids-in-malaga/things-to-do-in-malaga-with-a-toddler/'], ['Muelle Uno: podzimní trh', 'https://www.muelleuno.com/eventos/mercado-de-otono-5/'], ['22places', 'https://www.22places.com/malaga-with-kids/'], ['Stroller Friendly', 'https://stroller-friendly.com/cities/malaga-spain/'], ['Ryo: Muelle Uno', 'https://ryo.co/es/destinos/espana/lugares/el-muelle-uno/']],
   },
   {
-    id: 'pompidou', name: 'Pompidou a dětská Casa Mágica', area: 'Přístav', cat: 'indoor', emoji: '🧸', must: 5,
+    id: 'pompidou', name: 'Pompidou a dětská Casa Mágica', area: 'Přístav', cat: 'indoor', emoji: '🧸', must: 5, kids: 'ok',
     wx: ['dest', 'oblacno'], wind: false, dur: '1–1,5 h', durKind: 'kratke',
     lat: 36.71904, lon: -4.41326, gq: 'Centre Pompidou Málaga',
     about: 'Pobočka pařížského Centre Pompidou v prosklené krychli El Cubo na Muelle Uno, otevřená v roce 2015 jako první mimo Francii. Vystavuje moderní a současné umění 20. a 21. století z pařížských sbírek.',
@@ -313,7 +313,7 @@ const ACTIVITIES = [
     src: [['Pompidou: návštěva', 'https://centrepompidou-malaga.eu/visita/'], ['Pompidou: Casa Mágica', 'https://centrepompidou-malaga.eu/mediacion/'], ['Planomato', 'https://planomato.com/es/malaga/p/la-casa-magica-juegos-de-volumen-malaga'], ['Pompidou: Casa Mágica', 'https://centrepompidou-malaga.eu/exposicion/la-casa-magica-juego-de-volumenes/'], ['Wikipedie (es): Centre Pompidou Málaga', 'https://es.wikipedia.org/wiki/Centro_Pompidou_de_M%C3%A1laga']],
   },
   {
-    id: 'alcazaba', name: 'Alcazaba: maurská pevnost výtahem', area: 'Centrum', cat: 'pamatky', emoji: '🏰', must: 5,
+    id: 'alcazaba', name: 'Alcazaba: maurská pevnost výtahem', area: 'Centrum', cat: 'pamatky', emoji: '🏰', must: 5, kids: 'part',
     wx: ['slunce', 'oblacno'], wind: false, dur: '1–1,5 h', durKind: 'kratke',
     lat: 36.72101, lon: -4.41592, gq: 'Alcazaba de Málaga',
     about: 'Maurská pevnost a palác z 11. století na úbočí kopce Gibralfaro nad přístavem. Uvnitř jsou patia s fontánami a zahrady, hradbami je spojená s hradem Gibralfaro na vrcholu.',
@@ -340,7 +340,7 @@ const ACTIVITIES = [
     src: [['Alcazaba: ceny a hodiny', 'https://alcazabaygibralfaro.malaga.eu/es/visitas/horarios-y-tarifas/'], ['Město Málaga: výtah', 'https://www.malaga.eu/visorcontenido/ANUDocumentDisplayer/177335/COMUNICADO.pdf'], ['22places', 'https://www.22places.com/malaga-with-kids/'], ['Intravel', 'https://intravel.net/malaga/attractions/ascensor-a-la-alcazaba']],
   },
   {
-    id: 'teatro-romano', name: 'Římské divadlo', area: 'Centrum', cat: 'pamatky', emoji: '🏛️', must: 3,
+    id: 'teatro-romano', name: 'Římské divadlo', area: 'Centrum', cat: 'pamatky', emoji: '🏛️', must: 3, kids: 'part',
     wx: ['oblacno', 'slunce', 'dest'], wind: false, dur: '20–40 min', durKind: 'kratke',
     lat: 36.72127, lon: -4.41683, gq: 'Teatro Romano de Málaga',
     about: 'Zbytky římského divadla, které vzniklo na začátku 1. století našeho letopočtu přímo pod dnešní Alcazabou. Objevili je v roce 1951 při úpravě zahrad, k areálu patří malé návštěvnické centrum s výkladem.',
@@ -364,7 +364,7 @@ const ACTIVITIES = [
     src: [['Junta de Andalucía', 'https://www.juntadeandalucia.es/aaiicc/enclaves/enclave-arqueologico-teatro-romano-de-malaga'], ['Guide to Málaga', 'https://www.guidetomalaga.com/do/kids-in-malaga/things-to-do-in-malaga-with-a-toddler/']],
   },
   {
-    id: 'gibralfaro', name: 'Gibralfaro: hrad s výhledem', area: 'Centrum', cat: 'pamatky', emoji: '🔭', must: 3,
+    id: 'gibralfaro', name: 'Gibralfaro: hrad s výhledem', area: 'Centrum', cat: 'pamatky', emoji: '🔭', must: 3, kids: 'part',
     wx: ['slunce', 'oblacno'], wind: true, dur: '1–1,5 h (vyhlídka 20 min)', durKind: 'kratke',
     lat: 36.72339, lon: -4.41182, gq: 'Castillo de Gibralfaro, Málaga',
     about: 'Hrad ze 14. století na vrcholu kopce Gibralfaro, který dal postavit nasrídský král Júsuf I. na ochranu Alcazaby. Po hradbách vede ochoz s výhledem na přístav, býčí arénu a celou zátoku.',
@@ -389,7 +389,7 @@ const ACTIVITIES = [
     src: [['Gibralfaro: ceny a hodiny', 'https://alcazabaygibralfaro.malaga.eu/es/visitas/horarios-y-tarifas/'], ['Castillo de Gibralfaro FAQ', 'https://castillodegibralfaro.com/en/faq/'], ['Stroller Friendly', 'https://stroller-friendly.com/cities/malaga-spain/'], ['TripAdvisor', 'https://www.tripadvisor.com/ShowUserReviews-g187438-d244000-r527728159-Castillo_de_Gibralfaro-Malaga_Costa_del_Sol_Province_of_Malaga_Andalucia.html']],
   },
   {
-    id: 'atarazanas', name: 'Tržnice Atarazanas: rybí „zoo“', area: 'Centrum', cat: 'jidlo', emoji: '🐙', must: 4,
+    id: 'atarazanas', name: 'Tržnice Atarazanas: rybí „zoo“', area: 'Centrum', cat: 'jidlo', emoji: '🐙', must: 4, kids: 'part',
     wx: ['dest', 'oblacno', 'slunce'], wind: false, dur: '45–75 min i s obědem', durKind: 'kratke',
     lat: 36.71810, lon: -4.42451, gq: 'Mercado Central de Atarazanas, Málaga',
     about: 'Hlavní městská tržnice v železné hale z konce 19. století. Vchází se do ní mramorovou branou ze 14. století, posledním zbytkem maurských loděnic (atarazanas), podle kterých má jméno.',
@@ -414,7 +414,7 @@ const ACTIVITIES = [
     src: [['22places', 'https://www.22places.com/malaga-with-kids/'], ['Bucht v troubě', 'https://www.buchtavtroube.cz/2024/02/proc-se-vydat-do-malagy-v-zime-a-co-tam-delat-i-s-detmi/'], ['Pelago', 'https://www.pelago.com/en/malaga/mercado-central-de-atarazanas-c1865'], ['Město Málaga: Atarazanas', 'https://rutasarqueologicas.malaga.eu/punto-n-20/']],
   },
   {
-    id: 'mimma', name: 'MIMMA: muzeum, kde se smí bubnovat', area: 'Centrum', cat: 'indoor', emoji: '🥁', must: 4,
+    id: 'mimma', name: 'MIMMA: muzeum, kde se smí bubnovat', area: 'Centrum', cat: 'indoor', emoji: '🥁', must: 4, kids: 'ok',
     wx: ['dest', 'oblacno'], wind: false, dur: '1–1,5 h', durKind: 'kratke',
     lat: 36.72338, lon: -4.41974, gq: 'MIMMA Museo Interactivo de la Música, Málaga',
     about: 'Muzeum hudby v paláci Conde de las Navas z 18. století v historickém centru. Ve sbírce má přes 1 000 nástrojů z různých epoch a zemí a v označených místnostech se na ně smí hrát.',
@@ -436,7 +436,7 @@ const ACTIVITIES = [
     src: [['MIMMA', 'https://musicaenaccion.com/'], ['Guide to Málaga', 'https://www.guidetomalaga.com/do/kids-in-malaga/things-to-do-in-malaga-with-a-toddler/'], ['TripAdvisor', 'https://www.tripadvisor.com/ShowTopic-g187438-i333-k7470004-1_2_days_in_Malaga_with_a_2_5_toddler-Malaga_Costa_del_Sol_Province_of_Malaga_Andalucia.html'], ['MIMMA: ceník a hodiny', 'https://www.musicaenaccion.com/'], ['Wikipedie (es): MIMMA', 'https://es.wikipedia.org/wiki/Museo_Interactivo_de_la_M%C3%BAsica_de_M%C3%A1laga']],
   },
   {
-    id: 'echegaray', name: 'Dětské divadlo v Teatro Echegaray', area: 'Centrum', cat: 'indoor', emoji: '🎭', must: 4,
+    id: 'echegaray', name: 'Dětské divadlo v Teatro Echegaray', area: 'Centrum', cat: 'indoor', emoji: '🎭', must: 4, kids: 'ok',
     wx: ['dest', 'oblacno', 'slunce'], wind: false, dur: '1–1,5 h', durKind: 'kratke',
     lat: 36.72139, lon: -4.41939, gq: 'Teatro Echegaray, Málaga',
     about: 'Městské divadlo pro necelých 300 diváků v ulici Echegaray v centru. Původně kino z roku 1932, od roku 2009 divadlo, které spravuje Teatro Cervantes.',
@@ -460,7 +460,7 @@ const ACTIVITIES = [
     src: [['mMálaga: dětské divadlo', 'https://mmalaga.es/agenda/programa-teatro-infantil-echegaray/'], ['Teatro Málaga: program', 'https://teatromalaga.com/cartelera'], ['Teatro Echegaray: historie', 'https://teatroechegaray.com/en/seccion/historia-teatro-echegaray/']],
   },
   {
-    id: 'museo-malaga', name: 'Museo de Málaga: archeologie zdarma', area: 'Centrum', cat: 'indoor', emoji: '🏺', must: 3,
+    id: 'museo-malaga', name: 'Museo de Málaga: archeologie zdarma', area: 'Centrum', cat: 'indoor', emoji: '🏺', must: 3, kids: 'part',
     wx: ['dest', 'oblacno'], wind: false, dur: '45–75 min', durKind: 'kratke',
     lat: 36.71997, lon: -4.41682, gq: 'Museo de Málaga, Palacio de la Aduana',
     about: 'Muzeum v neoklasicistním paláci Aduana (bývalá celnice), otevřené v roce 2016 spojením dvou sbírek. V prvním patře je výtvarné umění, ve druhém archeologie s více než 15 000 předměty.',
@@ -484,7 +484,7 @@ const ACTIVITIES = [
     src: [['Museo de Málaga', 'https://www.museosdeandalucia.es/web/museodemalaga/informacion-general'], ['Wikipedia: Museo de Málaga', 'https://en.wikipedia.org/wiki/Museo_de_M%C3%A1laga']],
   },
   {
-    id: 'casa-natal', name: 'Rodný dům Picassa a holubi', area: 'Centrum', cat: 'indoor', emoji: '🕊️', must: 3,
+    id: 'casa-natal', name: 'Rodný dům Picassa a holubi', area: 'Centrum', cat: 'indoor', emoji: '🕊️', must: 3, kids: 'part',
     wx: ['dest', 'oblacno'], wind: false, dur: '30–45 min, workshop 1,5 h', durKind: 'kratke',
     lat: 36.72407, lon: -4.41756, gq: 'Museo Casa Natal Picasso, Plaza de la Merced',
     about: 'Dům na Plaza de la Merced, kde se v roce 1881 narodil Pablo Picasso. Muzeum ukazuje předměty jeho rodiny, Picassovu grafiku a keramiku a dočasné výstavy.',
@@ -504,7 +504,7 @@ const ACTIVITIES = [
     src: [['Casa Natal: hodiny a ceny', 'http://museocasanatalpicasso.malaga.eu/Visita/horarios-y-tarifas/'], ['Picasso en familia', 'https://museocasanatalpicasso.malaga.eu/sgevento/Picasso-en-familia-2026-2027/'], ['Casa Natal: ceník a hodiny', 'https://museocasanatalpicasso.malaga.eu/Visita/horarios-y-tarifas/']],
   },
   {
-    id: 'parque-malaga', name: 'Parque de Málaga: papoušci a oslík', area: 'Centrum', cat: 'park', emoji: '🦜', must: 3,
+    id: 'parque-malaga', name: 'Parque de Málaga: papoušci a oslík', area: 'Centrum', cat: 'park', emoji: '🦜', must: 3, kids: 'ok',
     wx: ['slunce', 'oblacno'], wind: false, dur: '45–90 min', durKind: 'kratke',
     lat: 36.71942, lon: -4.41601, gq: 'Paseo del Parque, Málaga',
     about: 'Městský park z konce 19. století na pruhu země získaném z moře mezi přístavem a Alcazabou. Tři 800 m dlouhé aleje podél třídy Paseo del Parque lemují palmy a stovky druhů subtropických rostlin.',
@@ -528,7 +528,7 @@ const ACTIVITIES = [
     src: [['Guide to Málaga', 'https://www.guidetomalaga.com/do/kids-in-malaga/things-to-do-in-malaga-with-a-toddler/'], ['Infotour Málaga', 'https://infotourmalaga.com/los-mejores-parques-infantiles-para-ninos-en-malaga/'], ['Visita Málaga: Parque de Málaga', 'https://visita.malaga.eu/en/what-to-see-and-do/culture/historic-monuments/parks-gardens-and-natural-areas/parque-de-malaga-malaga-s-park-p103346']],
   },
   {
-    id: 'larios', name: 'Calle Larios a historické centrum', area: 'Centrum', cat: 'pamatky', emoji: '🚶', must: 3,
+    id: 'larios', name: 'Calle Larios a historické centrum', area: 'Centrum', cat: 'pamatky', emoji: '🚶', must: 3, kids: 'part',
     wx: ['slunce', 'oblacno'], wind: false, dur: '30–60 min', durKind: 'kratke',
     lat: 36.72108, lon: -4.42198, gq: 'Plaza de la Constitución, Málaga',
     about: 'Hlavní pěší a nákupní ulice historického centra, otevřená v roce 1891 a od roku 2003 bez aut. Vede z Alamedy na náměstí Plaza de la Constitución a je dlážděná hladkým mramorem.',
@@ -549,7 +549,7 @@ const ACTIVITIES = [
     src: [['Guide to Málaga', 'https://www.guidetomalaga.com/do/kids-in-malaga/things-to-do-in-malaga-with-a-toddler/'], ['22places', 'https://www.22places.com/malaga-with-kids/'], ['Visita Málaga: Calle Larios', 'https://visita.malaga.eu/en/what-to-see-and-do/culture/historic-monuments/squares-fountains-and-streets/calle-marques-de-larios-p103588']],
   },
   {
-    id: 'fly-blue', name: 'Vyhlídková loď po zálivu', area: 'Přístav', cat: 'more', emoji: '⛴️', must: 3,
+    id: 'fly-blue', name: 'Vyhlídková loď po zálivu', area: 'Přístav', cat: 'more', emoji: '⛴️', must: 3, kids: 'part',
     wx: ['slunce'], wind: true, dur: '1 h plavba a 20 min čekání', durKind: 'kratke',
     lat: 36.71599, lon: -4.41380, gq: 'Fly Blue, Muelle Uno, Málaga',
     about: 'Vyhlídkové plavby firmy Fly Blue z mola Muelle Uno v málažském přístavu, větší loď pobere 180 lidí. Hodinový okruh vede po zálivu podél přístavu a pláží, delší plavby trvají 90 minut a večerní jede na západ slunce.',
@@ -573,7 +573,7 @@ const ACTIVITIES = [
     src: [['Fly Blue', 'https://www.fly-blue.es/en/excursiones-catamaran-malaga/'], ['Málaga Top', 'https://www.malagatop.com/en/catamaran-boat-trips-in-malaga/'], ['Mundo Marino', 'https://mundomarino.es/puerto-malaga/'], ['Fly Blue: online rezervace', 'https://tpv.fly-blue.es/NewHome'], ['Fly Blue: časté dotazy', 'https://www.fly-blue.es/faq']],
   },
   {
-    id: 'aeromuseo', name: 'Aeromuseo: sednout si do letadla', area: 'U letiště', cat: 'indoor', emoji: '✈️', must: 3,
+    id: 'aeromuseo', name: 'Aeromuseo: sednout si do letadla', area: 'U letiště', cat: 'indoor', emoji: '✈️', must: 3, kids: 'ok',
     wx: ['oblacno', 'slunce', 'dest'], wind: false, dur: '1–1,5 h', durKind: 'kratke',
     lat: 36.66924, lon: -4.48045, gq: 'Aeromuseo Málaga',
     about: 'Letecké muzeum hned u málažského letiště. Na ploše přes 5000 m² stojí historická civilní i vojenská letadla a vrtulníky, do některých se dá vlézt.',
@@ -596,7 +596,7 @@ const ACTIVITIES = [
     src: [['Aeromuseo', 'https://aeromuseo.org/'], ['Andalucía.org', 'https://www.andalucia.org/en/malaga-visitas-aeromuseo']],
   },
   {
-    id: 'pedregalejo', name: 'Pedregalejo: espetos a klidné zátočiny', area: 'Východní pláže', cat: 'more', emoji: '🐟', must: 4,
+    id: 'pedregalejo', name: 'Pedregalejo: espetos a klidné zátočiny', area: 'Východní pláže', cat: 'more', emoji: '🐟', must: 4, kids: 'ok',
     wx: ['slunce', 'oblacno'], wind: true, dur: '2–3 h', durKind: 'pulden',
     lat: 36.72008, lon: -4.37050, gq: 'Playa de Pedregalejo, Málaga',
     about: 'Bývalá rybářská čtvrť na východě Málagy s nejstarší městskou promenádou. Asi 1,2 km dlouhou pláž dělí vlnolamy na mělké klidné zátoky, podél promenády stojí rybí restaurace a chiringuitos s espetos.',
@@ -621,7 +621,7 @@ const ACTIVITIES = [
     src: [['Kupi', 'https://kupi.com/en-ae/explore/spain/malaga/pedregalejo-beach'], ['Spain.info', 'https://m-org.spain.info/en/beach/pedregalejo'], ['Wanderlog', 'https://wanderlog.com/place/details/2324685/playa-pedregalejo'], ['Visita Málaga: pláž Pedregalejo', 'https://visita.malaga.eu/en/what-to-see-and-do/beaches/pedregalejo-las-acacias-beach-p103830']],
   },
   {
-    id: 'la-concepcion', name: 'Botanická zahrada La Concepción', area: 'Sever města', cat: 'park', emoji: '🌴', must: 3,
+    id: 'la-concepcion', name: 'Botanická zahrada La Concepción', area: 'Sever města', cat: 'park', emoji: '🌴', must: 3, kids: 'part',
     wx: ['oblacno', 'slunce'], wind: false, dur: '2–3 h', durKind: 'pulden',
     lat: 36.76040, lon: -4.42580, gq: 'Jardín Botánico-Histórico La Concepción, Málaga',
     about: 'Historická botanická zahrada na severním okraji Málagy, kterou v polovině 19. století založili manželé Loringovi. Subtropický park s palmami, jezírky a vodopádem, podle města nejzachovalejší zahrada svého typu v Evropě.',
@@ -644,7 +644,7 @@ const ACTIVITIES = [
     src: [['La Concepción: hodiny a ceny', 'https://laconcepcion.malaga.eu/es/visita/horarios-y-tarifas/'], ['Picuco', 'https://www.picuco.com/es-es/attractions/jardin-botanico-historico-la-concepcion'], ['La Concepción: hodiny a ceny', 'https://laconcepcion.malaga.eu/es/visitas/']],
   },
   {
-    id: 'dadada', name: 'Dadadá: divadlo pro miminka', area: 'Centrum', cat: 'indoor', emoji: '👶', must: 3,
+    id: 'dadada', name: 'Dadadá: divadlo pro miminka', area: 'Centrum', cat: 'indoor', emoji: '👶', must: 3, kids: 'ok',
     wx: ['dest', 'oblacno', 'slunce'], wind: false, dur: '45–60 min', durKind: 'kratke',
     lat: 36.72831, lon: -4.41867, gq: 'Teatro Cánovas, Plaza del Ejido 5, Málaga',
     about: 'Divadelní představení souboru La Perrera pro miminka a batolata do 3 let v malém sále B divadla Teatro Cánovas. Hraje se beze slov.',
@@ -667,7 +667,7 @@ const ACTIVITIES = [
     src: [['Teatro Cánovas', 'https://www.juntadeandalucia.es/aaiicc/teatros/teatro-canovas/'], ['Teatro Málaga: program', 'https://teatromalaga.com/cartelera'], ['Teatro Cánovas: Dadadá', 'https://www.juntadeandalucia.es/aaiicc/teatros/teatro-canovas/dadada-1'], ['Teatro Cánovas: ceny', 'https://www.juntadeandalucia.es/aaiicc/teatros/teatro-canovas/precios-y-promociones']],
   },
   {
-    id: 'katedrala', name: 'Katedrála La Manquita', area: 'Centrum', cat: 'pamatky', emoji: '⛪', must: 2,
+    id: 'katedrala', name: 'Katedrála La Manquita', area: 'Centrum', cat: 'pamatky', emoji: '⛪', must: 2, kids: 'no',
     wx: ['dest', 'oblacno'], wind: false, dur: '30–45 min', durKind: 'kratke',
     lat: 36.72018, lon: -4.41941, gq: 'Catedral de Málaga',
     about: 'Renesanční katedrála v centru Málagy, stavěná v letech 1528–1782. Jižní věž zůstala nedostavěná, proto jí místní říkají La Manquita, „jednoruká“.',
@@ -689,7 +689,7 @@ const ACTIVITIES = [
     src: [['Katedrála: ceny a hodiny', 'https://malagacatedral.com/visita-cultural/tarifas-y-horarios/'], ['Travelbible', 'https://travelbible.cz/malaga-pruvodce/']],
   },
   {
-    id: 'malagueta', name: 'Pláž Malagueta', area: 'Centrum', cat: 'more', emoji: '🏖️', must: 2,
+    id: 'malagueta', name: 'Pláž Malagueta', area: 'Centrum', cat: 'more', emoji: '🏖️', must: 2, kids: 'part',
     wx: ['slunce'], wind: true, dur: '1–2 h', durKind: 'kratke',
     lat: 36.71644, lon: -4.41094, gq: 'Playa de la Malagueta, Málaga',
     about: 'Městská pláž nejblíž centru a přístavu, 1,2 km dlouhá a 45 m široká, s dětským hřištěm. Vede podél ní promenáda Paseo Marítimo Pablo Ruiz Picasso.',
@@ -712,7 +712,7 @@ const ACTIVITIES = [
     src: [['Harmonizing the Chaos', 'https://harmonizingthechaos.com/malaga-with-kids/'], ['Guide to Málaga', 'https://www.guidetomalaga.com/do/kids-in-malaga/things-to-do-in-malaga-with-a-toddler/'], ['Visita Málaga: pláž Malagueta', 'https://visita.malaga.eu/en/what-to-see-and-do/beaches/la-malagueta-beach-p103827']],
   },
   {
-    id: 'el-tintero', name: 'El Tintero v El Palu: aukce talířů', area: 'Východní pláže', cat: 'jidlo', emoji: '🍽️', must: 2,
+    id: 'el-tintero', name: 'El Tintero v El Palu: aukce talířů', area: 'Východní pláže', cat: 'jidlo', emoji: '🍽️', must: 2, kids: 'part',
     wx: ['slunce', 'oblacno'], wind: true, dur: '1,5–2,5 h', durKind: 'pulden',
     lat: 36.71688, lon: -4.34810, gq: 'El Tintero, El Palo, Málaga',
     about: 'Velká rybí restaurace na pláži Playa del Dedo na konci El Pala. Neobjednává se: číšníci chodí mezi stoly s talíři, vyvolávají jídla a kdo první zvedne ruku, dostane talíř. Na konci spočítají prázdné talíře.',
@@ -732,7 +732,7 @@ const ACTIVITIES = [
     src: [['Thatch', 'https://thatch.co/places/207108/el-tintero'], ['Kupi', 'https://kupi.com/en/explore/spain/malaga/el-palo-beach'], ['El Tintero: jídelní lístek', 'https://eltinteromalaga.com/carta/'], ['El Tintero', 'https://eltinteromalaga.com/']],
   },
   {
-    id: 'museo-picasso', name: 'Museo Picasso', area: 'Centrum', cat: 'indoor', emoji: '🖼️', must: 2,
+    id: 'museo-picasso', name: 'Museo Picasso', area: 'Centrum', cat: 'indoor', emoji: '🖼️', must: 2, kids: 'no',
     wx: ['dest'], wind: false, dur: '45–60 min', durKind: 'kratke',
     lat: 36.72155, lon: -4.41828, gq: 'Museo Picasso Málaga',
     about: 'Muzeum Pabla Picassa v jeho rodném městě, v paláci Buenavista z 16. století. Stálá sbírka obrazů, kreseb a keramiky z celého malířova života pochází od jeho rodiny.',
@@ -751,7 +751,7 @@ const ACTIVITIES = [
     src: [['Museo Picasso', 'https://www.museopicassomalaga.org/visita'], ['22places', 'https://www.22places.com/malaga-with-kids/']],
   },
   {
-    id: 'imaginacion', name: 'Muzeum iluzí Imaginación', area: 'Soho', cat: 'indoor', emoji: '🌀', must: 2,
+    id: 'imaginacion', name: 'Muzeum iluzí Imaginación', area: 'Soho', cat: 'indoor', emoji: '🌀', must: 2, kids: 'part',
     wx: ['dest'], wind: false, dur: '45–75 min', durKind: 'kratke',
     lat: 36.71527, lon: -4.42357, gq: 'Museo de la Imaginación, Málaga',
     about: 'Malé interaktivní muzeum optických klamů v centru kousek od Calle Larios. Má tři sály: iluze, které se smí osahat, sál světel a stínů a fotokoutky s 3D malbami.',
@@ -770,7 +770,7 @@ const ACTIVITIES = [
     src: [['Museo de la Imaginación', 'https://www.museoimaginacion.com/'], ['Intravel', 'https://intravel.net/malaga/attractions/museo-de-la-imaginacion'], ['Museo de la Imaginación: vstupenky', 'https://www.museoimaginacion.com/event-list']],
   },
   {
-    id: 'nakupni-centra', name: 'Nákupní centra s hračkami (déšť)', area: 'Centrum', cat: 'indoor', emoji: '🛍️', must: 2,
+    id: 'nakupni-centra', name: 'Nákupní centra s hračkami (déšť)', area: 'Centrum', cat: 'indoor', emoji: '🛍️', must: 2, kids: 'part',
     wx: ['dest'], wind: false, dur: '1–2 h', durKind: 'kratke',
     lat: 36.71748, lon: -4.42828, gq: 'El Corte Inglés, Avenida de Andalucía, Málaga',
     about: 'Velká obchodní centra kousek od historického centra: obchodní dům El Corte Inglés na Avenida de Andalucía, Vialia u nádraží María Zambrano a Larios Centro. Uvnitř obchody, restaurace a toalety.',
@@ -793,7 +793,7 @@ const ACTIVITIES = [
     src: [['Guide to Málaga', 'https://www.guidetomalaga.com/do/kids-in-malaga/things-to-do-in-malaga-with-a-toddler/'], ['Ouigo', 'https://www.ouigo.com/es/planes-con-ninos-malaga-actividades-familia'], ['Malagacar: otevírací doba center 2026', 'https://www.malagacar.com/sp/blog/ocio/centros-comerciales-malaga/']],
   },
   {
-    id: 'altitude', name: 'Altitude: trampolíny se zónou 0–3', area: 'Polígono Guadalhorce', cat: 'indoor', emoji: '🤾', must: 2,
+    id: 'altitude', name: 'Altitude: trampolíny se zónou 0–3', area: 'Polígono Guadalhorce', cat: 'indoor', emoji: '🤾', must: 2, kids: 'ok',
     wx: ['dest'], wind: false, dur: '1–1,5 h', durKind: 'kratke',
     lat: 36.68770, lon: -4.47697, gq: 'Altitude Trampoline Park Málaga',
     about: 'Krytý zábavní park v průmyslové zóně Guadalhorce. Na 4000 m² má trampolíny, velké dětské prolézačkové hřiště, minigolf a samostatnou zónu pro děti 0–3 roky.',
@@ -814,7 +814,7 @@ const ACTIVITIES = [
 
   /* ---------- Výlety mimo Málagu ---------- */
   {
-    id: 'bioparc', name: 'Bioparc Fuengirola', area: 'Fuengirola', cat: 'zvirata', emoji: '🦍', must: 5,
+    id: 'bioparc', name: 'Bioparc Fuengirola', area: 'Fuengirola', cat: 'zvirata', emoji: '🦍', must: 5, kids: 'ok',
     wx: ['slunce', 'oblacno'], wind: false, dur: 'Celý den, v parku 3–4 h', durKind: 'celyden', out: true,
     lat: 36.53707, lon: -4.62745, gq: 'Bioparc Fuengirola',
     about: 'Zoo ve Fuengirole bez klecí: zvířata z tropických pralesů Afriky, Madagaskaru a jihovýchodní Asie ve výbězích oddělených vodou a skalami.',
@@ -840,7 +840,7 @@ const ACTIVITIES = [
     src: [['Bioparc: vstupenky', 'https://www.bioparcfuengirola.es/entradas/'], ['Bioparc: hodiny', 'https://www.bioparcfuengirola.es/horarios/'], ['Taquilla', 'https://www.taquilla.com/entradas/bioparc-fuengirola'], ['Mumsnet', 'https://www.mumsnet.com/talk/holidays/3498912-Costa-del-Sol-with-8mo'], ['Renfe: děti do 6 let zdarma', 'https://www.renfe.com/es/es/cercanias/cercanias-malaga/tarifas/descuentos/ninos-y-jovenes']],
   },
   {
-    id: 'paloma', name: 'Benalmádena: park Paloma s pávi a králíky', area: 'Benalmádena', cat: 'zvirata', emoji: '🦚', must: 4,
+    id: 'paloma', name: 'Benalmádena: park Paloma s pávi a králíky', area: 'Benalmádena', cat: 'zvirata', emoji: '🦚', must: 4, kids: 'ok',
     wx: ['slunce', 'oblacno'], wind: false, dur: 'Půl dne až celý den', durKind: 'pulden', out: true,
     lat: 36.59352, lon: -4.52936, gq: 'Parque de la Paloma, Benalmádena',
     about: 'Největší park v Benalmádeně, přes 200 000 m², s umělým jezerem, zahradou s více než 450 druhy kaktusů a malou zoo. Po trávnících volně chodí kachny, pávi a králíci.',
@@ -866,7 +866,7 @@ const ACTIVITIES = [
     src: [['Kidvoyage', 'https://kidvoyage.com/things-to-do/spain/costa-del-sol/paloma-park'], ['Andalucia.com', 'https://andalucia.com/benalmadena/arroyo/la-paloma-park'], ['Planomato', 'https://www.planomato.com/es/benalmadena/v/parque-paloma'], ['Turismo Benalmádena: Parque de la Paloma', 'https://turismo.benalmadena.es/parque-de-la-paloma'], ['Renfe: děti do 6 let zdarma', 'https://www.renfe.com/es/es/cercanias/cercanias-malaga/tarifas/descuentos/ninos-y-jovenes']],
   },
   {
-    id: 'sea-life', name: 'Sea Life Benalmádena: akvárium s tunelem', area: 'Benalmádena', cat: 'zvirata', emoji: '🐠', must: 4,
+    id: 'sea-life', name: 'Sea Life Benalmádena: akvárium s tunelem', area: 'Benalmádena', cat: 'zvirata', emoji: '🐠', must: 4, kids: 'ok',
     wx: ['dest', 'oblacno'], wind: false, dur: '1–1,5 h, s cestou půl dne', durKind: 'pulden', out: true,
     lat: 36.59654, lon: -4.51530, gq: 'Sea Life Benalmádena',
     about: 'Akvárium ze sítě Sea Life v přístavu Puerto Marina v Benalmádeně. Má prosklený tunel pod nádrží se žraloky, nádrž s rejnoky, výběh vyder a ostrůvek s tučňáky.',
@@ -892,7 +892,7 @@ const ACTIVITIES = [
     src: [['Sea Life', 'https://www.visitsealife.com/benalmadena/'], ['Taquilla', 'https://www.taquilla.com/entradas/sea-life-benalmadena'], ['Jet2', 'https://www.jet2holidays.com/things-to-do/costa-del-sol/sea-life-benalmadena'], ['Sea Life: ceník', 'https://www.visitsealife.com/benalmadena/tarifas/entradas-sea-life-benalmadena/entrada-standard/'], ['Sea Life: online prodej', 'https://me-slbenalmadena.eu.tickets.visitsealife.com/snap-calendar/package/Daily%20Tickets%20-%20ES/70480?l=es-es'], ['Consorcio Málaga: jízdné 2026', 'https://ctmam.es/tarifas/']],
   },
   {
-    id: 'torremolinos', name: 'Torremolinos: Batería, Carihuela a promenáda', area: 'Torremolinos', cat: 'more', emoji: '🏖️', must: 4,
+    id: 'torremolinos', name: 'Torremolinos: Batería, Carihuela a promenáda', area: 'Torremolinos', cat: 'more', emoji: '🏖️', must: 4, kids: 'ok',
     wx: ['slunce', 'oblacno'], wind: true, dur: 'Celý den', durKind: 'celyden', out: true,
     lat: 36.60728, lon: -4.50436, gq: 'Playa de la Carihuela, Torremolinos',
     about: 'Přímořské letovisko asi 12 km jihozápadně od Málagy. La Carihuela je bývalá rybářská čtvrť s pláží a promenádou plnou rybích restaurací, Parque de la Batería nad ní má jezero s loďkami, 15metrovou vyhlídkovou věž s výtahem a kanóny staré pobřežní baterie.',
@@ -919,7 +919,7 @@ const ACTIVITIES = [
     src: [['Barceló: Batería', 'https://www.barcelo.com/guia-turismo/es/espana/torremolinos/que-ver/parque-de-la-bateria/'], ['Malagacar', 'https://www.malagacar.com/sp/blog/ocio/parques-benalmadena-torremolinos/'], ['Visit Andalucía', 'https://visit-andalucia.com/parque-la-bateria-torremolinos/'], ['Turismo Torremolinos: La Carihuela', 'https://turismotorremolinos.es/en/discover/area/carihuela-area/'], ['Turismo Torremolinos: Parque de la Batería', 'https://turismotorremolinos.es/en/discover/places-of-interest/bateria-park/'], ['Renfe: děti do 6 let zdarma', 'https://www.renfe.com/es/es/cercanias/cercanias-malaga/tarifas/descuentos/ninos-y-jovenes'], ['Consorcio Málaga: jízdné 2026', 'https://ctmam.es/tarifas/']],
   },
   {
-    id: 'monowa', name: 'Monowa: motýlí skleník', area: 'Benalmádena', cat: 'zvirata', emoji: '🦋', must: 3,
+    id: 'monowa', name: 'Monowa: motýlí skleník', area: 'Benalmádena', cat: 'zvirata', emoji: '🦋', must: 3, kids: 'ok',
     wx: ['dest', 'oblacno'], wind: false, dur: '1–1,5 h, s cestou půl dne', durKind: 'pulden', out: true,
     lat: 36.58929, lon: -4.58140, gq: 'Monowa Butterfly Park, Benalmádena',
     about: 'Motýlí park v Benalmádeně vedle buddhistické stupy. V tropickém skleníku volně létají motýli z Asie, Ameriky a Afriky, k tomu jsou tu exotičtí ptáci, ryby a hmyz.',
@@ -942,7 +942,7 @@ const ACTIVITIES = [
     src: [['Monowa', 'https://monowa.es/'], ['Planomato', 'https://www.planomato.com/es/benalmadena/v/monowa'], ['Renfe: děti do 6 let zdarma', 'https://www.renfe.com/es/es/cercanias/cercanias-malaga/tarifas/descuentos/ninos-y-jovenes'], ['Consorcio Málaga: jízdné 2026', 'https://ctmam.es/tarifas/']],
   },
   {
-    id: 'crocodile-park', name: 'Crocodile Park Torremolinos', area: 'Torremolinos', cat: 'zvirata', emoji: '🐊', must: 3,
+    id: 'crocodile-park', name: 'Crocodile Park Torremolinos', area: 'Torremolinos', cat: 'zvirata', emoji: '🐊', must: 3, kids: 'part',
     wx: ['slunce', 'oblacno'], wind: false, dur: '1–1,5 h, s cestou půl dne', durKind: 'pulden', out: true,
     lat: 36.62440, lon: -4.50883, gq: 'Crocodile Park Torremolinos',
     about: 'Zoo zaměřená na krokodýly v Torremolinos, s venkovními nádržemi několika druhů krokodýlů a terárii dalších plazů.',
@@ -962,7 +962,7 @@ const ACTIVITIES = [
     src: [['Crocodile Park: hodiny', 'https://www.cocodrilospark.com/horario'], ['Crocodile Park: ceny', 'https://www.cocodrilospark.com/precios'], ['Andalucia.com', 'https://www.andalucia.com/entertainment/wildlife-parks/crocodile-park.htm'], ['Renfe: děti do 6 let zdarma', 'https://www.renfe.com/es/es/cercanias/cercanias-malaga/tarifas/descuentos/ninos-y-jovenes']],
   },
   {
-    id: 'nerja', name: 'Nerja: jeskyně, Balcón de Europa a pláž', area: 'Nerja', cat: 'pamatky', emoji: '⛰️', must: 3,
+    id: 'nerja', name: 'Nerja: jeskyně, Balcón de Europa a pláž', area: 'Nerja', cat: 'pamatky', emoji: '⛰️', must: 3, kids: 'part',
     wx: ['slunce', 'oblacno'], wind: false, dur: 'Celý den (8–9 h)', durKind: 'celyden', out: true,
     lat: 36.74427, lon: -3.87540, gq: 'Balcón de Europa, Nerja',
     about: 'Nerja je bílé městečko na útesech asi 55 km východně od Málagy a Balcón de Europa je vyhlídková terasa nad mořem v jeho centru. Cueva de Nerja 4 km za městem je krasová jeskyně s obřími krápníky, objevená v roce 1959.',
@@ -988,7 +988,7 @@ const ACTIVITIES = [
     src: [['Cueva de Nerja', 'https://cuevadenerja.es/'], ['ALSA', 'https://www.alsa.com/ruta/malaga-nerja'], ['Spain.info', 'https://www.spain.info/en/beach/burriana/'], ['Mumsnet', 'https://www.mumsnet.com/talk/holidays/3425190-Nerja'], ['Cueva de Nerja: ceny 2026', 'https://cuevadenerja.es/precio-entrada-cueva-de-nerja-en-2026/'], ['Cueva de Nerja: vstup zdarma', 'https://cuevadenerja.es/entrada-gratis-a-la-cueva-de-nerja-y-descuentos/'], ['ALSA: děti a miminka', 'https://www.alsa.com/ayuda/descuento-ninos-bebes'], ['Movelia: ALSA Málaga–Nerja', 'https://www.movelia.es/es/rutas/autobuses/malaga-nerja']],
   },
   {
-    id: 'selwo-marina', name: 'Selwo Marina: tučňáci (ověřit provoz)', area: 'Benalmádena', cat: 'zvirata', emoji: '🐧', must: 2,
+    id: 'selwo-marina', name: 'Selwo Marina: tučňáci (ověřit provoz)', area: 'Benalmádena', cat: 'zvirata', emoji: '🐧', must: 2, kids: 'part',
     wx: ['slunce', 'oblacno'], wind: false, dur: '2,5–3,5 h, s cestou půl dne', durKind: 'pulden', out: true,
     lat: 36.59278, lon: -4.53216, gq: 'Selwo Marina, Benalmádena',
     about: 'Malý mořský park v Benalmádeně u parku Paloma: tučňáci v chlazené hale, lachtani, tropičtí ptáci a delfinárium. Hlavní bazén je teď podle webu dočasně bez programu.',

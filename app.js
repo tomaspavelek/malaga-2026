@@ -15,14 +15,14 @@
   };
 
   const TRIP_FILTERS = { wx: 'vse', cats: [], dur: [], dist: [], stroller: [], cost: [], must: false, hideDone: false };
-  const FOOD_FILTERS = { meals: [], kids: [], cuisine: [], price: [], dist: [] };
+  const FOOD_FILTERS = { meals: [], kids: [], tags: [], price: [], dist: [] };
   const state = {
     tab: store.get('tab', 'dnes'),
     wxMode: store.get('wxMode', 'dnes'),
     stayDay: store.get('stayDay', TRIP.start),
     info: store.get('info', store.get('cesta', 'tam')),
     f: Object.assign({ ...TRIP_FILTERS, sort: 'must', more: false, view: 'list' }, store.get('filters', {})),
-    ff: Object.assign({ ...FOOD_FILTERS, sort: 'dist', more: false }, store.get('foodFilters', {})),
+    ff: Object.assign({ ...FOOD_FILTERS, sort: 'dist', more: false, view: 'list' }, store.get('foodFilters', {})),
     pick: null,                       // výběr z Plánu: { kind: 'act' | 'meal', date, meal }
     done: store.get('done', {}),
     checks: store.get('checks', {}),
@@ -85,6 +85,11 @@
     r.km = km(STAY, r);
     r.walkMin = Math.round(r.km * 1.3 / 4.2 * 60);                          // s kočárkem asi 4 km/h, ulice nejsou vzdušná čára
     r.distKind = r.out ? 'vylet' : r.km <= 1 ? 'blizko' : r.km <= 3 ? 'mesto' : 'dal';
+    // hodnocení z textu „TripAdvisor 3,8 (375) · Google 4,4 (5 747)“; hlavní je Google, TripAdvisor jako druhé
+    const rate = src => { const m = (r.rating || '').match(new RegExp(src + ' (\\d,\\d) \\(([\\d \\u00a0]+)\\)')); return m ? { src, v: +m[1].replace(',', '.'), c: +m[2].replace(/\D/g, '') } : null; };
+    const g = rate('Google'), ta = rate('TripAdvisor');
+    r.rate = g || ta;
+    r.rateAlt = g && ta;
   });
 
   /* ---------- Počasí ---------- */
@@ -101,12 +106,6 @@
   };
   const wmo = c => WMO[c] || ['Proměnlivo', 'partly'];
   const icon = (id, cls = '') => `<svg class="${cls}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
-  /* Andaluská dlaždice (azulejo) – barvy bere z CSS proměnných karty počasí, proto je vzor přímo v ní */
-  const AZULEJO = `<svg><defs><pattern id="az" width="44" height="44" patternUnits="userSpaceOnUse">
-    <g style="fill:var(--tile-a)"><rect x="13" y="13" width="18" height="18"/><rect x="13" y="13" width="18" height="18" transform="rotate(45 22 22)"/></g>
-    <g style="fill:var(--tile-b)"><circle cx="22" cy="22" r="4.2"/><circle cx="0" cy="0" r="7"/><circle cx="44" cy="0" r="7"/><circle cx="0" cy="44" r="7"/><circle cx="44" cy="44" r="7"/>
-    <rect x="20.5" y="0" width="3" height="5"/><rect x="20.5" y="39" width="3" height="5"/><rect x="0" y="20.5" width="5" height="3"/><rect x="39" y="20.5" width="5" height="3"/></g>
-    </pattern></defs><rect width="100%" height="100%" fill="url(#az)"/></svg>`;
   const WX_LABEL = { slunce: 'Slunce', oblacno: 'Zataženo / chladněji', dest: 'Déšť' };
   const WX_ICON = { slunce: 'sun', oblacno: 'cloud', dest: 'rain' };
 
@@ -310,6 +309,22 @@
   const costBadge = a => a.cost == null ? '' : `<span class="cost" title="Vstup a doprava tam a zpět pro 2 dospělé a 2 děti">${icon('euro')}<b>${a.cost && a.fam.verified === false ? '≈ ' : ''}${fmtEur(a.cost)}</b>${a.cost ? '<span>za rodinu</span>' : ''}</span>`;
   const KIDS = { ok: 'Výborné s dětmi', part: 'S dětmi ujde', no: 'S dětmi spíš ne' };
   const KIDS_F = { ok: 'Pro děti výborné', part: 'Ujde', no: 'Spíš ne' };
+  const KIDS_RANK = { ok: 0, part: 1, no: 2 };
+  // barevné bloky na kartě: o co jde (modrý) a jak to tam chodí s dětmi (semafor)
+  const aboutBlock = (title, text, web) => `<div class="about"><b>${icon('info')}${title}</b><p>${text}${web ? ` <a href="${web}" target="_blank" rel="noopener">Web ${icon('ext')}</a>` : ''}</p></div>`;
+  const kidsBlock = (lvl, text) => `<div class="kids" data-kids="${lvl}"><b><span class="dot" data-kids="${lvl}"></span>${KIDS[lvl]}</b>${text ? `<p>${text}</p>` : ''}</div>`;
+  const fmtRate = v => v.toFixed(1).replace('.', ',');
+  const fmtCount = n => n.toLocaleString('cs-CZ');
+  function ratingBlock(r) {
+    const p = r.rate, alt = r.rateAlt;
+    if (!p) return '<div class="rating rating--none">Bez vlastního hodnocení</div>';
+    return `<div class="rating" role="img" aria-label="Hodnocení ${p.src} ${fmtRate(p.v)} z 5, ${fmtCount(p.c)} hodnocení">
+      <b class="rating__num">${fmtRate(p.v)}</b>
+      <span class="rating__main"><span class="rating__stars" style="--p:${Math.round(p.v / 5 * 100)}%">★★★★★</span><small>${p.src} · ${fmtCount(p.c)} hodnocení</small></span>
+      ${alt ? `<span class="rating__alt"><small>${alt.src}</small><b>${fmtRate(alt.v)}</b><small>${fmtCount(alt.c)}×</small></span>` : ''}
+    </div>`;
+  }
+  const sortSel = (attr, cur, opts) => `<label class="sortsel">${icon('sort')}<select ${attr} aria-label="Řadit podle">${Object.entries(opts).map(([k, l]) => `<option value="${k}"${k === cur ? ' selected' : ''}>${l}</option>`).join('')}</select></label>`;
   const priceMeter = n => `<span class="price" role="img" aria-label="Cenová hladina ${n} z 5">${'€'.repeat(n)}<span class="off">${'€'.repeat(5 - n)}</span></span>`;
   const inPlanActs = id => { const ds = PLAN.datesWith(id); return ds.length ? `<p class="inplan">${icon('cal')} V plánu: ${ds.map(fmtS).join(', ')}</p>` : ''; };
   const inPlanMeals = id => { const ms = PLAN.mealsWith(id); return ms.length ? `<p class="inplan">${icon('cal')} V plánu: ${ms.map(x => `${fmtS(x.date)} ${MEALS[x.meal].label.toLowerCase()}`).join(', ')}</p>` : ''; };
@@ -333,7 +348,6 @@
           </div>
           ${a.must >= 5 ? '<span class="must">Must see</span>' : ''}
         </div>
-        ${a.about ? `<p class="act__about">${a.about}${a.web ? ` <a href="${a.web}" target="_blank" rel="noopener">Web ${icon('ext')}</a>` : ''}</p>` : ''}
         <div class="stats">
           <div class="stat">${icon('clock')}<b>${fmtH(a.h)}</b><span>na místě</span></div>
           <div class="stat">${icon('pin')}<b>${fmtKm(a.km)}</b><span>od ubytka</span></div>
@@ -351,7 +365,8 @@
           ${a.pros.map(p => `<span class="tag tag--plus">${p}</span>`).join('')}
           ${a.cons.map(p => `<span class="tag tag--minus">${p}</span>`).join('')}
         </div>
-        ${a.tip ? `<p class="act__tip"><b>Pro děti:</b> ${a.tip}</p>` : ''}
+        ${a.about ? aboutBlock('O co jde', a.about, a.web) : ''}
+        ${kidsBlock(a.kids, a.tip)}
       </div>
       <details class="fold">
         <summary>Jak se tam dostaneme${icon('chev')}</summary>
@@ -402,19 +417,21 @@
           <div class="act__emoji" aria-hidden="true">${r.emoji || cu.emoji}</div>
           <div class="act__head">
             <h3 class="act__title">${r.name}</h3>
-            <p class="act__sub">${cu.label} · ${r.area}</p>
+            <p class="act__sub">${r.area}</p>
           </div>
           ${priceMeter(r.price)}
         </div>
-        <p class="act__about">${r.what}${r.web ? ` <a href="${r.web}" target="_blank" rel="noopener">Web ${icon('ext')}</a>` : ''}</p>
+        ${ratingBlock(r)}
+        <div class="ctags" aria-label="Kuchyně, klepnutím vyfiltrujete">${r.tags.map(t => `<button class="ctag" data-fftag="${t}" aria-pressed="${state.ff.tags.includes(t)}"><span aria-hidden="true">${FOOD_TAGS[t].emoji}</span>${FOOD_TAGS[t].label}</button>`).join('')}</div>
         <div class="stats">
           <div class="stat">${icon('pin')}<b>${fmtKm(r.km)}</b><span>od ubytka</span></div>
           <div class="stat">${icon(walk ? 'walk' : r.out ? 'train' : 'bus')}<b>${walk ? fmtMinShort(r.walkMin) : r.out ? r.area : 'MHD'}</b><span>${walk ? 'pěšky' : r.out ? 'mimo Málagu' : 'busem, taxi'}</span></div>
           <div class="stat">${icon('euro')}<b>${r.famEur ? '≈ ' + r.famEur + ' €' : '?'}</b><span>za rodinu</span></div>
         </div>
         <div class="mealtags" aria-label="Kdy tam jíst">${r.meals.length ? Object.entries(MEALS).map(([m, M]) => `<span class="mealtag ${r.meals.includes(m) ? 'on' : ''}">${M.label}</span>`).join('') : '<span class="mealtag on">Na zmrzlinu mezi jídly</span>'}</div>
-        <div class="kids" data-kids="${r.kids}"><b><span class="dot" data-kids="${r.kids}"></span>${KIDS[r.kids]}</b><p>${r.kidsWhy}</p></div>
         <div data-plan-rest="${r.id}" style="display:contents">${inPlanMeals(r.id)}</div>
+        ${aboutBlock('Co vaří', r.what, r.web)}
+        ${kidsBlock(r.kids, r.kidsWhy)}
         ${r.tip ? `<p class="act__tip"><b>Tip:</b> ${r.tip}</p>` : ''}
       </div>
       <details class="fold">
@@ -489,7 +506,6 @@
       ${state.wxMode === 'pobyt' ? stayList() : ''}
 
       <div class="hero" data-wx="${w.src === 'klima' ? 'klima' : w.cond}">
-        <div class="hero__tiles" aria-hidden="true">${AZULEJO}</div>
         <p class="hero__date">${fmtLong(date)} <span class="hero__daytag">${dayTag}</span></p>
         <div class="hero__main">
           ${icon(w.ico, 'hero__icon')}
@@ -709,6 +725,7 @@
       (!f.hideDone || !state.done[a.id]));
     list.sort(f.sort === 'dist' ? (x, y) => x.km - y.km
       : f.sort === 'cost' ? (x, y) => ((x.cost ?? 999) - (y.cost ?? 999)) || (y.must - x.must)
+      : f.sort === 'kids' ? (x, y) => (KIDS_RANK[x.kids] - KIDS_RANK[y.kids]) || (y.must - x.must) || (x.km - y.km)
       : (x, y) => (y.must - x.must) || (x.km - y.km));
     // během pobytu (nebo při výběru dne z plánu): co má ten den zavřeno, až na konec (sort je stabilní)
     const day = refDay();
@@ -740,9 +757,10 @@
         </div>
         <div class="result-line">
           <span>${list.length} ${plural(list.length, 'místo', 'místa', 'míst')}</span>
-          <span>
-            <button class="linkish" data-fmore>${f.more ? 'Skrýt filtry' : 'Další filtry'}${moreCount ? ` (${moreCount})` : ''}</button>
-            · <button class="linkish" data-fview>${f.view === 'map' ? 'Seznam' : 'Mapa'}</button>
+          <span class="result-line__tools">
+            ${sortSel('data-fsort', f.sort, TRIP_SORTS)}
+            <button class="linkish" data-fmore>${f.more ? 'Skrýt filtry' : 'Filtry'}${moreCount ? ` (${moreCount})` : ''}</button>
+            <button class="linkish" data-fview>${f.view === 'map' ? 'Seznam' : 'Mapa'}</button>
           </span>
         </div>
         ${f.more ? `<div class="more-filters">
@@ -761,17 +779,17 @@
           <div><h4>Další</h4><div class="chips">
             ${chip('data-fflag', 'must', 'Jen to nejlepší (4–5 ★)', f.must)}${chip('data-fflag', 'hideDone', 'Skrýt navštívené', f.hideDone)}
           </div></div>
-          <div><h4>Řadit</h4><div class="chips">
-            ${chip('data-fsort', 'must', 'Podle atraktivity', f.sort === 'must')}${chip('data-fsort', 'dist', 'Podle vzdálenosti', f.sort === 'dist')}${chip('data-fsort', 'cost', 'Podle ceny', f.sort === 'cost')}
-          </div></div>
           <button class="linkish" data-freset>Zrušit všechny filtry</button>
         </div>` : ''}
       </div>
-      ${f.view === 'map' ? '<div class="map" id="map"></div>' : `
+      ${f.view === 'map' ? '<div class="map" id="map-vylety"></div>' : `
       <div class="list">${list.length ? list.map(a => actCard(a, { date: refDay() })).join('') : `
         <div class="empty"><p>Těmto filtrům nic neodpovídá.</p><button class="btn btn--sm" data-freset>Zrušit filtry</button></div>`}</div>`}`;
-    if (f.view === 'map') drawMap(list);
+    if (f.view === 'map') drawMap('#map-vylety', list, a => a.emoji || CATS[a.cat].emoji,
+      a => `<b>${a.name}</b><br>${fmtH(a.h)} · ${fmtKm(a.km)}<br>${a.how.sum}<br><a href="#" data-showcard="${a.id}">Zobrazit detail</a>`);
   }
+  const TRIP_SORTS = { must: 'Atraktivita', dist: 'Vzdálenost', kids: 'Pro děti', cost: 'Cena' };
+  const FOOD_SORTS = { dist: 'Vzdálenost', rating: 'Hodnocení', kids: 'Pro děti', price: 'Cena' };
 
   /* Mapa (Leaflet se načte až při prvním otevření) */
   let leafletP = null;
@@ -788,27 +806,26 @@
     });
     return leafletP;
   }
-  async function drawMap(list) {
-    const box = $('#map');
+  /* Mapa pro výlety i restaurace: pinOf vrací emoji špendlíku, popupOf obsah bubliny */
+  async function drawMap(sel, list, pinOf, popupOf) {
+    const box = $(sel);
     try { await loadLeaflet(); } catch { box.innerHTML = '<div class="empty">Mapa potřebuje internet.</div>'; return; }
     if (!document.body.contains(box)) return;
-    const map = L.map(box, { zoomControl: true }).setView([STAY.lat, STAY.lon], 12);
+    const map = L.map(box, { zoomControl: true, zoomSnap: 0.5 }).setView([STAY.lat, STAY.lon], 12);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
     const pin = (e) => L.divIcon({ className: 'map-pin', html: e, iconSize: [26, 26], iconAnchor: [13, 13] });
     L.marker([STAY.lat, STAY.lon], { icon: pin('🏠') }).addTo(map).bindPopup('<b>Ubytování</b>');
     const pts = [[STAY.lat, STAY.lon]];
-    list.forEach(a => {
-      pts.push([a.lat, a.lon]);
-      L.marker([a.lat, a.lon], { icon: pin(a.emoji || CATS[a.cat].emoji) }).addTo(map)
-        .bindPopup(`<b>${a.name}</b><br>${fmtH(a.h)} · ${fmtKm(a.km)}<br>${a.how.sum}<br><a href="#" data-showcard="${a.id}">Zobrazit detail</a>`);
+    list.forEach(x => {
+      pts.push([x.lat, x.lon]);
+      L.marker([x.lat, x.lon], { icon: pin(pinOf(x)) }).addTo(map).bindPopup(popupOf(x));
     });
-    // přiblížit na město, výlety mimo Málagu jsou vidět po oddálení
-    const inCity = [[STAY.lat, STAY.lon], ...list.filter(a => !a.out).map(a => [a.lat, a.lon])];
+    // přiblížit na město, místa mimo Málagu jsou vidět po oddálení
+    const inCity = [[STAY.lat, STAY.lon], ...list.filter(x => !x.out).map(x => [x.lat, x.lon])];
     map.fitBounds(inCity.length > 1 ? inCity : pts, { padding: [24, 24] });
   }
 
   /* ---------- Záložka Jídlo ---------- */
-  const KIDS_RANK = { ok: 0, part: 1, no: 2 };
   function filteredFood() {
     const f = state.ff;
     const pick = state.pick && state.pick.kind === 'meal' ? state.pick : null;
@@ -816,11 +833,14 @@
       (!pick || r.meals.includes(pick.meal)) &&
       (!f.meals.length || f.meals.some(m => r.meals.includes(m))) &&
       (!f.kids.length || f.kids.includes(r.kids)) &&
-      (!f.cuisine.length || f.cuisine.includes(r.cuisine)) &&
+      (!f.tags.length || f.tags.some(t => r.tags.includes(t))) &&
       (!f.price.length || f.price.includes(r.price)) &&
       (!f.dist.length || f.dist.includes(r.distKind)));
     const byKm = (x, y) => x.km - y.km;
+    // podle hodnocení: známka, při shodě víc recenzí; podniky bez hodnocení na konec
+    const byRate = (x, y) => ((y.rate ? y.rate.v : 0) - (x.rate ? x.rate.v : 0)) || ((y.rate ? y.rate.c : 0) - (x.rate ? x.rate.c : 0));
     list.sort(f.sort === 'kids' ? (x, y) => (KIDS_RANK[x.kids] - KIDS_RANK[y.kids]) || byKm(x, y)
+      : f.sort === 'rating' ? (x, y) => byRate(x, y) || byKm(x, y)
       : f.sort === 'price' ? (x, y) => (x.price - y.price) || byKm(x, y) : byKm);
     if (pick) list.sort((x, y) => (x.closed || []).includes(dow(pick.date)) - (y.closed || []).includes(dow(pick.date)));
     return list;
@@ -830,8 +850,7 @@
     const el = $('#tab-jidlo');
     const f = state.ff;
     const list = filteredFood();
-    const moreCount = f.cuisine.length + f.price.length + f.dist.length;
-    const usedCuis = Object.entries(CUISINES).filter(([k]) => FOOD.some(r => r.cuisine === k));
+    const moreCount = f.price.length + f.dist.length;
     el.innerHTML = `
       <div class="sec-head"><h2 class="h-sec">Kde se najíst<small>${FOOD.length} podniků podle recenzí a podle toho, jak to tam chodí s dětmi.</small></h2></div>
       <div class="filters${f.more ? ' is-open' : ''}">
@@ -842,28 +861,32 @@
         <div class="chips" role="group" aria-label="S dětmi">
           ${Object.entries(KIDS_F).map(([k, l]) => chip('data-ffkids', k, l, f.kids.includes(k), `<span class="dot" data-kids="${k}"></span>`)).join('')}
         </div>
+        <div class="chips" role="group" aria-label="Kuchyně">
+          ${Object.entries(FOOD_TAGS).map(([k, c]) => chip('data-fftag', k, c.label, f.tags.includes(k), `<span aria-hidden="true">${c.emoji}</span>`)).join('')}
+        </div>
         <div class="result-line">
           <span>${list.length} ${plural(list.length, 'podnik', 'podniky', 'podniků')}</span>
-          <button class="linkish" data-ffmore>${f.more ? 'Skrýt filtry' : 'Další filtry'}${moreCount ? ` (${moreCount})` : ''}</button>
+          <span class="result-line__tools">
+            ${sortSel('data-ffsort', f.sort, FOOD_SORTS)}
+            <button class="linkish" data-ffmore>${f.more ? 'Skrýt filtry' : 'Filtry'}${moreCount ? ` (${moreCount})` : ''}</button>
+            <button class="linkish" data-ffview>${f.view === 'map' ? 'Seznam' : 'Mapa'}</button>
+          </span>
         </div>
         ${f.more ? `<div class="more-filters">
-          <div><h4>Kuchyně</h4><div class="chips">
-            ${usedCuis.map(([k, c]) => chip('data-ffcuis', k, c.label, f.cuisine.includes(k), `<span aria-hidden="true">${c.emoji}</span>`)).join('')}
-          </div></div>
           <div><h4>Cena na osobu</h4><div class="chips">
             ${[1, 2, 3, 4, 5].map(n => chip('data-ffprice', n, '€'.repeat(n), f.price.includes(n))).join('')}
           </div><p class="src" style="margin-top:6px">€ do 10 € · €€ do 20 € · €€€ do 35 € · €€€€ do 60 € · €€€€€ víc</p></div>
           <div><h4>Vzdálenost od ubytka</h4><div class="chips">
             ${chip('data-ffdist', 'blizko', 'Do 1 km', f.dist.includes('blizko'))}${chip('data-ffdist', 'mesto', 'Do 3 km', f.dist.includes('mesto'))}${chip('data-ffdist', 'dal', 'Dál po Málaze', f.dist.includes('dal'))}${chip('data-ffdist', 'vylet', 'U výletů mimo Málagu', f.dist.includes('vylet'))}
           </div></div>
-          <div><h4>Řadit</h4><div class="chips">
-            ${chip('data-ffsort', 'dist', 'Nejblíž', f.sort === 'dist')}${chip('data-ffsort', 'kids', 'Nejlepší pro děti', f.sort === 'kids')}${chip('data-ffsort', 'price', 'Nejlevnější', f.sort === 'price')}
-          </div></div>
           <button class="linkish" data-ffreset>Zrušit všechny filtry</button>
         </div>` : ''}
       </div>
-      <div class="list">${list.length ? list.map(foodCard).join('') : FOOD.length ? `
-        <div class="empty"><p>Těmto filtrům nic neodpovídá.</p><button class="btn btn--sm" data-ffreset>Zrušit filtry</button></div>` : '<div class="empty">Seznam restaurací se připravuje.</div>'}</div>`;
+      ${f.view === 'map' ? '<div class="map" id="map-jidlo"></div>' : `
+      <div class="list">${list.length ? list.map(foodCard).join('') : `
+        <div class="empty"><p>Těmto filtrům nic neodpovídá.</p><button class="btn btn--sm" data-ffreset>Zrušit filtry</button></div>`}</div>`}`;
+    if (f.view === 'map') drawMap('#map-jidlo', list, r => r.emoji || (CUISINES[r.cuisine] || {}).emoji || '🍽️',
+      r => `<b>${r.name}</b><br>${r.rate ? `★ ${fmtRate(r.rate.v)} ${r.rate.src} · ` : ''}${fmtKm(r.km)}<br>${r.tags.map(t => FOOD_TAGS[t].label).join(', ')}<br><a href="#" data-showfood="${r.id}">Zobrazit detail</a>`);
   }
 
   /* ---------- Záložka Info (cesta, příprava, tipy) ---------- */
@@ -1049,7 +1072,8 @@
   }
   function showRest(id) {
     state.pick = null;
-    if (!filteredFood().some(r => r.id === id)) state.ff = { ...state.ff, ...FOOD_FILTERS, meals: [], kids: [], cuisine: [], price: [], dist: [] };
+    state.ff.view = 'list';
+    if (!filteredFood().some(r => r.id === id)) state.ff = { ...state.ff, ...FOOD_FILTERS, meals: [], kids: [], tags: [], price: [], dist: [] };
     saveFF(); go('jidlo', { scroll: false });
     const el = $('#food-' + id); if (el) el.scrollIntoView({ block: 'start' });
   }
@@ -1073,7 +1097,7 @@
   const toggleIn = (arr, v) => arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v];
 
   document.addEventListener('click', e => {
-    const t = e.target.closest('button, a[data-showcard]');
+    const t = e.target.closest('button, a[data-showcard], a[data-showfood]');
     if (!t) return;
     const d = t.dataset;
     if (d.go) { hideToast(); return go(d.go); }
@@ -1090,19 +1114,23 @@
     if (d.fstr) { state.f.stroller = toggleIn(state.f.stroller, d.fstr); saveF(); return renderTrips(); }
     if (d.fcost) { state.f.cost = toggleIn(state.f.cost, d.fcost); saveF(); return renderTrips(); }
     if (d.fflag) { state.f[d.fflag] = !state.f[d.fflag]; saveF(); return renderTrips(); }
-    if (d.fsort) { state.f.sort = d.fsort; saveF(); return renderTrips(); }
     if ('fmore' in d) { state.f.more = !state.f.more; saveF(); return renderTrips(); }
     if ('fview' in d) { state.f.view = state.f.view === 'map' ? 'list' : 'map'; saveF(); return renderTrips(); }
     if ('freset' in d) { state.f = { ...state.f, ...TRIP_FILTERS, cats: [], dur: [], dist: [], stroller: [], cost: [] }; saveF(); return renderTrips(); }
     // filtry jídla
     if (d.ffmeal) { state.ff.meals = toggleIn(state.ff.meals, d.ffmeal); saveFF(); return renderFood(); }
     if (d.ffkids) { state.ff.kids = toggleIn(state.ff.kids, d.ffkids); saveFF(); return renderFood(); }
-    if (d.ffcuis) { state.ff.cuisine = toggleIn(state.ff.cuisine, d.ffcuis); saveFF(); return renderFood(); }
+    if (d.fftag) {
+      state.ff.tags = toggleIn(state.ff.tags, d.fftag); saveFF(); renderFood();
+      // chip na kartě: po přefiltrování zpátky nahoru na výsledky
+      if (t.classList.contains('ctag')) window.scrollTo({ top: 0 });
+      return;
+    }
     if (d.ffprice) { state.ff.price = toggleIn(state.ff.price, +d.ffprice); saveFF(); return renderFood(); }
     if (d.ffdist) { state.ff.dist = toggleIn(state.ff.dist, d.ffdist); saveFF(); return renderFood(); }
-    if (d.ffsort) { state.ff.sort = d.ffsort; saveFF(); return renderFood(); }
     if ('ffmore' in d) { state.ff.more = !state.ff.more; saveFF(); return renderFood(); }
-    if ('ffreset' in d) { state.ff = { ...state.ff, ...FOOD_FILTERS, meals: [], kids: [], cuisine: [], price: [], dist: [] }; saveFF(); return renderFood(); }
+    if ('ffview' in d) { state.ff.view = state.ff.view === 'map' ? 'list' : 'map'; saveFF(); return renderFood(); }
+    if ('ffreset' in d) { state.ff = { ...state.ff, ...FOOD_FILTERS, meals: [], kids: [], tags: [], price: [], dist: [] }; saveFF(); return renderFood(); }
     // přidávání do plánu
     if (d.add) {
       if (state.pick && state.pick.kind === 'act') { const date = state.pick.date; addActTo(date, d.add, true); return backToDay(date); }
@@ -1129,8 +1157,8 @@
       PLAN.setMeal(date, m, null); renderPlan();
       return toast(`${MEALS[m].label} ${fmtS(date)}: na ubytku`, () => { PLAN.setMeal(date, m, prev); renderPlan(); }, false);
     }
-    if (d.pickact) { state.pick = { kind: 'act', date: d.pickact }; return go('vylety'); }
-    if (d.pickmeal) { const [date, meal] = d.pickmeal.split('|'); state.pick = { kind: 'meal', date, meal }; return go('jidlo'); }
+    if (d.pickact) { state.pick = { kind: 'act', date: d.pickact }; state.f.view = 'list'; return go('vylety'); }
+    if (d.pickmeal) { const [date, meal] = d.pickmeal.split('|'); state.pick = { kind: 'meal', date, meal }; state.ff.view = 'list'; return go('jidlo'); }
     if ('pickcancel' in d) return backToDay(state.pick.date);
     if (d.showact) return showAct(d.showact);
     if (d.showrest) return showRest(d.showrest);
@@ -1151,6 +1179,12 @@
       e.preventDefault();
       state.f.view = 'list'; saveF(); renderTrips();
       const card = $('#act-' + d.showcard);
+      if (card) { card.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    }
+    if (d.showfood) {
+      e.preventDefault();
+      state.ff.view = 'list'; saveFF(); renderFood();
+      const card = $('#food-' + d.showfood);
       if (card) { card.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     }
   });
@@ -1177,6 +1211,8 @@
   });
   document.addEventListener('change', e => {
     if (e.target.dataset.note) return saveNote(e.target);
+    if ('fsort' in e.target.dataset) { state.f.sort = e.target.value; saveF(); return renderTrips(); }
+    if ('ffsort' in e.target.dataset) { state.ff.sort = e.target.value; saveFF(); return renderFood(); }
     const id = e.target.dataset.check;
     if (!id) return;
     state.checks[id] = e.target.checked; if (!e.target.checked) delete state.checks[id];
