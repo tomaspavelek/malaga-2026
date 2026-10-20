@@ -11,6 +11,8 @@ const TRIP = {
     lat: 36.69518, lon: -4.44059,
   },
   // Klimatický průměr pro dny mimo 16denní předpověď (AEMET, letiště Málaga: listopad max 20,1 °C, min 11,3 °C)
+  // Firebase Realtime Database pro sdílený plán (prázdné = plán jen v tomhle telefonu). Pravidla: CONTEXT.md.
+  sync: 'https://malaga-2026-25099-default-rtdb.europe-west1.firebasedatabase.app',
   climate: { tmaxStart: 22, tmaxEnd: 21, tminStart: 13, tminEnd: 12, sea: 19, note: 'začátkem listopadu kolem 21–22 °C přes den a 12–13 °C v noci. V listopadu prší v průměru 5–6 dní, zato vydatně (AEMET).' },
   cats: {
     zvirata: { label: 'Zvířata', emoji: '🐠' },

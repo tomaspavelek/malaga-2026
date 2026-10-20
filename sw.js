@@ -1,9 +1,10 @@
-/* Offline režim: aplikace a obrázky z cache, počasí vždy ze sítě (záložní kopie je v localStorage). */
-const CACHE = 'malaga-v2';
+/* Offline režim: aplikace a obrázky z cache, počasí vždy ze sítě (záložní kopie je v localStorage).
+   Sdílený plán (Firebase) jde mimo service worker, cizí domény se tu neobsluhují. */
+const CACHE = 'malaga-v4';
 const SHELL = [
-  './', 'index.html', 'style.css', 'app.js', 'data/trip.js', 'data/activities.js', 'data/tips.js', 'manifest.webmanifest',
+  './', 'index.html', 'style.css', 'app.js', 'plan.js', 'data/trip.js', 'data/activities.js', 'data/tips.js', 'data/food.js', 'data/calendar.js', 'manifest.webmanifest',
   'icons/icon.svg', 'icons/icon-180.png', 'icons/icon-192.png', 'img/parking-ostrava.png',
-  'fonts/caprasimo-400-latin.woff2', 'fonts/caprasimo-400-latin-ext.woff2',
+  'fonts/fraunces-latin.woff2', 'fonts/fraunces-latin-ext.woff2',
   'fonts/atkinson-latin.woff2', 'fonts/atkinson-latin-ext.woff2',
   'fonts/dmmono-400-latin.woff2', 'fonts/dmmono-400-latin-ext.woff2',
   'fonts/dmmono-500-latin.woff2', 'fonts/dmmono-500-latin-ext.woff2',
