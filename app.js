@@ -25,7 +25,7 @@
     ff: Object.assign({ ...FOOD_FILTERS, sort: 'dist', more: false, view: 'list' }, store.get('foodFilters', {})),
     pick: null,                       // výběr z Plánu: { kind: 'act' | 'meal', date, meal }
     done: store.get('done', {}),
-    checks: store.get('checks', {}),
+    prepWho: store.get('prepWho', ''),  // filtr úkolů v Přípravě: '' = všichni, 'tom', 'misa'
     wx: store.get('wx2', null),       // { ts, fc, sea }
     wxLoading: false,
     wxError: null,
@@ -87,9 +87,11 @@
     r.distKind = r.out ? 'vylet' : r.km <= 1 ? 'blizko' : r.km <= 3 ? 'mesto' : 'dal';
     // hodnocení z textu „TripAdvisor 3,8 (375) · Google 4,4 (5 747)“; hlavní je Google, TripAdvisor jako druhé
     const rate = src => { const m = (r.rating || '').match(new RegExp(src + ' (\\d,\\d) \\(([\\d \\u00a0]+)\\)')); return m ? { src, v: +m[1].replace(',', '.'), c: +m[2].replace(/\D/g, '') } : null; };
-    const g = rate('Google'), ta = rate('TripAdvisor');
-    r.rate = g || ta;
-    r.rateAlt = g && ta;
+    r.rateG = rate('Google'); r.rateTA = rate('TripAdvisor');
+    r.rate = r.rateG || r.rateTA;   // pro řazení
+    // recenze: Google = místo v Mapách (přímý odkaz na recenze potřebuje place ID), TripAdvisor ze zdrojů, jinak hledání
+    r.taUrl = ((r.src || []).find(([, u]) => /tripadvisor\./.test(u)) || [])[1] ||
+      'https://www.tripadvisor.com/Search?q=' + encodeURIComponent(r.name + ' Málaga');
   });
 
   /* ---------- Počasí ---------- */
@@ -228,7 +230,7 @@
     return { title, text };
   }
 
-  /* ---------- Doporučení ---------- */
+  /* ---------- Dny pobytu ---------- */
   function dayType(date) {
     if (date === TRIP.start) return 'prilet';
     if (date === TRIP.end) return 'odlet';
@@ -242,31 +244,6 @@
     if (a.closedDates && a.closedDates.includes(date)) return true;
     return (a.closed || []).includes(dow(date));
   }
-  function recommend(w, n = 3) {
-    const type = dayType(w.date);
-    const scored = ACTIVITIES.map(a => {
-      if (isClosed(a, w.date)) return null;
-      if (type !== 'normal' && !a.nearby) return null;
-      if (w.cond === 'dest' && !a.wx.includes('dest')) return null;
-      let s = a.must * 10;
-      if (a.wx.includes(w.cond)) s += 12;
-      if (a.onlyDates) s += 15;                                     // akce jen v tento den, jindy už nebude
-      if (w.cond === 'slunce' && a.wx[0] === 'slunce') s += 4;       // venkovní věci si slunce zaslouží víc
-      if (w.windy && a.wind) s -= 25;
-      if (state.done[a.id]) s -= 30;
-      if (a.out) s -= 4;                                             // výlet stojí víc energie
-      return { a, s };
-    }).filter(Boolean).sort((x, y) => y.s - x.s);
-    // pestrost: nejvýš dvě aktivity ze stejné kategorie
-    const out = [], perCat = {};
-    for (const { a } of scored) {
-      if ((perCat[a.cat] || 0) >= 2) continue;
-      out.push(a); perCat[a.cat] = (perCat[a.cat] || 0) + 1;
-      if (out.length >= n) break;
-    }
-    return out;
-  }
-
   /* ---------- Plán: zátěž dne ---------- */
   function dayLoad(date) {
     const acts = PLAN.day(date).acts.map(id => ACT[id]).filter(Boolean);
@@ -315,15 +292,15 @@
   const kidsBlock = (lvl, text) => `<div class="kids" data-kids="${lvl}"><b><span class="dot" data-kids="${lvl}"></span>${KIDS[lvl]}</b>${text ? `<p>${text}</p>` : ''}</div>`;
   const fmtRate = v => v.toFixed(1).replace('.', ',');
   const fmtCount = n => n.toLocaleString('cs-CZ');
-  function ratingBlock(r) {
-    const p = r.rate, alt = r.rateAlt;
-    if (!p) return '<div class="rating rating--none">Bez vlastního hodnocení</div>';
-    return `<div class="rating" role="img" aria-label="Hodnocení ${p.src} ${fmtRate(p.v)} z 5, ${fmtCount(p.c)} hodnocení">
-      <b class="rating__num">${fmtRate(p.v)}</b>
-      <span class="rating__main"><span class="rating__stars" style="--p:${Math.round(p.v / 5 * 100)}%">★★★★★</span><small>${p.src} · ${fmtCount(p.c)} hodnocení</small></span>
-      ${alt ? `<span class="rating__alt"><small>${alt.src}</small><b>${fmtRate(alt.v)}</b><small>${fmtCount(alt.c)}×</small></span>` : ''}
-    </div>`;
-  }
+  // hodnocení: dva stejné odkazy (Google, Tripadvisor) se známkou a počtem recenzí
+  const RATE_SRC = { Google: 'Google', TripAdvisor: 'Tripadvisor' };
+  const ratePill = (x, url) => `<a class="rlink" href="${url}" target="_blank" rel="noopener" aria-label="${RATE_SRC[x.src]}: ${fmtRate(x.v)} z 5, ${fmtCount(x.c)} hodnocení, otevřít recenze">
+    <span class="rlink__star" aria-hidden="true">★</span><b>${fmtRate(x.v)}</b><span>${RATE_SRC[x.src]}</span><small>${fmtCount(x.c)}</small></a>`;
+  // chybí-li známka z jednoho zdroje, odkaz na jeho recenze tam zůstane bez čísla
+  const rateLink = (src, url) => `<a class="rlink" href="${url}" target="_blank" rel="noopener" aria-label="Recenze na ${src}"><span>${src}</span></a>`;
+  const ratingLinks = r => r.rateG || r.rateTA
+    ? `<div class="rlinks">${r.rateG ? ratePill(r.rateG, gmapsPlace(r)) : rateLink('Google', gmapsPlace(r))}${r.rateTA ? ratePill(r.rateTA, r.taUrl) : rateLink('Tripadvisor', r.taUrl)}</div>`
+    : '<p class="rlinks rlinks--none">Bez vlastního hodnocení</p>';
   const sortSel = (attr, cur, opts) => `<label class="sortsel">${icon('sort')}<select ${attr} aria-label="Řadit podle">${Object.entries(opts).map(([k, l]) => `<option value="${k}"${k === cur ? ' selected' : ''}>${l}</option>`).join('')}</select></label>`;
   const priceMeter = n => `<span class="price" role="img" aria-label="Cenová hladina ${n} z 5">${'€'.repeat(n)}<span class="off">${'€'.repeat(5 - n)}</span></span>`;
   const inPlanActs = id => { const ds = PLAN.datesWith(id); return ds.length ? `<p class="inplan">${icon('cal')} V plánu: ${ds.map(fmtS).join(', ')}</p>` : ''; };
@@ -334,14 +311,11 @@
     const done = !!state.done[a.id];
     const closedThatDay = opts.date && isClosed(a, opts.date);
     const r = rideOf(a);
-    const lead = opts.rank
-      ? `<div class="rank" aria-hidden="true">${opts.rank}</div>`
-      : `<div class="act__emoji" aria-hidden="true">${a.emoji || CATS[a.cat].emoji}</div>`;
     return `
-    <article class="act ${done ? 'is-done' : ''}" id="${opts.rank ? 'reco' : 'act'}-${a.id}" data-id="${a.id}">
+    <article class="act ${done ? 'is-done' : ''}" id="act-${a.id}" data-id="${a.id}">
       <div class="act__body">
         <div class="act__top">
-          ${lead}
+          <div class="act__emoji" aria-hidden="true">${a.emoji || CATS[a.cat].emoji}</div>
           <div class="act__head">
             <h3 class="act__title">${a.name}</h3>
             <p class="act__sub">${CATS[a.cat].label}${a.area ? ' · ' + a.area : ''} · ${stars(a.must)}</p>
@@ -421,7 +395,7 @@
           </div>
           ${priceMeter(r.price)}
         </div>
-        ${ratingBlock(r)}
+        ${ratingLinks(r)}
         <div class="ctags" aria-label="Kuchyně, klepnutím vyfiltrujete">${r.tags.map(t => `<button class="ctag" data-fftag="${t}" aria-pressed="${state.ff.tags.includes(t)}"><span aria-hidden="true">${FOOD_TAGS[t].emoji}</span>${FOOD_TAGS[t].label}</button>`).join('')}</div>
         <div class="stats">
           <div class="stat">${icon('pin')}<b>${fmtKm(r.km)}</b><span>od ubytka</span></div>
@@ -474,7 +448,7 @@
   const arrival = () => fixedRow(`Přílet do Málagy ${ITINERARY.tam.pass.to.time}`, 'Transfer na ubytko, nákup, večer doma');
   const departure = () => fixedRow(`Odlet z Málagy ${ITINERARY.zpet.pass.from.time}`, 'Check-out do 12:00, na letiště nejpozději 15:00');
 
-  /* ---------- Záložka Dnes ---------- */
+  /* ---------- Záložka Počasí (v kódu pořád „dnes“, ať zůstane uložená volba záložky) ---------- */
   function renderToday() {
     const el = $('#tab-dnes');
     const today = todayStr();
@@ -484,17 +458,11 @@
     const w = dayWeather(date);
     const v = verdict(w);
     const updated = state.wx ? new Date(state.wx.ts).toLocaleString('cs-CZ', { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : null;
-    const inTrip = date >= TRIP.start && date <= TRIP.end;
-    const dt = dayType(date);
-    const dayTag = !inTrip ? 'Náhled: tak je teď v Málaze' : dt === 'prilet' ? 'Den příletu' : dt === 'odlet' ? 'Den odletu' : `Den ${dayDiff(TRIP.start, date) + 1} z ${stayDays.length}`;
+    const dayTag = date === TRIP.start ? 'Den příletu' : date === TRIP.end ? 'Den odletu' : '';
 
     let hours = w.hours || [];
     if (date === today) { const h = nowHourMadrid(); hours = hours.filter(x => x.h >= Math.min(h, 20)); }
     hours = hours.filter(x => x.h >= 8 && x.h <= 20);
-
-    const reco = recommend(w, 3);
-    const typeNote = dt === 'prilet' ? 'Den příletu: jen věci do 1,5 km od ubytka, ať se stihne nákup a spaní.' :
-      dt === 'odlet' ? 'Den odletu: jen kousek od ubytka, check-out je ve 12:00.' : '';
 
     el.innerHTML = `
       <div class="seg" role="group" aria-label="Který den">
@@ -506,7 +474,7 @@
       ${state.wxMode === 'pobyt' ? stayList() : ''}
 
       <div class="hero" data-wx="${w.src === 'klima' ? 'klima' : w.cond}">
-        <p class="hero__date">${fmtLong(date)} <span class="hero__daytag">${dayTag}</span></p>
+        <p class="hero__date">${fmtLong(date)}${dayTag ? ` <span class="hero__daytag">${dayTag}</span>` : ''}</p>
         <div class="hero__main">
           ${icon(w.ico, 'hero__icon')}
           <div>
@@ -531,32 +499,7 @@
           <span>${state.wxError ? state.wxError : updated ? 'Aktualizováno ' + updated : 'Předpověď zatím není načtená'}</span>
           <button class="hero__refresh ${state.wxLoading ? 'is-loading' : ''}" data-refresh>${icon('refresh')} ${state.wxLoading ? 'Načítám' : 'Načíst znovu'}</button>
         </div>
-      </div>
-
-      ${inTrip ? planCard(date, w, date === today ? 'dnes' : date === tomorrow ? 'zítra' : fmtLong(date)) : ''}
-      ${inTrip && dayEvents(date).length ? `<section class="card todayplan" aria-label="Co se v Málaze děje">
-        <div class="sec-head"><h3>V Málaze ${date === today ? 'dnes' : date === tomorrow ? 'zítra' : fmtS(date)}</h3></div>
-        ${eventsList(dayEvents(date))}
-      </section>` : ''}
-
-      <section class="reco" aria-labelledby="reco-h">
-        <div class="sec-head">
-          <h2 class="h-sec" id="reco-h">Co ${date === today ? 'dnes' : date === tomorrow ? 'zítra' : 'ten den'} dělat
-            <small>${w.src === 'klima' ? 'Orientačně podle průměrného počasí.' : `Seřazeno podle atraktivity pro vás, s ohledem na ${w.cond === 'dest' ? 'déšť' : w.cond === 'slunce' ? 'slunce' : 'počasí'}${w.windy ? ' a vítr' : ''} a zavírací dny.`}</small>
-          </h2>
-        </div>
-        ${typeNote ? `<p class="reco-note">${typeNote}</p>` : ''}
-        ${reco.length ? reco.map((a, i) => actCard(a, { rank: i + 1, date })).join('') : '<div class="empty">Na tenhle den nic nesedí. Zkuste záložku Výlety.</div>'}
-        <button class="btn" data-goto-filter="${w.src === 'klima' ? 'vse' : w.cond}">Všechny výlety ${w.src === 'klima' ? '' : 'na ' + (w.cond === 'dest' ? 'déšť' : w.cond === 'slunce' ? 'slunce' : 'zataženo')} ${icon('chev')}</button>
-      </section>
-
-      <section class="card card--flat" aria-label="Rychlé akce">
-        <div class="quick">
-          <a href="https://www.google.com/maps/dir/?api=1&destination=${STAY.lat},${STAY.lon}&travelmode=transit" target="_blank" rel="noopener"><span class="q-ico">🏠</span>Cesta domů</a>
-          <button data-show-address><span class="q-ico">🪪</span>Adresa pro řidiče</button>
-          <a href="tel:112"><span class="q-ico">🆘</span>Tísňová linka 112</a>
-        </div>
-      </section>`;
+      </div>`;
   }
 
   /* Co se v Málaze ten den děje (data/calendar.js), nejdůležitější první */
@@ -571,36 +514,15 @@
       : e.kind === 'tip' ? 'klidný den' : e.time || DAY_KINDS[e.kind].label.toLowerCase()).join(', ');
   const evMeta = e => `<span class="pev__meta">${[DAY_KINDS[e.kind].label, e.time, e.where].filter(Boolean).join(' · ')}${e.verified === false ? ' · neověřeno' : ''}</span>`;
   const evSrc = e => e.src && e.src.length ? `<p class="src">Zdroj: ${e.src.map(([l, u]) => `<a href="${u}" target="_blank" rel="noopener">${l}</a>`).join(', ')}</p>` : '';
-  // celá položka (Dnes)
-  const evItem = e => `<li class="pev" data-kind="${e.kind}">
-      <span class="pev__ico" aria-hidden="true">${evEmoji(e)}</span>
-      <div><b>${e.act && ACT[e.act] ? `<button class="linkish" data-showact="${e.act}">${e.title}</button>` : e.title}</b>${evMeta(e)}
-        <p>${e.text}</p>${evSrc(e)}</div>
-    </li>`;
-  // řádek s rozbalením (Plán): deset dní pod sebou musí jít projet očima
+  // řádek s rozbalením: deset dní pod sebou musí jít projet očima
   const evRow = e => `<li class="pev pev--row" data-kind="${e.kind}"><details>
       <summary><span class="pev__ico" aria-hidden="true">${evEmoji(e)}</span><span><b>${e.title}</b>${evMeta(e)}</span>${icon('chev')}</summary>
       <div class="pev__body"><p>${e.text}</p>${e.act && ACT[e.act] ? `<button class="linkish" data-showact="${e.act}">Karta: ${ACT[e.act].name}</button>` : ''}${evSrc(e)}</div>
     </details></li>`;
   // víc položek než max: zbytek pod „Další“, ať karta dne nenaroste přes celý displej
-  const eventsList = (evs, max = 3, item = evItem) => `<ul class="pevs">${evs.slice(0, max).map(item).join('')}</ul>${evs.length > max ? `
+  const eventsList = (evs, max = 4, item = evRow) => `<ul class="pevs">${evs.slice(0, max).map(item).join('')}</ul>${evs.length > max ? `
     <details class="pevs__more"><summary>Další ${evs.length - max} ${plural(evs.length - max, 'věc', 'věci', 'věcí')} v Málaze${icon('chev')}</summary>
       <ul class="pevs">${evs.slice(max).map(item).join('')}</ul></details>` : ''}`;
-
-  /* Plán vybraného dne na záložce Dnes */
-  function planCard(date, w, label) {
-    const p = PLAN.day(date);
-    const acts = p.acts.map(id => ACT[id]).filter(Boolean);
-    const meals = Object.keys(MEALS).filter(m => REST[p.meals[m]]);
-    const notes = [['tom', 'Tom'], ['misa', 'Míša']].filter(([k]) => p.notes[k]);
-    if (!acts.length && !meals.length && !notes.length) return '';
-    return `<section class="card todayplan" aria-label="Plán na ${label}">
-      <div class="sec-head"><h3>V plánu na ${label}</h3><button class="linkish" data-jumpplan="${date}">Upravit plán</button></div>
-      ${acts.length ? `<ol class="pacts">${acts.map((a, i) => planActRow(a, i, date, w, 0)).join('')}</ol>` : ''}
-      ${meals.map(m => `<div class="pmeal"><span class="pmeal__ico">${MEALS[m].emoji}</span><span class="pmeal__l">${MEALS[m].label}</span><button class="pmeal__v" data-showrest="${p.meals[m]}">${REST[p.meals[m]].name}</button><span></span></div>`).join('')}
-      ${notes.map(([k, n]) => `<p class="tl__text"><b>${n}:</b> ${esc(p.notes[k])}</p>`).join('')}
-    </section>`;
-  }
 
   function stayList() {
     const horizon = fcHorizon();
@@ -618,9 +540,14 @@
   }
 
   /* ---------- Záložka Plán ---------- */
-  const SYNC_TXT = { live: 'Sdíleno', connecting: 'Připojuji', offline: 'Offline', error: 'Kód nefunguje', local: 'Jen v tomto telefonu' };
-  const statusChip = () => `<span class="chip-status" data-s="${PLAN.status()}">${SYNC_TXT[PLAN.status()]}</span>`;
-  const editing = () => !!(document.activeElement && document.activeElement.matches('textarea[data-note], .sync__join input'));
+  const SYNC_TXT = { live: 'Sdíleno', connecting: 'Připojuji', offline: 'Offline', error: 'Nesdílí se', local: 'Jen v tomto telefonu' };
+  const statusChip = () => {
+    const s = PLAN.status(), n = PLAN.pending();
+    const title = s === 'offline' && n ? `${n} ${plural(n, 'změna čeká', 'změny čekají', 'změn čeká')} na odeslání` : s === 'live' ? 'Oba telefony vidí stejný plán' : '';
+    return `<span class="chip-status" data-s="${s}"${title ? ` title="${title}"` : ''}>${SYNC_TXT[s]}</span>`;
+  };
+  // rozepsaná poznámka nebo tažený úkol: změny z druhého telefonu počkají
+  const editing = () => dragging || !!$('.whomenu') || !!(document.activeElement && document.activeElement.matches('textarea[data-note]'));
 
   function renderPlan() {
     const el = $('#tab-plan');
@@ -640,16 +567,16 @@
           <span class="pbar__col"><i style="height:${Math.min(100, r.total / 9 * 100)}%" data-load="${loadKind(r.total, r.d)}"></i></span><span>${+r.d.slice(8)}.</span><span class="pbar__sig" aria-hidden="true">${ev ? evEmoji(ev) : ''}</span></button>`; }).join('')}</div>
         <p class="plansum__legend"><span><i></i>pohodový den</span><span><i data-load="mid"></i>plný den</span><span><i data-load="high"></i>na malé děti moc</span>${CALENDAR.length ? '<span>symbol pod dnem: svátek nebo akce v Málaze</span>' : ''}</p>
       </section>
-      ${rows.map(dayCard).join('')}
-      ${syncCard()}`;
+      ${rows.map(dayCard).join('')}`;
   }
 
   function dayCard({ d, acts, travel, total }) {
     const p = PLAN.day(d), w = dayWeather(d), dt = dayType(d), evs = dayEvents(d);
     const wxNote = w.src === 'klima' ? '<small>průměr</small>' : `<small>déšť ${w.pop ?? 0} %${w.windy ? ', vítr' : ''}</small>`;
+    const tag = (evs.some(e => e.kind === 'svatek') ? '<span class="pday__sig">Svátek</span>' : '') + (dt === 'prilet' ? 'Den příletu' : dt === 'odlet' ? 'Den odletu' : '');
     return `<section class="pday ${d === tripToday() ? 'is-today' : ''}" id="pday-${d}" aria-label="${fmtLong(d)}">
       <header class="pday__head">
-        <div><h3 class="pday__date">${fmtLong(d)}</h3><span class="pday__tag">${evs.some(e => e.kind === 'svatek') ? '<span class="pday__sig">Svátek</span>' : ''}${dt === 'prilet' ? 'Den příletu' : dt === 'odlet' ? 'Den odletu' : `Den ${dayDiff(TRIP.start, d) + 1} z ${stayDays.length}`}${w.src === 'fc' ? ` · ${w.desc.toLowerCase()}` : ''}</span></div>
+        <div><h3 class="pday__date">${fmtLong(d)}</h3>${tag ? `<span class="pday__tag">${tag}</span>` : ''}</div>
         <div class="pday__wx">${icon(w.ico)}<span class="mono">${Math.round(w.tmax)}°<small>/${Math.round(w.tmin)}°</small></span>${wxNote}</div>
       </header>
       ${acts.length ? `<div class="pday__load" data-load="${loadKind(total, d)}">${icon('clock')}<b>${fmtHours(total)}</b> naplánováno <span>· z toho cesta ${fmtMin(travel)}</span></div>` : ''}
@@ -679,35 +606,6 @@
           return `<label class="pnote"><span>Poznámka ${n}</span><textarea data-note="${d}|${k}" rows="${Math.max(2, Math.min(8, Math.ceil(t.length / 38) + (t.match(/\n/g) || []).length))}" maxlength="2000" placeholder="Nápady, co nezapomenout…">${esc(t)}</textarea></label>`;
         }).join('')}
       </div>
-    </section>`;
-  }
-
-  function syncCard() {
-    if (!PLAN.enabled()) return `<section class="card card--flat sync" aria-label="Sdílení plánu">
-      <h3>Sdílení plánu</h3>
-      <p class="muted">Plán je zatím uložený jen v tomhle telefonu. Sdílení mezi telefony se zapne, až bude připojená databáze.</p>
-    </section>`;
-    const c = PLAN.code();
-    if (!c) return `<section class="card sync" aria-label="Sdílení plánu">
-      <h3>Sdílení plánu</h3>
-      <p>Propojte oba telefony, ať vidíte stejný plán i poznámky. Jeden telefon plán vytvoří a pošle odkaz, druhý ho otevře.</p>
-      <div class="btn-row"><button class="btn btn--primary" data-sync-new>${icon('share')} Vytvořit sdílený plán</button></div>
-      <form class="sync__join" data-sync-join>
-        <input name="code" placeholder="Kód z druhého telefonu" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Kód plánu">
-        <button class="btn">Připojit</button>
-      </form>
-    </section>`;
-    const pend = PLAN.pending();
-    return `<section class="card sync" aria-label="Sdílení plánu">
-      <h3>Sdílení plánu ${statusChip()}</h3>
-      <p>${PLAN.status() === 'error' ? 'Databáze tenhle kód nepřijala. Zkontrolujte ho nebo vytvořte nový plán.' :
-        PLAN.status() === 'offline' ? `Bez připojení. ${pend ? `${pend} ${plural(pend, 'změna čeká', 'změny čekají', 'změn čeká')} na odeslání.` : 'Změny se uloží a odešlou samy.'}` :
-        'Oba telefony vidí stejný plán. Druhý telefon připojíte odkazem.'}</p>
-      <div class="btn-row">
-        <button class="btn btn--primary" data-sync-share>${icon('share')} Poslat odkaz</button>
-        <button class="btn btn--sm btn--ghost" data-sync-leave>Odpojit tento telefon</button>
-      </div>
-      <p class="sync__code">Máte stránku na ploše telefonu? Odkaz se otevře v prohlížeči, takže v aplikaci vložte kód ručně: <span class="mono">${c}</span></p>
     </section>`;
   }
 
@@ -745,7 +643,7 @@
     const list = filtered();
     const moreCount = f.dur.length + f.dist.length + f.stroller.length + f.cost.length + (f.must ? 1 : 0) + (f.hideDone ? 1 : 0);
     el.innerHTML = `
-      <div class="sec-head"><h2 class="h-sec">Výlety a místa<small>${ACTIVITIES.length} míst vybraných pro rodinu s předškolákem a batoletem.</small></h2></div>
+      <div class="sec-head"><h2 class="h-sec">Výlety a místa<small>Místa vybraná pro rodinu s předškolákem a batoletem.</small></h2></div>
       <div class="filters${f.more ? ' is-open' : ''}">
         ${state.pick && state.pick.kind === 'act' ? pickBar() : ''}
         <div class="chips" role="group" aria-label="Počasí">
@@ -756,7 +654,6 @@
           ${Object.entries(CATS).map(([k, c]) => chip('data-fcat', k, c.label, f.cats.includes(k), `<span aria-hidden="true">${c.emoji}</span>`)).join('')}
         </div>
         <div class="result-line">
-          <span>${list.length} ${plural(list.length, 'místo', 'místa', 'míst')}</span>
           <span class="result-line__tools">
             ${sortSel('data-fsort', f.sort, TRIP_SORTS)}
             <button class="linkish" data-fmore>${f.more ? 'Skrýt filtry' : 'Filtry'}${moreCount ? ` (${moreCount})` : ''}</button>
@@ -852,7 +749,7 @@
     const list = filteredFood();
     const moreCount = f.price.length + f.dist.length;
     el.innerHTML = `
-      <div class="sec-head"><h2 class="h-sec">Kde se najíst<small>${FOOD.length} podniků podle recenzí a podle toho, jak to tam chodí s dětmi.</small></h2></div>
+      <div class="sec-head"><h2 class="h-sec">Kde se najíst<small>Podniky vybrané podle recenzí a podle toho, jak to tam chodí s dětmi.</small></h2></div>
       <div class="filters${f.more ? ' is-open' : ''}">
         ${state.pick && state.pick.kind === 'meal' ? pickBar() : ''}
         <div class="chips" role="group" aria-label="Jídlo dne">
@@ -865,7 +762,6 @@
           ${Object.entries(FOOD_TAGS).map(([k, c]) => chip('data-fftag', k, c.label, f.tags.includes(k), `<span aria-hidden="true">${c.emoji}</span>`)).join('')}
         </div>
         <div class="result-line">
-          <span>${list.length} ${plural(list.length, 'podnik', 'podniky', 'podniků')}</span>
           <span class="result-line__tools">
             ${sortSel('data-ffsort', f.sort, FOOD_SORTS)}
             <button class="linkish" data-ffmore>${f.more ? 'Skrýt filtry' : 'Filtry'}${moreCount ? ` (${moreCount})` : ''}</button>
@@ -886,14 +782,14 @@
       <div class="list">${list.length ? list.map(foodCard).join('') : `
         <div class="empty"><p>Těmto filtrům nic neodpovídá.</p><button class="btn btn--sm" data-ffreset>Zrušit filtry</button></div>`}</div>`}`;
     if (f.view === 'map') drawMap('#map-jidlo', list, r => r.emoji || (CUISINES[r.cuisine] || {}).emoji || '🍽️',
-      r => `<b>${r.name}</b><br>${r.rate ? `★ ${fmtRate(r.rate.v)} ${r.rate.src} · ` : ''}${fmtKm(r.km)}<br>${r.tags.map(t => FOOD_TAGS[t].label).join(', ')}<br><a href="#" data-showfood="${r.id}">Zobrazit detail</a>`);
+      r => `<b>${r.name}</b><br>${r.rate ? `★ ${fmtRate(r.rate.v)} ${RATE_SRC[r.rate.src]} · ` : ''}${fmtKm(r.km)}<br>${r.tags.map(t => FOOD_TAGS[t].label).join(', ')}<br><a href="#" data-showfood="${r.id}">Zobrazit detail</a>`);
   }
 
   /* ---------- Záložka Info (cesta, příprava, tipy) ---------- */
   function renderInfo() {
     const el = $('#tab-info');
     const seg = state.info;
-    const p = checkProgress();
+    const p = prepProgress();
     el.innerHTML = `
       <div class="seg" role="group" aria-label="Info">
         <button data-info="tam" aria-pressed="${seg === 'tam'}">Tam<small>so 31. 10.</small></button>
@@ -931,27 +827,200 @@
       <div class="pass__info">${p.info.map(([k, v]) => `<span>${k}<b>${v}</b></span>`).join('')}</div>
     </article>`;
   }
-  function checkProgress() {
-    const all = CHECKLIST.flatMap(g => g.items);
-    return { total: all.length, done: all.filter(i => state.checks[i.id]).length };
+  /* ---------- Příprava: sdílené úkoly ----------
+     Výchozí sekce a úkoly jsou v CHECKLIST (data/trip.js), změny a nové věci v PLAN.prep():
+     výchozí položka + uložené pole = výsledek; smazaná výchozí má del: true, vlastní se maže celá. */
+  const WHO = { tom: 'Tom', misa: 'Míša' };
+  function prepModel() {
+    const st = PLAN.prep();
+    const secs = CHECKLIST.map((g, i) => ({ id: g.id, title: g.title, ord: i * 10, def: true, ...(st.secs[g.id] || {}) }));
+    Object.entries(st.secs).forEach(([id, o]) => { if (!secs.some(s => s.id === id)) secs.push({ id, title: '', ord: 0, ...o }); });
+    const live = secs.filter(s => !s.del && s.title).sort((a, b) => a.ord - b.ord);
+    const ids = new Set(live.map(s => s.id));
+    const tasks = CHECKLIST.flatMap(g => g.items.map((it, i) => ({ id: it.id, t: it.t, n: it.n || '', sec: g.id, ord: i * 10, who: '', done: false, def: true, ...(st.tasks[it.id] || {}) })));
+    Object.entries(st.tasks).forEach(([id, o]) => { if (!tasks.some(t => t.id === id)) tasks.push({ id, t: '', n: '', sec: '', ord: 0, who: '', done: false, ...o }); });
+    return { secs: live, tasks: tasks.filter(t => !t.del && t.t && ids.has(t.sec)).sort((a, b) => a.ord - b.ord) };
   }
+  const prepProgress = () => { const { tasks } = prepModel(); return { total: tasks.length, done: tasks.filter(t => t.done).length }; };
+  const nextOrd = (tasks, sec) => Math.max(-10, ...tasks.filter(t => t.sec === sec).map(t => t.ord)) + 10;
+  // odškrtnutí ze staré verze (jen v telefonu) jednou přenést do sdílených úkolů
+  function migrateChecks() {
+    const old = store.get('checks', {});
+    if (store.get('checksMoved', false) || !Object.keys(old).length) return;
+    const { tasks } = prepModel();
+    tasks.filter(t => old[t.id] && !t.done).forEach(t => PLAN.setTask(t.id, { done: true }));
+    store.set('checksMoved', true);
+  }
+
+  const taskRow = t => `<li class="task ${t.done ? 'is-done' : ''}" data-task="${t.id}">
+      <span class="task__grip" data-grip aria-hidden="true">${icon('grip')}</span>
+      <label class="task__check"><input type="checkbox" data-taskdone="${t.id}" ${t.done ? 'checked' : ''} aria-label="Hotovo: ${esc(t.t)}"></label>
+      <button class="task__main" data-taskedit="${t.id}"><span>${esc(t.t)}</span>${t.n.trim() ? `<small>${esc(t.n)}</small>` : ''}</button>
+      <button class="who${t.who ? '' : ' is-empty'}" data-who="${t.id}" data-whoval="${t.who}" aria-label="${t.who ? 'Úkol má ' + WHO[t.who] + ', změnit' : 'Přiřadit osobu'}">${t.who ? WHO[t.who] : icon('user')}</button>
+    </li>`;
   function renderChecklist() {
-    const p = checkProgress();
+    const { secs, tasks } = prepModel();
+    const f = state.prepWho, done = tasks.filter(t => t.done).length;
     return `
-      <div class="card card--flat">
-        <div class="sec-head"><h2 class="h-sec">Před odjezdem<small>Zaškrtnutí se ukládá jen v tomhle telefonu.</small></h2></div>
-        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="${p.total}" aria-valuenow="${p.done}"><i style="width:${p.total ? p.done / p.total * 100 : 0}%"></i></div>
+      <div class="card card--flat prep-head">
+        <div class="sec-head"><h2 class="h-sec">Před odjezdem<small>${done} z ${tasks.length} hotovo. Úkoly vidí oba telefony.</small></h2></div>
+        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="${tasks.length}" aria-valuenow="${done}"><i style="width:${tasks.length ? done / tasks.length * 100 : 0}%"></i></div>
+        <div class="prep-bar">
+          <div class="chips" role="group" aria-label="Čí úkoly">
+            ${chip('data-prepwho', 'vse', 'Všichni', !f)}${Object.entries(WHO).map(([k, n]) => chip('data-prepwho', k, n, f === k)).join('')}
+          </div>
+          <button class="btn btn--sm btn--primary" data-taskadd="">${icon('plus')} Úkol</button>
+        </div>
       </div>
-      ${CHECKLIST.map(g => `
-        <section aria-label="${g.title}">
-          <h3 class="h-sec" style="font-size:19px;margin-bottom:8px">${g.title}</h3>
-          <ul class="checks">${g.items.map(i => `
-            <li><label class="check"><input type="checkbox" data-check="${i.id}" ${state.checks[i.id] ? 'checked' : ''}><span>${i.t}${i.n ? `<small>${i.n}</small>` : ''}</span></label></li>`).join('')}
-          </ul>
-        </section>`).join('')}`;
+      ${secs.map(s => {
+        const list = tasks.filter(t => t.sec === s.id), shown = list.filter(t => !f || t.who === f);
+        return `<section class="psect" aria-label="${esc(s.title)}">
+          <div class="psect__head"><h3>${esc(s.title)}</h3><span class="psect__n">${list.filter(t => t.done).length}/${list.length}</span>
+            <button class="ibtn" data-secedit="${s.id}" aria-label="Upravit sekci ${esc(s.title)}">${icon('edit')}</button></div>
+          <ul class="tasks" data-sec="${s.id}">${shown.map(taskRow).join('')}</ul>
+          ${f && !shown.length ? `<p class="psect__empty">${WHO[f]} tady nic nemá.</p>` : ''}
+          <button class="addline" data-taskadd="${s.id}">${icon('plus')} Přidat úkol</button>
+        </section>`;
+      }).join('')}
+      <button class="btn" data-secadd>${icon('plus')} Nová sekce</button>`;
   }
+
+  function taskSheet(id, secId) {
+    const { secs, tasks } = prepModel();
+    if (!secs.length) return secSheet();
+    const t = id ? tasks.find(x => x.id === id) : { t: '', n: '', sec: secId || secs[0].id, who: state.prepWho || '' };
+    if (!t) return;
+    openSheet(`
+      <p class="sheet__eyebrow">${id ? 'Upravit úkol' : 'Nový úkol'}</p>
+      <form class="tform" data-taskform="${id || ''}">
+        <label class="field"><span>Název</span><input name="t" required maxlength="200" value="${esc(t.t)}" autocomplete="off"></label>
+        <label class="field"><span>Sekce</span><select name="sec" required>${secs.map(s => `<option value="${s.id}"${s.id === t.sec ? ' selected' : ''}>${esc(s.title)}</option>`).join('')}</select></label>
+        <fieldset class="field"><legend>Kdo to má <small>nepovinné</small></legend>
+          <div class="seg">${[['', 'Nikdo'], ...Object.entries(WHO)].map(([k, n]) => `<label><input type="radio" name="who" value="${k}"${t.who === k ? ' checked' : ''}><span>${n}</span></label>`).join('')}</div></fieldset>
+        <label class="field"><span>Popis <small>nepovinné</small></span><textarea name="n" rows="3" maxlength="1000">${esc(t.n.trim())}</textarea></label>
+        <div class="btn-row"><button class="btn btn--primary">${id ? 'Uložit' : 'Přidat úkol'}</button><button class="btn" type="button" data-sheetclose>Zrušit</button>
+          ${id ? `<button class="btn btn--ghost tform__del" type="button" data-taskdel="${id}">Smazat úkol</button>` : ''}</div>
+      </form>`);
+    if (!id) setTimeout(() => { const i = $('#sheet-body input[name="t"]'); if (i) i.focus(); }, 50);
+  }
+  function secSheet(id) {
+    const { secs, tasks } = prepModel();
+    const s = id ? secs.find(x => x.id === id) : { title: '' };
+    if (!s) return;
+    const n = id ? tasks.filter(t => t.sec === id).length : 0;
+    openSheet(`
+      <p class="sheet__eyebrow">${id ? 'Upravit sekci' : 'Nová sekce'}</p>
+      <form class="tform" data-secform="${id || ''}">
+        <label class="field"><span>Název sekce</span><input name="title" required maxlength="80" value="${esc(s.title)}" autocomplete="off"></label>
+        <div class="btn-row"><button class="btn btn--primary">${id ? 'Uložit' : 'Přidat sekci'}</button><button class="btn" type="button" data-sheetclose>Zrušit</button>
+          ${id && !n ? `<button class="btn btn--ghost tform__del" type="button" data-secdel="${id}">Smazat sekci</button>` : ''}</div>
+        ${id && n ? `<p class="muted">Smazat jde jen prázdná sekce. Úkoly přesuňte tažením za úchyt nebo v úpravě úkolu.</p>` : ''}
+      </form>`);
+    setTimeout(() => { const i = $('#sheet-body input[name="title"]'); if (i && !id) i.focus(); }, 50);
+  }
+  function saveTaskForm(form) {
+    const id = form.dataset.taskform, v = Object.fromEntries(new FormData(form));
+    const t = (v.t || '').trim(), sec = v.sec, who = v.who || '';
+    if (!t || !sec) return;
+    const { tasks } = prepModel();
+    const cur = id && tasks.find(x => x.id === id);
+    // prázdný popis se u výchozího úkolu uloží jako mezera, jinak by se vrátil text z CHECKLIST
+    const n = (v.n || '').trim() || (cur && cur.def ? ' ' : '');
+    if (cur) PLAN.setTask(id, { t, n, who, sec, ...(cur.sec !== sec ? { ord: nextOrd(tasks, sec) } : {}) });
+    else PLAN.setTask(PLAN.newId('u-'), { t, n, who, sec, ord: nextOrd(tasks, sec), done: false });
+    closeSheet(); renderInfo();
+  }
+  function saveSecForm(form) {
+    const id = form.dataset.secform, title = (new FormData(form).get('title') || '').trim();
+    if (!title) return;
+    if (id) PLAN.setSec(id, { title });
+    else { const { secs } = prepModel(); PLAN.setSec(PLAN.newId('s-'), { title, ord: Math.max(-10, ...secs.map(s => s.ord)) + 10 }); }
+    closeSheet(); renderInfo();
+  }
+  function deleteTask(id) {
+    const { tasks } = prepModel();
+    const t = tasks.find(x => x.id === id);
+    if (!t) return;
+    if (t.def) PLAN.setTask(id, { del: true }); else PLAN.dropTask(id);
+    closeSheet(); renderInfo();
+    toast(`Smazáno: ${esc(t.t)}`, () => {
+      if (t.def) PLAN.setTask(id, { del: null });
+      else PLAN.setTask(id, { t: t.t, n: t.n, who: t.who, sec: t.sec, ord: t.ord, done: t.done });
+      renderInfo();
+    }, false);
+  }
+
+  /* Přesun úkolu tažením za úchyt (pointer events, funguje prstem i myší, i mezi sekcemi) */
+  let dragging = null;
+  function dragPlace(x, y) {
+    const el = document.elementFromPoint(x, y);
+    if (!el || !dragging) return;
+    const { li } = dragging, over = el.closest('.task'), sect = el.closest('.psect');
+    if (over && over !== li && over.parentNode.matches('.tasks')) {
+      const r = over.getBoundingClientRect();
+      over.parentNode.insertBefore(li, y < r.top + r.height / 2 ? over : over.nextSibling);
+    } else if (!over && sect) {
+      const list = $('.tasks', sect);
+      if (list && !list.contains(li)) list.appendChild(li);
+    }
+  }
+  function dragScroll() {
+    if (!dragging) return;
+    const { y } = dragging, top = 70, bottom = innerHeight - 100;
+    const v = y < top ? -Math.min(16, (top - y) / 3) : y > bottom ? Math.min(16, (y - bottom) / 3) : 0;
+    if (v) { scrollBy(0, v); dragPlace(dragging.x, y); }
+    requestAnimationFrame(dragScroll);
+  }
+  document.addEventListener('pointerdown', e => {
+    const grip = e.target.closest('[data-grip]');
+    if (!grip || e.button > 0) return;
+    e.preventDefault();
+    $$('.whomenu').forEach(m => m.remove());
+    const li = grip.closest('.task'), r = li.getBoundingClientRect();
+    const ghost = li.cloneNode(true);
+    ghost.classList.add('task--ghost');
+    Object.assign(ghost.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px' });
+    document.body.appendChild(ghost);
+    document.body.classList.add('is-dragging');
+    li.classList.add('is-placeholder');
+    dragging = { li, ghost, id: li.dataset.task, dy: e.clientY - r.top, x: e.clientX, y: e.clientY };
+    try { grip.setPointerCapture(e.pointerId); } catch { /* starší prohlížeče */ }
+    requestAnimationFrame(dragScroll);
+  });
+  document.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    dragging.x = e.clientX; dragging.y = e.clientY;
+    dragging.ghost.style.top = (e.clientY - dragging.dy) + 'px';
+    dragPlace(e.clientX, e.clientY);
+  });
+  const dragEnd = e => {
+    if (!dragging) return;
+    const { li, ghost, id } = dragging;
+    dragging = null;
+    ghost.remove(); li.classList.remove('is-placeholder'); document.body.classList.remove('is-dragging');
+    const list = li.parentNode;
+    if (e.type !== 'pointercancel' && list && list.dataset.sec) {
+      const { tasks } = prepModel();
+      const ordOf = el => { const t = el && tasks.find(x => x.id === el.dataset.task); return t ? t.ord : null; };
+      const a = ordOf(li.previousElementSibling), b = ordOf(li.nextElementSibling);
+      const ord = a == null && b == null ? nextOrd(tasks, list.dataset.sec) : a == null ? b - 10 : b == null ? a + 10 : (a + b) / 2;
+      const cur = tasks.find(x => x.id === id);
+      if (cur && (cur.sec !== list.dataset.sec || cur.ord !== ord)) PLAN.setTask(id, { sec: list.dataset.sec, ord });
+    }
+    remotePending = false;
+    renderInfo();
+  };
+  document.addEventListener('pointerup', dragEnd);
+  document.addEventListener('pointercancel', dragEnd);
   function tipsBody() {
     return `
+      <section class="card card--flat" aria-label="Rychlé akce">
+        <div class="quick">
+          <a href="https://www.google.com/maps/dir/?api=1&destination=${STAY.lat},${STAY.lon}&travelmode=transit" target="_blank" rel="noopener"><span class="q-ico">🏠</span>Cesta domů</a>
+          <button data-show-address><span class="q-ico">🪪</span>Adresa pro řidiče</button>
+          <a href="tel:112"><span class="q-ico">🆘</span>Tísňová linka 112</a>
+        </div>
+      </section>
       <section class="card" aria-label="Kontakty">
         <h3>Důležité kontakty</h3>
         <div>${CONTACTS.map(c => `
@@ -1052,17 +1121,6 @@
     const el = $('#pday-' + date);
     if (el) el.scrollIntoView({ block: 'start' });
   }
-  async function sharePlan() {
-    const url = PLAN.shareUrl();
-    if (!url) return;
-    const text = `Plán na Málagu. Otevři odkaz a uvidíš stejný plán. Kód pro aplikaci na ploše: ${PLAN.code()}`;
-    try { if (navigator.share) { await navigator.share({ title: 'Málaga s dětmi: plán', text, url }); return; } }
-    catch (e) { if (e && e.name === 'AbortError') return; }
-    try { await navigator.clipboard.writeText(url); toast('Odkaz je zkopírovaný, vložte ho do zprávy', null, false); return; } catch { /* níže */ }
-    openSheet(`<p class="sheet__eyebrow">Odkaz na plán</p><p>Zkopírujte odkaz a pošlete ho druhému telefonu:</p>
-      <input class="sync__join" style="width:100%;min-height:44px;padding:8px 12px;border-radius:12px;border:1px solid var(--linea);font:15px var(--f-mono)" value="${esc(url)}" readonly onfocus="this.select()">
-      <button class="btn" data-sheetclose>Hotovo</button>`);
-  }
   function showAct(id) {
     state.pick = null;
     state.f.view = 'list';
@@ -1097,6 +1155,8 @@
   const toggleIn = (arr, v) => arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v];
 
   document.addEventListener('click', e => {
+    // nabídka osoby u úkolu se zavře klepnutím kamkoli jinam
+    if (!e.target.closest('.whomenu, [data-who]')) closeWho();
     const t = e.target.closest('button, a[data-showcard], a[data-showfood]');
     if (!t) return;
     const d = t.dataset;
@@ -1105,7 +1165,6 @@
     if (d.stayday) { state.stayDay = d.stayday; store.set('stayDay', d.stayday); renderToday(); return $('.hero').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     if ('refresh' in d) return loadWeather(true);
     if (d.done) { state.done[d.done] = !state.done[d.done]; if (!state.done[d.done]) delete state.done[d.done]; store.set('done', state.done); return renderers[state.tab](); }
-    if (d.gotoFilter) { state.f = { ...state.f, wx: d.gotoFilter, cats: [], dur: [], dist: [], view: 'list' }; saveF(); return go('vylety'); }
     // filtry výletů
     if (d.fwx) { state.f.wx = d.fwx; saveF(); return renderTrips(); }
     if (d.fcat) { state.f.cats = toggleIn(state.f.cats, d.fcat); saveF(); return renderTrips(); }
@@ -1164,13 +1223,27 @@
     if (d.showrest) return showRest(d.showrest);
     if (d.jump) { const el = $('#pday-' + d.jump); return el && el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     if (d.jumpplan) { go('plan', { scroll: false }); const el = $('#pday-' + d.jumpplan); return el && el.scrollIntoView({ block: 'start' }); }
-    // sdílení plánu
-    if ('syncNew' in d) { PLAN.create(); renderPlan(); return toast('Sdílený plán je vytvořený. Pošlete odkaz druhému telefonu.', null, false); }
-    if ('syncShare' in d) return sharePlan();
-    if ('syncLeave' in d) {
-      if (d.confirm !== '1') { t.dataset.confirm = '1'; t.textContent = 'Opravdu odpojit? Klepněte znovu'; return; }
-      PLAN.leave(); return renderPlan();
+    // Příprava
+    if (d.prepwho) { state.prepWho = d.prepwho === 'vse' ? '' : d.prepwho; store.set('prepWho', state.prepWho); return renderInfo(); }
+    if ('taskadd' in d) return taskSheet(null, d.taskadd);
+    if (d.taskedit) return taskSheet(d.taskedit);
+    if (d.taskdel) return deleteTask(d.taskdel);
+    if ('secadd' in d) return secSheet();
+    if (d.secedit) return secSheet(d.secedit);
+    if (d.secdel) {
+      const { secs } = prepModel(), s = secs.find(x => x.id === d.secdel);
+      if (s) { if (s.def) PLAN.setSec(s.id, { del: true }); else PLAN.dropSec(s.id); }
+      closeSheet(); return renderInfo();
     }
+    if (d.who) {
+      const open = $('.whomenu');
+      $$('.whomenu').forEach(m => m.remove());
+      if (open && open.dataset.for === d.who) return flushRemote();
+      t.closest('.task').insertAdjacentHTML('beforeend', `<div class="whomenu" data-for="${d.who}" role="menu">${Object.entries(WHO).map(([k, n]) =>
+        `<button role="menuitem" data-setwho="${d.who}|${k}" aria-pressed="${d.whoval === k}">${n}</button>`).join('')}${d.whoval ? `<button role="menuitem" data-setwho="${d.who}|">Nikdo</button>` : ''}</div>`);
+      return;
+    }
+    if (d.setwho) { const [id, who] = d.setwho.split('|'); PLAN.setTask(id, { who }); return renderInfo(); }
     // Info a ostatní
     if (d.info) { state.info = d.info; store.set('info', d.info); return renderInfo(); }
     if ('showAddress' in d) { $('#show-driver-text').innerHTML = STAY.addressBig; return $('#show-driver').showModal(); }
@@ -1191,13 +1264,15 @@
   // klepnutí mimo spodní panel ho zavře
   $$('dialog').forEach(dl => dl.addEventListener('click', e => { if (e.target === dl) dl.close(); }));
 
-  document.addEventListener('submit', e => {
-    if (!e.target.matches('[data-sync-join]')) return;
+  document.addEventListener('submit', async e => {
+    const f = e.target;
+    if (f.matches('[data-taskform]')) { e.preventDefault(); return saveTaskForm(f); }
+    if (f.matches('[data-secform]')) { e.preventDefault(); return saveSecForm(f); }
+    if (f.id !== 'lock-form') return;
     e.preventDefault();
-    const v = e.target.elements.code.value;
-    if (!PLAN.join(v)) return toast('Tohle nevypadá jako kód plánu', null, false);
-    renderPlan();
-    toast('Telefon je připojený ke sdílenému plánu', null, false);
+    const ok = await unlock(f.elements.code.value);
+    $('#lock-err').hidden = ok;
+    if (ok) start(); else f.elements.code.select();
   });
 
   const noteTimers = {};
@@ -1213,18 +1288,14 @@
     if (e.target.dataset.note) return saveNote(e.target);
     if ('fsort' in e.target.dataset) { state.f.sort = e.target.value; saveF(); return renderTrips(); }
     if ('ffsort' in e.target.dataset) { state.ff.sort = e.target.value; saveFF(); return renderFood(); }
-    const id = e.target.dataset.check;
-    if (!id) return;
-    state.checks[id] = e.target.checked; if (!e.target.checked) delete state.checks[id];
-    store.set('checks', state.checks);
-    const p = checkProgress();
-    const bar = $('.progress i'); if (bar) bar.style.width = (p.done / p.total * 100) + '%';
-    const lab = $('[data-info="pred"] small'); if (lab) lab.textContent = `${p.done}/${p.total}`;
+    if (e.target.dataset.taskdone) { PLAN.setTask(e.target.dataset.taskdone, { done: e.target.checked }); return renderInfo(); }
   });
 
-  /* Změny plánu z druhého telefonu: překreslit, ale nikdy pod rukama při psaní poznámky */
+  /* Změny plánu z druhého telefonu: překreslit, ale nikdy pod rukama při psaní poznámky, tažení úkolu nebo výběru osoby */
   let remotePending = false;
-  const rerenderPlanViews = () => { refreshSlots(); if (state.tab === 'plan') renderPlan(); else if (state.tab === 'dnes') renderToday(); };
+  const rerenderPlanViews = () => { refreshSlots(); if (state.tab === 'plan') renderPlan(); else if (state.tab === 'info' && state.info === 'pred') renderInfo(); };
+  const flushRemote = () => { if (remotePending && !editing()) { remotePending = false; rerenderPlanViews(); } };
+  function closeWho() { if (!$('.whomenu')) return; $$('.whomenu').forEach(m => m.remove()); flushRemote(); }
   PLAN.onChange(kind => {
     if (kind === 'local') return;
     if (editing()) { remotePending = true; return; }
@@ -1232,25 +1303,39 @@
     rerenderPlanViews();
   });
   document.addEventListener('focusout', e => {
-    if (!remotePending || !e.target.matches('textarea[data-note], .sync__join input')) return;
+    if (!remotePending || !e.target.matches('textarea[data-note]')) return;
     remotePending = false;
     setTimeout(() => { if (!editing()) rerenderPlanViews(); else remotePending = true; }, 400);
   });
 
-  /* ---------- Odpočet v hlavičce ---------- */
-  function countdown() {
-    const t = todayStr();
-    const el = $('#countdown');
-    if (t < TRIP.start) { const n = dayDiff(t, TRIP.start); el.textContent = n === 1 ? 'Letíme zítra' : `Letíme za ${n} ${plural(n, 'den', 'dny', 'dní')}`; }
-    else if (t <= TRIP.end) el.textContent = `Den ${dayDiff(TRIP.start, t) + 1} z ${stayDays.length}`;
-    else el.textContent = 'Zase doma';
+  /* ---------- Zámek: celá stránka za kódem, zařízení si ho zapamatuje ----------
+     V repu je jen otisk kódu (TRIP.lock). Ze stejného kódu se odvodí klíč plánu ve Firebase,
+     takže každý telefon, který kód zná, vidí stejný plán a stejné úkoly. */
+  const sha256 = async s => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))];
+  const toHex = b => b.map(x => x.toString(16).padStart(2, '0')).join('');
+  const KEY_ALPHA = 'abcdefghijkmnpqrstuvwxyz23456789';
+  async function unlock(input) {
+    const k = String(input || '').trim();
+    if (!k || !window.crypto || !crypto.subtle) return false;
+    if (toHex(await sha256('malaga-2026:zamek:' + k)) !== TRIP.lock) return false;
+    const b = await sha256('malaga-2026:plan:' + k);
+    PLAN.join(b.slice(0, 20).map(x => KEY_ALPHA[x % 32]).join('').replace(/(.{5})(?=.)/g, '$1-'));
+    store.set('unlock', TRIP.lock);
+    return true;
   }
 
   /* ---------- Start ---------- */
-  countdown();
-  if (PLAN.joinedFromLink()) { go('plan', { scroll: false }); toast('Telefon je připojený ke sdílenému plánu', null, false); }
-  else go(state.tab, { scroll: false });
-  loadWeather();
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) { countdown(); loadWeather(); } });
+  let started = false;
+  function start() {
+    if (started) return;
+    started = true;
+    document.body.classList.remove('is-locked');
+    migrateChecks();
+    go(state.tab, { scroll: false });
+    loadWeather();
+  }
+  if (store.get('unlock') === TRIP.lock && PLAN.code()) start();
+  else setTimeout(() => $('#lock-in').focus(), 0);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && started) loadWeather(); });
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 })();

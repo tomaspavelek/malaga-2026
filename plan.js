@@ -1,8 +1,9 @@
-/* Plán pobytu: výlety, jídla a poznámky po dnech.
-   Ukládá se v telefonu (localStorage). S kódem plánu se sdílí přes Firebase Realtime Database
-   (REST + EventSource, bez SDK a bez přihlášení). Změny bez signálu čekají ve frontě a odešlou se po připojení.
-   Zapisují se jen listy stromu (days/<datum>/acts, …/meals/<jídlo>, …/notes/<kdo>), takže dva telefony si
-   nepřepisují celé dny. */
+/* Plán pobytu: výlety, jídla a poznámky po dnech, k tomu úkoly z Přípravy.
+   Ukládá se v telefonu (localStorage) a s kódem plánu se sdílí přes Firebase Realtime Database
+   (REST + EventSource, bez SDK a bez přihlášení). Kód se odvozuje ze vstupního kódu stránky (app.js).
+   Změny bez signálu čekají ve frontě a odešlou se po připojení.
+   Zapisují se jen listy stromu (days/<datum>/acts, …/meals/<jídlo>, …/notes/<kdo>, prep/tasks/<id>/<pole>),
+   takže dva telefony si nepřepisují celé dny ani úkoly. */
 const PLAN = (() => {
   'use strict';
 
@@ -48,15 +49,26 @@ const PLAN = (() => {
     Object.entries(src.notes).forEach(([w, t]) => { if (t) out[`days/${date}/notes/${w}`] = t; });
     return out;
   };
+  // úkoly a sekce Přípravy jako listy: prep/tasks/<id>/<pole>
+  const prepLeaves = prep => {
+    const out = {};
+    ['tasks', 'secs'].forEach(k => Object.entries((prep || {})[k] || {}).forEach(([id, o]) =>
+      Object.entries(o || {}).forEach(([f, v]) => { if (!isEmpty(v)) out[`prep/${k}/${id}/${f}`] = v; })));
+    return out;
+  };
 
   /* ---------- Zápis ---------- */
-  function write(path, val) {
-    if (isEmpty(val)) val = null;
-    setPath(data, path, val);
+  function writeAll(entries) {
+    entries.forEach(([path, val]) => {
+      if (isEmpty(val)) val = null;
+      setPath(data, path, val);
+      if (code && BASE) queue[path] = val;
+    });
     ls.set('plan', data);
-    if (code && BASE) { queue[path] = val; ls.set('planQueue', queue); flush(); }
+    if (code && BASE) { ls.set('planQueue', queue); flush(); }
     emit('local');
   }
+  const write = (path, val) => writeAll([[path, val]]);
 
   async function flush() {
     if (flushing || !code || !BASE || !Object.keys(queue).length) return;
@@ -108,6 +120,7 @@ const PLAN = (() => {
         Object.entries(local.days || {}).forEach(([d, v]) => {
           if (!data.days[d]) Object.assign(queue, leaves(d, v));
         });
+        if (isEmpty(data.prep)) Object.assign(queue, prepLeaves(local.prep));
         joining = false; ls.set('planJoining', false);
       }
     } else {
@@ -135,14 +148,6 @@ const PLAN = (() => {
   }
   function setCode(c) { adopt(c); connect(); emit('status'); }
 
-  // odkaz od druhého telefonu: …/malaga-2026/#plan=<kód>
-  let joinedFromLink = false;
-  const fromHash = parseCode((location.hash.match(/^#plan=(.+)$/) || [])[1]);
-  if (fromHash) {
-    if (fromHash !== code) { adopt(fromHash); joinedFromLink = true; }
-    history.replaceState(null, '', location.pathname + location.search);
-  }
-
   connect();
   window.addEventListener('online', () => { if (code && (!es || es.readyState === 2)) connect(); else flush(); });
   document.addEventListener('visibilitychange', () => {
@@ -151,6 +156,7 @@ const PLAN = (() => {
   });
 
   const sameList = (arr, f) => { const a = [...arr]; f(a); return a; };
+  const fields = (base, obj) => Object.entries(obj).map(([f, v]) => [`${base}/${f}`, v]);
   return {
     day,
     datesWith: id => Object.keys(data.days).filter(d => listOf(data.days[d].acts).includes(id)).sort(),
@@ -166,15 +172,18 @@ const PLAN = (() => {
     },
     setMeal: (date, meal, id) => write(`days/${date}/meals/${meal}`, id || null),
     setNote: (date, who, text) => write(`days/${date}/notes/${who}`, String(text).slice(0, 2000)),
+    // Příprava: { tasks: { id: { t, n, sec, who, done, ord, del } }, secs: { id: { title, ord, del } } }
+    prep: () => ({ tasks: { ...((data.prep || {}).tasks || {}) }, secs: { ...((data.prep || {}).secs || {}) } }),
+    setTask: (id, obj) => writeAll(fields(`prep/tasks/${id}`, obj)),
+    setSec: (id, obj) => writeAll(fields(`prep/secs/${id}`, obj)),
+    dropTask: id => write(`prep/tasks/${id}`, null),
+    dropSec: id => write(`prep/secs/${id}`, null),
+    newId: prefix => prefix + gen().replace(/-/g, '').slice(0, 10),
     enabled: () => !!BASE,
     code: () => code,
     status: () => status,
     pending: () => Object.keys(queue).length,
-    joinedFromLink: () => joinedFromLink,
-    create: () => setCode(gen()),
     join(input) { const c = parseCode(input); if (!c) return false; if (c !== code) setCode(c); return true; },
-    leave() { if (es) es.close(); es = null; code = null; ls.set('planCode', null); queue = {}; ls.set('planQueue', queue); setStatus('local'); emit('status'); },
-    shareUrl: () => code ? `${location.origin}${location.pathname}#plan=${code}` : null,
     onChange: fn => subs.add(fn),
   };
 })();

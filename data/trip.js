@@ -13,6 +13,8 @@ const TRIP = {
   // Klimatický průměr pro dny mimo 16denní předpověď (AEMET, letiště Málaga: listopad max 20,1 °C, min 11,3 °C)
   // Firebase Realtime Database pro sdílený plán (prázdné = plán jen v tomhle telefonu). Pravidla: CONTEXT.md.
   sync: 'https://malaga-2026-25099-default-rtdb.europe-west1.firebasedatabase.app',
+  // Otisk vstupního kódu (SHA-256 z 'malaga-2026:zamek:' + kód). Z kódu se odvozuje i klíč sdíleného plánu, viz app.js.
+  lock: 'a76251d72cd48ec801a0436e72bedc9ce231773997ee3da49ae4a1115aa895c6',
   climate: { tmaxStart: 22, tmaxEnd: 21, tminStart: 13, tminEnd: 12, sea: 19, note: 'začátkem listopadu kolem 21–22 °C přes den a 12–13 °C v noci. V listopadu prší v průměru 5–6 dní, zato vydatně (AEMET).' },
   cats: {
     zvirata: { label: 'Zvířata', emoji: '🐠' },
@@ -34,21 +36,19 @@ const ITINERARY = {
       from: { code: 'OSR', name: 'Ostrava', time: '10:50' }, to: { code: 'AGP', name: 'Málaga', time: '14:25' },
       info: [['Bag drop', 'do 10:10'], ['Brána zavírá', '10:20'], ['Časový posun', 'žádný']],
     },
-    alert: '<b>Online check-in v pátek 30. 10. od 10:50</b> (otevírá se 24 h před odletem, když nemáte koupená místa). Palubenky jsou jen v aplikaci Ryanair. Odbavení na letišti v Ostravě stojí 55 € za osobu.',
+    alert: '<b>Online check-in jde udělat už teď.</b> S koupenými místy ho Ryanair otevírá 60 dní před letem. Palubenky jsou jen v aplikaci Ryanair. Odbavení na letišti v Ostravě stojí 55 € za osobu.',
     items: [
-      { t: '06:15', title: 'Budíček a snídaně', text: 'Rodiče v 6:15, děti v 6:30. Batole nakrmit ještě doma.',
+      { t: '07:00', title: 'Budíček a snídaně', text: 'Děti budíme v 7:00, snídaně v klidu doma. Batole nakrmit ještě před odjezdem.',
         more: 'Mléko, vodu pro miminko a příkrmy na cestu dejte do zvláštní tašky, ne do sáčku s tekutinami: dětská strava má výjimku z limitu 100 ml. Zimní bundy nechte v autě a do příručního zavazadla přibalte lehké bundy na návrat 9. 11. večer.' },
-      { t: '07:50', key: true, title: 'Odjezd z domova na letiště Mošnov', text: '24 km, 25–35 minut přes Plzeňskou na silnici I/58 směr Příbor. V čase je rezerva 15–20 minut.',
-        links: [['Navigovat na letiště', NAV('Letiště Leoše Janáčka Ostrava, Mošnov')]] },
-      { t: '08:20', title: 'Vyložit rodinu před odletovou halou', text: 'Před halou je prvních 15 minut zdarma. Jeden rodič zůstane s dětmi a kufry, druhý jede parkovat.' },
-      { t: '08:30', key: true, title: 'Parkování P5 (záloha P6)', text: 'P5 i P6 stojí 130 Kč za den, za 11 započatých dní tedy 1 430 Kč. P5 leží přímo před železničním terminálem, do haly je to pěšky 3–5 minut.',
-        more: 'S rezervací přes Parkum otevře závoru SPZ, případně QR kód z voucheru. Bez rezervace si vezmete lístek a ten <b>neztraťte</b> (ztráta stojí 2 000 Kč). Vyfoťte si lístek i místo stání. Když je plno, stejnou cenu mají P3, P3A a P4. Parkoviště nejsou hlídaná.',
-        img: { label: 'Plánek parkovišť', src: 'img/parking-ostrava.png', alt: 'Plánek parkovacích ploch letiště Ostrava 2026' },
-        links: [['Navigovat na P5', NAV('Parkoviště P5 Letiště Ostrava Mošnov')], ['Rezervace parkování', 'https://airport-ostrava.parkum.cz/booking?_locale=cs']] },
-      { t: '08:45', title: 'Bag drop Ryanair', text: 'Přepážka otevírá nejpozději v 8:50 a zavírá v 10:10. Přijděte i bez odbaveného kufru: kočárek a autosedačky tu dostanou visačku.',
-        more: 'Kočárek pak máte až ke schůdkům letadla. Každé dítě má zdarma 2 kusy výbavy (kočárek a k tomu autosedačku, podsedák nebo postýlku).' },
-      { t: '09:05', title: 'Bezpečnostní kontrola', text: 'Tekutiny do 100 ml v jednom litrovém sáčku. Dětské mléko, vodu a příkrmy vyndejte zvlášť; personál může chtít, abyste je ochutnali.' },
-      { t: '09:25', title: 'Dětský koutek, přebalit, nakrmit', text: 'Koutky jsou v obou patrech odletové haly za kontrolou. V 1. patře je místnost pro rodiče s dětmi s vlastním WC. Přebalte těsně před nástupem.' },
+      { t: '08:30', key: true, title: 'Odjezd z domova na letiště Mošnov', text: '24 km, 25–35 minut přes Plzeňskou na silnici I/58 směr Příbor. Na P5 budete kolem 9:00, do zavření bag dropu v 10:10 tak zbývá asi hodina.',
+        links: [['Navigovat na P5', NAV('Parkoviště P5 Letiště Ostrava Mošnov')]] },
+      { t: '09:00', key: true, title: 'Parkování P5 a pěšky do haly', text: 'Rovnou na P5 a do odletové haly jdete všichni spolu, s kočárkem a kufry 3–5 minut. P5 stojí 130 Kč za den, za 11 započatých dní tedy 1 430 Kč. Rezervace není potřeba.',
+        more: 'U vjezdu si vezmete lístek a ten <b>neztraťte</b> (ztráta stojí 2 000 Kč). Vyfoťte si lístek i místo stání. Platí se až při návratu: v automatu v příletové hale, nebo kartou u výjezdu. Když je P5 plné, stejnou cenu mají P6, P3, P3A a P4 (do 5–8 minut pěšky). Parkoviště nejsou hlídaná.',
+        img: { label: 'Plánek parkovišť', src: 'img/parking-ostrava.png', alt: 'Plánek parkovacích ploch letiště Ostrava 2026' } },
+      { t: '09:10', title: 'Bag drop Ryanair', text: 'Přepážka zavírá v 10:10. Odevzdáte kufry a kočárek tu dostane visačku.',
+        more: 'Kočárek pak máte až ke schůdkům letadla.' },
+      { t: '09:30', title: 'Bezpečnostní kontrola', text: 'Tekutiny do 100 ml v jednom litrovém sáčku. Dětské mléko, vodu a příkrmy vyndejte zvlášť; personál může chtít, abyste je ochutnali.' },
+      { t: '09:45', title: 'Dětský koutek, přebalit, nakrmit', text: 'Koutky jsou v obou patrech odletové haly za kontrolou. V 1. patře je místnost pro rodiče s dětmi s vlastním WC. Přebalte těsně před nástupem.' },
       { t: '10:05', title: 'K bráně', text: 'Brána zavírá v 10:20. Letadlo z Málagy přistává v 10:25, takže nástup začne nejspíš kolem 10:30 a zpoždění se přenáší. Svačinu mějte po ruce.' },
       { t: '10:50', key: true, title: 'Odlet FR 4086', text: 'Při startu kojit, dát lahev nebo dudlík, aby polykání vyrovnalo tlak v uších.',
         more: 'Přebalovací pult je na toaletě vzadu nebo uprostřed letadla. Posádka lahve ani jídlo neohřívá. O pás pro miminko na klíně si řekněte posádce při nástupu. S miminkem nesmíte sedět v řadě u nouzového východu.' },
@@ -71,7 +71,7 @@ const ITINERARY = {
       from: { code: 'AGP', name: 'Málaga', time: '17:05' }, to: { code: 'OSR', name: 'Ostrava', time: '20:30' },
       info: [['Bag drop', 'do 16:25'], ['Brána zavírá', '16:35'], ['Brány', 'D (Schengen)']],
     },
-    alert: '<b>Online check-in v neděli 8. 11. od 17:05.</b> Předem domluvte s hostitelem úschovu kufrů od 12:00 do 14:00 (nebo pozdní check-out) a odvoz na letiště ve 14:10 se sedačkami.',
+    alert: '<b>Online check-in na zpáteční let jde udělat taky už teď</b> (koupená místa). Předem vyřešte úschovu kufrů od 12:00 do 14:00 (hostitel, pozdní check-out nebo úschovna) a odvoz na letiště ve 14:10 se sedačkami.',
     items: [
       { t: '08:00', title: 'Snídaně a balení', text: 'Doklady stejné jako na cestu tam, palubenky v aplikaci v obou telefonech, jídlo a pití na let.' },
       { t: '10:30', title: 'Poslední procházka', text: 'Parque del Oeste (680 m, hřiště, jezírko) nebo pláž Misericordia (550 m).' },
@@ -93,42 +93,29 @@ const ITINERARY = {
   },
 };
 
+/* Výchozí úkoly v Info → Příprava. Úpravy, nové úkoly a sekce, pořadí, osoba a odškrtnutí se ukládají
+   ke sdílenému plánu (prep/tasks, prep/secs), id sekcí i úkolů proto neměnit. */
 const CHECKLIST = [
-  { title: 'Doklady', items: [
+  { id: 'doklady', title: 'Doklady', items: [
     { id: 'doc-op', t: 'Každý ze 4 má vlastní platný OP nebo pas, i miminko', n: 'Ryanair nepřijme rodný list ani zápis v dokladu rodiče.' },
     { id: 'doc-same', t: 'Na cestu tam i zpět zadat do check-inu stejný doklad' },
     { id: 'doc-ehic', t: 'Průkazy pojištěnce s modrou EHIC na rubu pro všechny 4', n: 'Zkontrolovat platnost.' },
     { id: 'doc-car', t: 'Řidičák a doklady od auta' },
   ] },
-  { title: 'Pojištění a registrace', items: [
+  { id: 'pojisteni', title: 'Pojištění a registrace', items: [
     { id: 'ins-cpzp', t: 'Cestovní pojištění ČPZP pro 4 osoby na 31. 10. – 9. 11.', n: 'Smlouvu mít v PDF v telefonu.' },
     { id: 'ins-tel', t: 'Uložit do telefonu asistenci Global Assistance +420 266 799 788', n: 'Nonstop, česky. Při ošetření volat jako první.' },
     { id: 'ins-drozd', t: 'Registrace DROZD včetně dětí', n: 'drozd.mzv.cz' },
   ] },
-  { title: 'Ryanair', items: [
-    { id: 'fr-seats', t: 'Rozhodnout o sedadlech', n: 'Zdarma posadí dítě vedle jednoho rodiče, druhý může sedět jinde. Všichni čtyři spolu jen s koupenými místy.' },
-    { id: 'fr-app', t: 'Aplikace Ryanair v obou telefonech s přihlášenou rezervací' },
-    { id: 'fr-ci-out', t: 'Online check-in TAM: pátek 30. 10. od 10:50', n: 'Nastavit si připomínku.' },
-    { id: 'fr-ci-back', t: 'Online check-in ZPĚT: neděle 8. 11. od 17:05' },
-    { id: 'fr-bags', t: 'Ověřit zaplacená zavazadla', n: 'Malá taška 40×30×20 cm na osobu se sedadlem, taška pro miminko do 5 kg (45×35×20 cm).' },
-    { id: 'fr-seatsdec', t: 'Rozhodnout, jestli poletí vlastní autosedačky', n: 'Zdarma v podpalubí (2 kusy výbavy na dítě včetně kočárku).' },
+  { id: 'ryanair', title: 'Ryanair', items: [
+    { id: 'fr-app', t: 'Aplikace Ryanair', n: 'Zkontrolovat aktualizaci.' },
+    { id: 'fr-ci-out', t: 'Online check-in TAM (FR 4086)', n: 'S koupenými místy jde už teď, Ryanair ho otevírá 60 dní před letem.' },
+    { id: 'fr-ci-back', t: 'Online check-in ZPĚT (FR 4085)', n: 'Taky už teď. Palubenky pak mít v aplikaci v obou telefonech.' },
   ] },
-  { title: 'Parkování a transfer', items: [
-    { id: 'pk-res', t: 'Rezervace parkování P5 (Parkum)', n: 'Okno 31. 10. 6:50 až 10. 11. 0:30, voucher s QR kódem do telefonu.' },
+  { id: 'transfer', title: 'Transfer a kufry', items: [
     { id: 'tr-in', t: 'Řidiči poslat let FR 4086, přílet 14:25, 2 dospělí + 2 děti + kočárek', n: 'Písemně potvrdit sedačky: vajíčko proti směru jízdy pro 10 měsíců a sedačku s pásy pro 3,5 roku. Vyžádat jméno a WhatsApp.' },
     { id: 'tr-out', t: 'Domluvit odvoz na letiště 9. 11. ve 14:10 se sedačkami' },
-    { id: 'host-bags', t: 'S hostitelem domluvit úschovu kufrů 12:00–14:00 v den odjezdu' },
-  ] },
-  { title: 'Do příručního zavazadla', items: [
-    { id: 'cb-docs', t: 'Doklady, telefony, powerbanka', n: 'Max. 2 powerbanky na osobu, ne do přihrádky nad hlavou.' },
-    { id: 'cb-food', t: 'Mléko, voda, příkrmy a svačiny na let', n: 'Mimo sáček s tekutinami.' },
-    { id: 'cb-nappy', t: 'Pleny (6–8), ubrousky, přebalovací podložka, pytlíky' },
-    { id: 'cb-clothes', t: 'Náhradní oblečení pro obě děti i pro rodiče' },
-    { id: 'cb-ears', t: 'Dudlík nebo pití na start a přistání' },
-    { id: 'cb-fun', t: '2–3 nové hračky nebo knížky, tablet se staženými pohádkami a sluchátka' },
-    { id: 'cb-carrier', t: 'Ergonosítko', n: 'Na cestu z letadla, než přijede kočárek.' },
-    { id: 'cb-meds', t: 'Dětský paracetamol nebo ibuprofen, teploměr, náplasti' },
-    { id: 'cb-jackets', t: 'Lehké bundy na návrat do Ostravy 9. 11. večer' },
+    { id: 'host-bags', t: 'Vyřešit úschovu kufrů v den odjezdu' },
   ] },
 ];
 
