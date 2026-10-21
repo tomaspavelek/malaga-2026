@@ -550,6 +550,16 @@ details.fold[open] > summary svg { transform: rotate(90deg); }
 .chip--milo[aria-pressed="true"] { background: var(--jacaranda); border-color: var(--jacaranda); color: #fff; }
 @media (prefers-color-scheme: dark) { .chip--milo[aria-pressed="true"] { color: #1A1230; } }
 .tip .milo { margin-top: 8px; }
+/* naše hvězdičky: Tom a Míša 0–3 */
+.ours { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 14px; margin: -2px 0; }
+.ours__p { display: inline-flex; align-items: center; }
+.ours__p b { font: 700 13px var(--f-body); margin-right: 2px; color: var(--who); }
+.ours__p[data-p="tom"] { --who: var(--mar); }
+.ours__p[data-p="misa"] { --who: var(--albero); }
+.ours__s { width: 30px; height: 36px; padding: 0; border: 0; background: none; font-size: 23px; line-height: 1; color: var(--linea); cursor: pointer; }
+.ours__s[aria-pressed="true"] { color: var(--who); }
+.ours__sum { margin-left: auto; font: 500 13px var(--f-mono); color: var(--tinta-2); }
+.chip__star { color: var(--albero); }
 .kids { display: grid; gap: 3px; padding: 10px 12px; border-radius: 12px; border-left: 5px solid var(--biznaga); background: var(--biznaga-claro); }
 .kids b { font-size: 14.5px; color: var(--biznaga); display: flex; align-items: center; gap: 6px; }
 .kids p { font-size: 14.5px; line-height: 1.45; color: var(--tinta); }

@@ -2,7 +2,8 @@
    Ukládá se v telefonu (localStorage) a s kódem plánu se sdílí přes Firebase Realtime Database
    (REST + EventSource, bez SDK a bez přihlášení). Kód se odvozuje ze vstupního kódu stránky (app.js).
    Změny bez signálu čekají ve frontě a odešlou se po připojení.
-   Zapisují se jen listy stromu (days/<datum>/acts, …/meals/<jídlo>, …/notes/<kdo>, prep/tasks/<id>/<pole>),
+   Zapisují se jen listy stromu (days/<datum>/acts, …/meals/<jídlo>, …/notes/<kdo>, prep/tasks/<id>/<pole>,
+   stars/<act|food>/<id>/<kdo>),
    takže dva telefony si nepřepisují celé dny ani úkoly. */
 const PLAN = (() => {
   'use strict';
@@ -178,6 +179,9 @@ const PLAN = (() => {
     setSec: (id, obj) => writeAll(fields(`prep/secs/${id}`, obj)),
     dropTask: id => write(`prep/tasks/${id}`, null),
     dropSec: id => write(`prep/secs/${id}`, null),
+    // naše hvězdičky: stars/<act|food>/<id>/<tom|misa> = 1–3, 0 se neukládá
+    stars: (kind, id) => ({ ...(((data.stars || {})[kind] || {})[id] || {}) }),
+    setStars: (kind, id, who, n) => write(`stars/${kind}/${id}/${who}`, n || null),
     newId: prefix => prefix + gen().replace(/-/g, '').slice(0, 10),
     enabled: () => !!BASE,
     code: () => code,
