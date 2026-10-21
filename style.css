@@ -30,12 +30,14 @@
   --mar: #0B5D8E;          /* Středomoře, primární */
   --mar-hondo: #083F60;
   --mar-claro: #E1EEF6;
-  --albero: #C98A1B;       /* okr andaluských cest, must-see */
+  --albero: #C98A1B;       /* okr andaluských cest, hvězdičky */
   --albero-claro: #FBEFD6;
   --biznaga: #2B7655;      /* plusy */
   --biznaga-claro: #E2F1E9;
   --granada: #B03547;      /* mínusy, varování */
   --granada-claro: #F9E3E6;
+  --jacaranda: #6B4FA0;    /* fialové jakarandy v Málaze: co radí Miloťáci */
+  --jacaranda-claro: #EFE9F8;
   --sun: #F2B33D;
   --cloud: #FFFFFF;
   --rain: #3E8FD0;
@@ -57,6 +59,7 @@
     --albero: #EBB54E; --albero-claro: #3A2C10;
     --biznaga: #63C496; --biznaga-claro: #133325;
     --granada: #EE8492; --granada-claro: #3C1A20;
+    --jacaranda: #BCA6EA; --jacaranda-claro: #261E3B;
     --cloud: #DCE6EE; --rain: #6DB4EC;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 22px rgba(0,0,0,.25);
     color-scheme: dark;
@@ -202,9 +205,6 @@ main { max-width: 640px; margin: 0 auto; padding: 0 16px; }
 .act__emoji { flex: none; width: 46px; height: 46px; display: grid; place-items: center; border-radius: 14px; font-size: 24px; background: var(--mar-claro); }
 .act__title { font: 700 20px/1.18 var(--f-display); letter-spacing: -.005em; }
 .act__sub { font-size: 14px; color: var(--tinta-2); margin-top: 3px; }
-.must { flex: none; display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase;
-  color: #fff; background: var(--albero); padding: 5px 9px; border-radius: 999px; white-space: nowrap; margin-top: 1px; }
-@media (prefers-color-scheme: dark) { .must { color: #2A1D05; } }
 .stars { color: var(--albero); letter-spacing: 1px; font-size: 14px; }
 .meta { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14.5px; color: var(--tinta); }
 .meta span { display: inline-flex; align-items: center; gap: 5px; }
@@ -537,6 +537,19 @@ details.fold[open] > summary svg { transform: rotate(90deg); }
 .ctag[aria-pressed="true"] { background: var(--tinta); border-color: var(--tinta); color: var(--papel); }
 .mealtag { font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 8px; background: var(--cal); color: var(--tinta-2); text-decoration: line-through; opacity: .55; }
 .mealtag.on { background: var(--mar-claro); color: var(--mar); text-decoration: none; opacity: 1; }
+/* Miloťáci: tipy od známých, mají pro rodinu největší váhu */
+.milo { display: grid; gap: 6px; padding: 10px 12px; border-radius: 12px; border-left: 5px solid var(--jacaranda); background: var(--jacaranda-claro); }
+.milo > b { font-size: 14.5px; color: var(--jacaranda); display: flex; align-items: center; gap: 6px; }
+.milo > b svg { width: 17px; height: 17px; flex: none; }
+.milo p, .milo blockquote { font-size: 14.5px; line-height: 1.45; color: var(--tinta); margin: 0; }
+.milo blockquote { font-style: italic; }
+.milo .milo__note { font-size: 13.5px; color: var(--tinta-2); }
+.milo .milo__note b { color: var(--tinta-2); }
+.chip--milo { border-color: var(--jacaranda); color: var(--jacaranda); }
+.chip--milo svg { width: 17px; height: 17px; }
+.chip--milo[aria-pressed="true"] { background: var(--jacaranda); border-color: var(--jacaranda); color: #fff; }
+@media (prefers-color-scheme: dark) { .chip--milo[aria-pressed="true"] { color: #1A1230; } }
+.tip .milo { margin-top: 8px; }
 .kids { display: grid; gap: 3px; padding: 10px 12px; border-radius: 12px; border-left: 5px solid var(--biznaga); background: var(--biznaga-claro); }
 .kids b { font-size: 14.5px; color: var(--biznaga); display: flex; align-items: center; gap: 6px; }
 .kids p { font-size: 14.5px; line-height: 1.45; color: var(--tinta); }

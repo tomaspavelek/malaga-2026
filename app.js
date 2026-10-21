@@ -14,8 +14,8 @@
     set(k, v) { try { localStorage.setItem('mlg:' + k, JSON.stringify(v)); } catch { /* ignore */ } },
   };
 
-  const TRIP_FILTERS = { wx: 'vse', cats: [], dur: [], dist: [], stroller: [], cost: [], must: false, hideDone: false };
-  const FOOD_FILTERS = { meals: [], kids: [], tags: [], price: [], dist: [] };
+  const TRIP_FILTERS = { wx: 'vse', cats: [], dur: [], dist: [], stroller: [], cost: [], must: false, hideDone: false, milo: false };
+  const FOOD_FILTERS = { meals: [], kids: [], tags: [], price: [], dist: [], milo: false };
   const state = {
     tab: store.get('tab', 'dnes'),
     wxMode: store.get('wxMode', 'dnes'),
@@ -26,6 +26,7 @@
     pick: null,                       // výběr z Plánu: { kind: 'act' | 'meal', date, meal }
     done: store.get('done', {}),
     prepWho: store.get('prepWho', ''),  // filtr úkolů v Přípravě: '' = všichni, 'tom', 'misa'
+    tipsMilo: store.get('tipsMilo', false),  // v Tipech jen to, co radí Miloťáci
     wx: store.get('wx2', null),       // { ts, fc, sea }
     wxLoading: false,
     wxError: null,
@@ -290,6 +291,9 @@
   // barevné bloky na kartě: o co jde (modrý) a jak to tam chodí s dětmi (semafor)
   const aboutBlock = (title, text, web) => `<div class="about"><b>${icon('info')}${title}</b><p>${text}${web ? ` <a href="${web}" target="_blank" rel="noopener">Web ${icon('ext')}</a>` : ''}</p></div>`;
   const kidsBlock = (lvl, text) => `<div class="kids" data-kids="${lvl}"><b><span class="dot" data-kids="${lvl}"></span>${KIDS[lvl]}</b>${text ? `<p>${text}</p>` : ''}</div>`;
+  // co k tomu řekli známí (Miloťáci): doslovné citace, shrnutí delší věci, co jsme ověřili
+  const miloBlock = m => `<div class="milo"><b>${icon('quote')}Miloťáci</b>${(m.q || []).map(q => `<blockquote>„${q}“</blockquote>`).join('')}${m.sum ? `<p>${m.sum}</p>` : ''}${m.note ? `<p class="milo__note"><b>Ověřili jsme:</b> ${m.note}</p>` : ''}</div>`;
+  const miloChip = (attr, on) => `<div class="chips" role="group" aria-label="Tipy od známých"><button class="chip chip--milo" ${attr} aria-pressed="${on}">${icon('quote')}Miloťáci</button></div>`;
   const fmtRate = v => v.toFixed(1).replace('.', ',');
   const fmtCount = n => n.toLocaleString('cs-CZ');
   // hodnocení: dva stejné odkazy (Google, Tripadvisor) se známkou a počtem recenzí
@@ -320,8 +324,8 @@
             <h3 class="act__title">${a.name}</h3>
             <p class="act__sub">${CATS[a.cat].label}${a.area ? ' · ' + a.area : ''} · ${stars(a.must)}</p>
           </div>
-          ${a.must >= 5 ? '<span class="must">Must see</span>' : ''}
         </div>
+        ${a.milo ? miloBlock(a.milo) : ''}
         <div class="stats">
           <div class="stat">${icon('clock')}<b>${fmtH(a.h)}</b><span>na místě</span></div>
           <div class="stat">${icon('pin')}<b>${fmtKm(a.km)}</b><span>od ubytka</span></div>
@@ -395,6 +399,7 @@
           </div>
           ${priceMeter(r.price)}
         </div>
+        ${r.milo ? miloBlock(r.milo) : ''}
         ${ratingLinks(r)}
         <div class="ctags" aria-label="Kuchyně, klepnutím vyfiltrujete">${r.tags.map(t => `<button class="ctag" data-fftag="${t}" aria-pressed="${state.ff.tags.includes(t)}"><span aria-hidden="true">${FOOD_TAGS[t].emoji}</span>${FOOD_TAGS[t].label}</button>`).join('')}</div>
         <div class="stats">
@@ -620,7 +625,8 @@
       (!f.stroller.length || f.stroller.includes(a.stroller.lvl)) &&
       (!f.cost.length || f.cost.includes(a.costKind)) &&
       (!f.must || a.must >= 4) &&
-      (!f.hideDone || !state.done[a.id]));
+      (!f.hideDone || !state.done[a.id]) &&
+      (!f.milo || !!a.milo));
     list.sort(f.sort === 'dist' ? (x, y) => x.km - y.km
       : f.sort === 'cost' ? (x, y) => ((x.cost ?? 999) - (y.cost ?? 999)) || (y.must - x.must)
       : f.sort === 'kids' ? (x, y) => (KIDS_RANK[x.kids] - KIDS_RANK[y.kids]) || (y.must - x.must) || (x.km - y.km)
@@ -646,6 +652,7 @@
       <div class="sec-head"><h2 class="h-sec">Výlety a místa<small>Místa vybraná pro rodinu s předškolákem a batoletem.</small></h2></div>
       <div class="filters${f.more ? ' is-open' : ''}">
         ${state.pick && state.pick.kind === 'act' ? pickBar() : ''}
+        ${miloChip('data-fmilo', f.milo)}
         <div class="chips" role="group" aria-label="Počasí">
           ${chip('data-fwx', 'vse', 'Jakékoli počasí', f.wx === 'vse')}
           ${['slunce', 'oblacno', 'dest'].map(c => chip('data-fwx', c, WX_LABEL[c], f.wx === c, icon(WX_ICON[c]))).join('')}
@@ -732,7 +739,8 @@
       (!f.kids.length || f.kids.includes(r.kids)) &&
       (!f.tags.length || f.tags.some(t => r.tags.includes(t))) &&
       (!f.price.length || f.price.includes(r.price)) &&
-      (!f.dist.length || f.dist.includes(r.distKind)));
+      (!f.dist.length || f.dist.includes(r.distKind)) &&
+      (!f.milo || !!r.milo));
     const byKm = (x, y) => x.km - y.km;
     // podle hodnocení: známka, při shodě víc recenzí; podniky bez hodnocení na konec
     const byRate = (x, y) => ((y.rate ? y.rate.v : 0) - (x.rate ? x.rate.v : 0)) || ((y.rate ? y.rate.c : 0) - (x.rate ? x.rate.c : 0));
@@ -752,6 +760,7 @@
       <div class="sec-head"><h2 class="h-sec">Kde se najíst<small>Podniky vybrané podle recenzí a podle toho, jak to tam chodí s dětmi.</small></h2></div>
       <div class="filters${f.more ? ' is-open' : ''}">
         ${state.pick && state.pick.kind === 'meal' ? pickBar() : ''}
+        ${miloChip('data-ffmilo', f.milo)}
         <div class="chips" role="group" aria-label="Jídlo dne">
           ${Object.entries(MEALS).map(([m, M]) => chip('data-ffmeal', m, M.label, f.meals.includes(m), `<span aria-hidden="true">${M.emoji}</span>`)).join('')}
         </div>
@@ -1013,7 +1022,10 @@
   document.addEventListener('pointerup', dragEnd);
   document.addEventListener('pointercancel', dragEnd);
   function tipsBody() {
+    const only = state.tipsMilo;
+    const secs = only ? TIPS.filter(s => s.items && s.items.some(t => t.milo)).map(s => ({ ...s, items: s.items.filter(t => t.milo) })) : TIPS;
     return `
+      ${miloChip('data-tmilo', only)}
       <section class="card card--flat" aria-label="Rychlé akce">
         <div class="quick">
           <a href="https://www.google.com/maps/dir/?api=1&destination=${STAY.lat},${STAY.lon}&travelmode=transit" target="_blank" rel="noopener"><span class="q-ico">🏠</span>Cesta domů</a>
@@ -1021,17 +1033,17 @@
           <a href="tel:112"><span class="q-ico">🆘</span>Tísňová linka 112</a>
         </div>
       </section>
-      <section class="card" aria-label="Kontakty">
+      ${only ? '' : `<section class="card" aria-label="Kontakty">
         <h3>Důležité kontakty</h3>
         <div>${CONTACTS.map(c => `
           <div class="contact"><div><b>${c.name}</b><small>${c.note || ''}</small></div>
           ${c.tel ? `<a class="btn btn--sm" href="tel:${c.tel.replace(/\s/g, '')}">${c.tel}</a>` : c.url ? `<a class="btn btn--sm" href="${c.url}" target="_blank" rel="noopener">Otevřít</a>` : ''}</div>`).join('')}</div>
-      </section>
-      ${TIPS.map(s => `
-        <details class="acc">
+      </section>`}
+      ${secs.map(s => `
+        <details class="acc"${only ? ' open' : ''}>
           <summary><span class="acc__ico" aria-hidden="true">${s.icon}</span><span><span class="acc__t">${s.title}</span><span class="acc__s">${s.sub}</span></span>${icon('chev')}</summary>
           <div class="acc__in">${s.html ? s.html() : s.items.map(t => `
-            <div class="tip"><h4>${t.h}</h4>${t.p ? `<p>${t.p}</p>` : ''}${t.ul ? `<ul>${t.ul.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}${t.links ? `<div class="btn-row" style="margin-top:6px">${t.links.map(([l, u]) => `<a class="btn btn--sm" href="${u}" target="_blank" rel="noopener">${l} ${icon('ext')}</a>`).join('')}</div>` : ''}</div>`).join('')}
+            <div class="tip"><h4>${t.h}</h4>${t.p ? `<p>${t.p}</p>` : ''}${t.ul ? `<ul>${t.ul.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}${t.milo ? miloBlock(t.milo) : ''}${t.links ? `<div class="btn-row" style="margin-top:6px">${t.links.map(([l, u]) => `<a class="btn btn--sm" href="${u}" target="_blank" rel="noopener">${l} ${icon('ext')}</a>`).join('')}</div>` : ''}</div>`).join('')}
           </div>
         </details>`).join('')}`;
   }
@@ -1174,6 +1186,7 @@
     if (d.fcost) { state.f.cost = toggleIn(state.f.cost, d.fcost); saveF(); return renderTrips(); }
     if (d.fflag) { state.f[d.fflag] = !state.f[d.fflag]; saveF(); return renderTrips(); }
     if ('fmore' in d) { state.f.more = !state.f.more; saveF(); return renderTrips(); }
+    if ('fmilo' in d) { state.f.milo = !state.f.milo; saveF(); return renderTrips(); }
     if ('fview' in d) { state.f.view = state.f.view === 'map' ? 'list' : 'map'; saveF(); return renderTrips(); }
     if ('freset' in d) { state.f = { ...state.f, ...TRIP_FILTERS, cats: [], dur: [], dist: [], stroller: [], cost: [] }; saveF(); return renderTrips(); }
     // filtry jídla
@@ -1188,6 +1201,8 @@
     if (d.ffprice) { state.ff.price = toggleIn(state.ff.price, +d.ffprice); saveFF(); return renderFood(); }
     if (d.ffdist) { state.ff.dist = toggleIn(state.ff.dist, d.ffdist); saveFF(); return renderFood(); }
     if ('ffmore' in d) { state.ff.more = !state.ff.more; saveFF(); return renderFood(); }
+    if ('ffmilo' in d) { state.ff.milo = !state.ff.milo; saveFF(); return renderFood(); }
+    if ('tmilo' in d) { state.tipsMilo = !state.tipsMilo; store.set('tipsMilo', state.tipsMilo); return renderInfo(); }
     if ('ffview' in d) { state.ff.view = state.ff.view === 'map' ? 'list' : 'map'; saveFF(); return renderFood(); }
     if ('ffreset' in d) { state.ff = { ...state.ff, ...FOOD_FILTERS, meals: [], kids: [], tags: [], price: [], dist: [] }; saveFF(); return renderFood(); }
     // přidávání do plánu

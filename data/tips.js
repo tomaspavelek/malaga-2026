@@ -23,7 +23,7 @@ const TIPS = [
   {
     icon: '🗓️', title: 'Návrh týdne a hotové plány', sub: 'Kostra pobytu podle zavíracích dnů a autobusů',
     items: [
-      { h: 'Jak s tím pracovat', p: 'Kostra počítá se zavíracími dny, svátkem 2. 11. a s tím, že bus 40 jezdí jen Po–Pá. Dny přehazujte podle počasí: záložka Dnes doporučí, co se na daný den hodí. Výlety s plánem dne (Bioparc, Benalmádena, Torremolinos, Nerja) najdete v kartách v sekci „Otevírací doba, ceny, zázemí“.' },
+      { h: 'Jak s tím pracovat', p: 'Kostra počítá se zavíracími dny, svátkem 2. 11. a s tím, že bus 40 jezdí jen Po–Pá. Dny přehazujte podle počasí (záložka Počasí ukáže Dnes, Zítra i Celý pobyt). Výlety s plánem dne (Bioparc, Benalmádena, Torremolinos, Nerja) najdete v kartách v sekci „Otevírací doba, ceny, zázemí“.' },
       { h: 'Den po dni', ul: [
         '<b>So 31. 10. (přílet):</b> nákup rovnou na tři dny (v neděli i ve svátečním pondělí je zavřeno), pak pláž Misericordia a západ slunce.',
         '<b>Ne 1. 11.:</b> dopoledne Parque del Oeste, nebo dětské divadlo „Péťa a vlk“ v Teatro Echegaray v 11:00. Odpoledne Alcazaba zdarma od 14:00, nebo Muelle Uno s podzimním trhem. Obchody zavřené, bus 40 nejede.',
@@ -157,19 +157,24 @@ const TIPS = [
       { h: 'Metro a vlak C1 s kočárkem', p: 'Nejbližší stanice vlaku Victoria Kent (1,6 km) má s kočárkem špatný přístup. Lepší je metro L2 ze stanice El Torcal (920 m, výtah) do El Perchel (5 minut) a tam vlak C1 ze stanice María Zambrano. C1 jede každých 20 minut: Torremolinos asi 18 minut, Benalmádena 25, Fuengirola 42. U turniketů pípnout kartou i při výstupu, jinak se strhne nejvyšší cena. Do Torremolinos, Benalmádeny a k Aeromuseu je jednodušší bus M-110 ze zastávky El Torcal hned u metra: Po–So co 15 min, v neděli a ve svátek co 20 min, bez přestupu.' },
       { h: 'Jak v autobuse s kočárkem', p: 'Nastupuje se předními dveřmi. EMT doporučuje kočárek složit, nebo ho postavit proti směru jízdy, zabrzdit a připoutat pásem autobusu. Nejjistější: miminko v nosítku, předškolák v kočárku. Bezkontaktní kartou zaplatíte u řidiče až 10 jízdenek najednou, držitel karty vystupuje poslední.' },
       { h: 'Taxi a autosedačky', p: 'Taxi smí ve městě vézt děti do 135 cm bez autosedačky na zadním sedadle. Uber, Cabify a transfery sedačky mít musí; Cabify Kids má jen jednu sedačku pro děti nad 9 kg, vajíčko ne. Orientační ceny: do centra asi 7 €, z centra 5–6 €, na letiště 15–17 €, z letiště 18–22,50 € (o víkendu víc), plus 0,58 € za kufr. Unitaxi 952 333 333, Taxi Unión 952 04 04 04.' },
+      { h: 'Autobusy podle Miloťáků', milo: { q: ['Autobusy jezdí často, ale o víkendech méně. Nastupuje se vždy předními dveřmi, i s kočárkem. Platí se u řidiče kartou, popř. drobnými, bankovky nemusí vzít.'], sum: 'Jednou jim karty nefungovaly (asi výpadek banky) a od řidiče dostali čočku.', note: 'Bankovky nad 5 € řidič nebere. Linka 7 jezdí ve všední den po 10 minutách, o víkendu po 15–20, linka 40 o víkendu vůbec. Rozložený kočárek patří na plošinu pro vozíčkáře; když je obsazená, složit a miminko do nosítka. Jako zálohu mějte drobné nebo kartu Consorcio.' } },
+      { h: 'Uber, taxi a autosedačky', milo: { q: ['Ubery nemají autosedačky, taxíky jako možnost jen jednu.'], note: 'Taxi po městě smí vézt děti bez sedačky na zadním sedadle. Cabify Kids má jednu sedačku na auto a jen pro děti od 9 kg. Nabídku Uberu se sedačkou jsme ve Španělsku nenašli.' } },
       { h: 'Aplikace', ul: ['EMT Málaga: příjezdy autobusů v reálném čase a QR jízdenky.', 'Google Maps: jízdní řády EMT i vlaku jsou v nich.', 'Uber, Cabify, Bolt a FreeNow jako záloha k taxi.'] },
     ],
   },
   {
     icon: '🛒', title: 'Nákupy a dětské potřeby', sub: 'Svátek 2. 11., obchody kolem nás, ceny plen',
     items: [
-      { h: 'Neděle 1. 11. a pondělí 2. 11.', p: 'V neděli jsou velké obchody zavřené, pondělí 2. 11. je v Andalusii svátek (Všech svatých přesunuté z neděle). Na 2. 11. obchody otevřít smí, ale nemusí. Velký nákup proto v sobotu 31. 10. do 21:30. Stejně zavřeno bude v neděli 8. 11.' },
+      { h: 'Neděle 1. 11. a pondělí 2. 11.', p: 'V neděli jsou velké obchody zavřené, pondělí 2. 11. je v Andalusii svátek (Všech svatých přesunuté z neděle). Na 2. 11. obchody otevřít smí, ale nemusí. Velký nákup proto v sobotu 31. 10. do 21:30. Stejně zavřeno bude v neděli 8. 11. Čerstvý chleba i v neděli: pekárna Fermento, C. Amalia Heredia 8 (asi 200 m), 9:00–21:30.' },
       { h: 'Supermarkety kolem nás', ul: [
-        'Mas, Carril de la Chupa 9: 170 m. Možná má otevřeno i v neděli (ověřit na místě).',
+        'Mas, Carril de la Chupa 9: 170 m. Po–So 9:00–21:30, v neděli zavřeno, 2. 11. neověřené.',
         'Mercadona, Av. Velázquez 43: 850 m. Po–So 9:00–21:30.',
         'Supeco (Carrefour), Héroe de Sostoa 188: 1,1 km. Po–So 9–22.',
         'Lidl, Av. Velázquez 60: 1,2 km. Po–So 9:00–21:30.',
       ] },
+      { h: 'Supermarket MAS podle Miloťáků', milo: { q: ['Vypadá malý, ale je tam všechno, není třeba hledat nic většího. Mají pult, kde si můžete nechat nakrájet jamón, výborný, vakuují čerstvě nakrájené salámy, mívají čerstvé ryby a mořské plody. Docela fajn hotovky (bramborová tortilla).'] } },
+      { h: 'Voda na mléko, dětské jídlo a pleny', milo: { q: ['Pokud budeš hledat kojeneckou vodu, ta se tam úplně nevede, ale brala jsem s označením ‚Muy débil‘ 😂, která splňuje to, co kojenecká voda: méně minerálů.', 'Mají i kojeneckou stravu, skleničky, kapsičky, křupky. Pampers pleny mají ve Španělsku značku Dodot, jinak jsou úplně stejné.'], note: '„Mineralización muy débil“ znamená do 50 mg minerálů na litr. Na mléko hledejte ještě sodík do 20 mg/l: v Mercadoně Fuente Dehesa (5,3 mg/l, i malá lahev s dětským uzávěrem). Aguadoy s dětským uzávěrem má sodíku 38 mg/l, na mléko spíš ne.' } },
+      { h: 'Bílé jogurty', milo: { q: ['Klasický problém s jogurty, čistě bílé se shánějí těžko, i bílé bývají doslazované.'], note: 'Neslazený bílý jogurt se jmenuje „yogur natural“ a běžně ho mají (Hacendado natural, Danone natural, řecký natural). Slazený má v názvu „azucarado“ nebo „con azúcar“.' } },
       { h: 'Lékárna hned u domu', p: 'Farmacia Pacífico, C/ Pacífico 34, 150 m. Otevřeno denně včetně neděle (zhruba 9:30–21:30). Dětský paracetamol se ve Španělsku prodává jen v lékárně.' },
       { h: 'Ceny v Mercadoně (říjen 2026)', ul: [
         'Pleny Deliplus vel. 4 (10–15 kg): 6,55 €, velké balení 19 €. Dodot vel. 4: 16,75 €.',
@@ -185,16 +190,19 @@ const TIPS = [
     icon: '🏠', title: 'Okolí ubytka', sub: 'Pláž, hřiště, zmrzlina, pekárna, kde se najíst',
     items: [
       { h: 'Pláž a promenáda', p: 'Playa de la Misericordia je 550 m (7 minut pěšky). Rovná promenáda Antonio Banderas je ideální na kočárek a odrážedlo, po cestě jsou hřiště, sprchy a WC (u komína La Chimenea, 11–20 h).' },
-      { h: 'Hřiště', p: 'Nejbližší hřiště je do 300 m od domu, další na promenádě u pláže a v parku Chiquito de la Calzada (400 m). Parque del Oeste (680 m, 9 minut) má přes 400 m² dětských zón, jezírko, sochy a toalety.' },
+      { h: 'Hřiště', p: 'Nejbližší hřiště je do 300 m od domu, další na promenádě u pláže a v parku Chiquito de la Calzada (400 m). Parque del Oeste (680 m, 9 minut) má přes 400 m² dětských zón, jezírko, sochy a toalety.', milo: { q: ['[Hřiště jsou] podél pláže co kousek, u komínu je přímo v písku, což je fajn.', 'Hřiště jsou na každém kroku, netřeba vypisovat.'] } },
       { h: 'Zmrzlina a pekárny', ul: [
         'Zmrzlina: Marcello (120 m), Perlatto na C/ Pacífico 19 (190 m), DeLuque na Carril de la Chupa (210 m).',
         'Pekárna La Canasta, Av. Sor Teresa Prat 61 (320 m).',
+        'Pekárna Fermento, C. Amalia Heredia 8 (asi 200 m): dýňový chléb, i v neděli. Tip od Miloťáků je u karty v Jídle.',
         'Churros: Bar Mercado de Huelin (1,3 km, káva s churrem kolem 1,70 €), v centru Casa Aranda.',
       ] },
       { h: 'Kde se najíst poblíž', ul: [
         'Chiringuito La Campana, Paseo Marítimo Antonio Banderas 9: espetos kolem 4,90 €, 10:30–18:00.',
         'Litoral Pacífico, Paseo Marítimo Antonio Banderas 5: espetos, Po–So 13–17 a 21–24, Ne 13–17. Doporučená rezervace.',
         'La Famiglia Pacífico, C/ Pacífico 5: italská, velká terasa, o víkendu kuchyně 13:30–23:30.',
+        'Moby Dick, C/ Pacífico 23 na promenádě: od snídaně do večera, Miloťáci ho chválí.',
+        'Pizzería Primavera, C/ Pacífico 29: pizza s sebou přes WhatsApp, dětské menu, v úterý zavřeno.',
       ] },
       { h: 'Lékař', p: 'Zdravotní středisko Centro de Salud Las Delicias, C/ Frigiliana 21 (asi 550 m). Do dětské nemocnice Materno-Infantil jede přímo autobus 7 ze zastávky u domu (33 minut).' },
     ],
@@ -211,6 +219,7 @@ const TIPS = [
       ] },
       { h: 'Pohotovostní lékárna', p: 'Na dveřích každé lékárny visí adresa té, která má zrovna službu (farmacia de guardia). Online je seznam na farmaceuticos.com.', links: [['Lékárny se službou', 'https://www.farmaceuticos.com/farmacias-de-guardia/malaga/']] },
       { h: 'Pozor na sílu španělských sirupů', p: 'Apiretal má 100 mg paracetamolu v 1 ml, český Paralen 24 mg/ml. Dávka v ml se liší zhruba čtyřikrát. Vždy čtěte mg/ml na obalu a dávkujte podle hmotnosti.' },
+      { h: 'Pláž po deštích', milo: { q: ['Po deštích je pláž bezpečná na procházku, ale vyhýbala bych se hraní v písku poblíž odvodových kanálů.'], sum: 'Miloťáci měli střevní potíže a dávají je za vinu dešťům: kanály na pláži odvádějí do moře dešťovou vodu z města i s tím, co v kanálech je. Problém jsou vytrvalé deště, které naplní i jinak prázdné koryto řeky. Ty chodí spíš v zimě a začátkem roku, mrholení a přeháňky nevadí.', note: 'Při silném dešti přetéká do moře i kanalizace. V srpnu a na přelomu září a října 2026 město kvůli E. coli zakázalo nebo nedoporučilo koupání na Misericordii a Sacabě. V listopadu prší v průměru 5,6 dne. Po vydatném dešti 2–3 dny nebrouzdat a nehrát si u výustí a potůčků přes pláž, suchý písek dál od nich je v pořádku. Po pláži umýt ruce.' } },
       { h: 'Kapsáři', p: 'Hlavně na Calle Larios, u katedrály a v davech, ve vlacích i „objímači“ převlečení za turisty. Tašku noste vepředu, nic cenného do koše kočárku, mobil nenechávejte na stolku v kavárně.' },
       { h: 'Toalety a přebalování', p: 'Veřejných toalet je málo. Použijte kavárny, nákupní centra (Muelle Uno 10–22 h) a muzea. Toalety zdarma jsou v podzemním parkingu u Pompidou (patro −1). Noste skládací přebalovací podložku.' },
     ],
@@ -243,6 +252,7 @@ const TIPS = [
         'Ryby z tržnice Atarazanas a večeře v apartmánu: ať si děti vyberou samy.',
       ] },
       { h: 'Jak to vypadá s kočárkem', p: 'Historické centrum se s kočárkem zvládne. Autobusy s rozloženým kočárkem jezdí, jen v plném je někdy potřeba ho složit. Na Alcazabu vede od května 2025 výtah z ulice Guillén Sotelo, na Gibralfaro se vyplatí jet nahoru autobusem 35 a dolů jít pěšky.' },
+      { h: 'Chození a kočárek', milo: { q: ['Celkově je to docela dost chození, [starší] to promrčela, měli jsme pro ni přídavné stupátko za kočárek, ale jelo se s tím jak s tankem a bylo nás slyšet kilometr daleko, do centra nic moc.'], sum: 'Měli půjčený golfáč. Příště by vzali vlastní kočárek: starší dítě se schoulí dolů do úložného prostoru, když se mu nechce chodit. Nebo kočárek do lehu, jedno dítě sedí vepředu a druhé za ním.' } },
       { h: 'Kde to nešlo dohledat', p: 'Reddit, emimino.cz a facebookové skupiny („Češi v Malaze“, „Češi na Costa del Sol“) automatické hledání blokují. Když budete chtít, zeptejte se tam ručně.' },
     ],
   },
