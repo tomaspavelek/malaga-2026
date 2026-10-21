@@ -597,10 +597,16 @@ body.is-locked .top, body.is-locked main, body.is-locked .tabbar { display: none
 .task__check input:checked::after { content: ""; width: 12px; height: 7px; border: 3px solid #fff; border-top: 0; border-right: 0; transform: rotate(-45deg) translate(1px, -1px); }
 .task__main { min-width: 0; text-align: left; border: 0; background: none; color: var(--tinta); font: 400 15.5px/1.35 var(--f-body); padding: 8px 2px; cursor: pointer; }
 .task__main small { display: block; font-size: 13.5px; color: var(--tinta-2); margin-top: 2px; }
+.task__checks { display: flex; }
+.task__check--who { width: 33px; height: 46px; grid-template-rows: auto auto; align-content: center; gap: 2px; }
+.task__check--who small { font: 700 11px/1 var(--f-body); }
+.task__check--who[data-p="tom"] small { color: var(--mar); }
+.task__check--who[data-p="misa"] small { color: var(--albero); }
 .task.is-done .task__main span { text-decoration: line-through; color: var(--tinta-2); }
 .who { flex: none; min-width: 52px; height: 32px; padding: 0 10px; border-radius: 999px; border: 0; font: 700 13px var(--f-body); cursor: pointer; }
 .who[data-whoval="tom"] { background: var(--mar-claro); color: var(--mar); }
 .who[data-whoval="misa"] { background: var(--albero-claro); color: var(--albero); }
+.who[data-whoval="oba"] { background: linear-gradient(90deg, var(--mar-claro), var(--albero-claro)); color: var(--tinta); }
 .who.is-empty { min-width: 32px; width: 32px; padding: 0; display: grid; place-items: center; border: 1.5px dashed var(--linea); background: none; color: var(--tinta-2); }
 .who svg { width: 16px; height: 16px; }
 .whomenu { position: absolute; right: 6px; top: calc(100% - 6px); z-index: 15; display: flex; gap: 6px; padding: 6px;

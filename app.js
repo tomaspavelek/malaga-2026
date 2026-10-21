@@ -1,4 +1,4 @@
-/* Málaga s dětmi – logika stránky (vanilla JS, bez buildu). Obsah je v data/, plán a jeho sdílení v plan.js. */
+/* Málaga – logika stránky (vanilla JS, bez buildu). Obsah je v data/, plán a jeho sdílení v plan.js. */
 (() => {
   'use strict';
 
@@ -325,7 +325,6 @@
             <p class="act__sub">${CATS[a.cat].label}${a.area ? ' · ' + a.area : ''} · ${stars(a.must)}</p>
           </div>
         </div>
-        ${a.milo ? miloBlock(a.milo) : ''}
         <div class="stats">
           <div class="stat">${icon('clock')}<b>${fmtH(a.h)}</b><span>na místě</span></div>
           <div class="stat">${icon('pin')}<b>${fmtKm(a.km)}</b><span>od ubytka</span></div>
@@ -343,6 +342,7 @@
           ${a.pros.map(p => `<span class="tag tag--plus">${p}</span>`).join('')}
           ${a.cons.map(p => `<span class="tag tag--minus">${p}</span>`).join('')}
         </div>
+        ${a.milo ? miloBlock(a.milo) : ''}
         ${a.about ? aboutBlock('O co jde', a.about, a.web) : ''}
         ${kidsBlock(a.kids, a.tip)}
       </div>
@@ -399,7 +399,6 @@
           </div>
           ${priceMeter(r.price)}
         </div>
-        ${r.milo ? miloBlock(r.milo) : ''}
         ${ratingLinks(r)}
         <div class="ctags" aria-label="Kuchyně, klepnutím vyfiltrujete">${r.tags.map(t => `<button class="ctag" data-fftag="${t}" aria-pressed="${state.ff.tags.includes(t)}"><span aria-hidden="true">${FOOD_TAGS[t].emoji}</span>${FOOD_TAGS[t].label}</button>`).join('')}</div>
         <div class="stats">
@@ -409,6 +408,7 @@
         </div>
         <div class="mealtags" aria-label="Kdy tam jíst">${r.meals.length ? Object.entries(MEALS).map(([m, M]) => `<span class="mealtag ${r.meals.includes(m) ? 'on' : ''}">${M.label}</span>`).join('') : '<span class="mealtag on">Na zmrzlinu mezi jídly</span>'}</div>
         <div data-plan-rest="${r.id}" style="display:contents">${inPlanMeals(r.id)}</div>
+        ${r.milo ? miloBlock(r.milo) : ''}
         ${aboutBlock('Co vaří', r.what, r.web)}
         ${kidsBlock(r.kids, r.kidsWhy)}
         ${r.tip ? `<p class="act__tip"><b>Tip:</b> ${r.tip}</p>` : ''}
@@ -840,6 +840,8 @@
      Výchozí sekce a úkoly jsou v CHECKLIST (data/trip.js), změny a nové věci v PLAN.prep():
      výchozí položka + uložené pole = výsledek; smazaná výchozí má del: true, vlastní se maže celá. */
   const WHO = { tom: 'Tom', misa: 'Míša' };
+  const ASSIGN = { ...WHO, oba: 'Oba' };   // úkol pro oba má checkbox pro každého, hotový je až po obou
+  const bothDone = t => t.who === 'oba' ? { ...t, by: t.by || {}, done: !!(t.by && t.by.tom && t.by.misa) } : t;
   function prepModel() {
     const st = PLAN.prep();
     const secs = CHECKLIST.map((g, i) => ({ id: g.id, title: g.title, ord: i * 10, def: true, ...(st.secs[g.id] || {}) }));
@@ -848,9 +850,13 @@
     const ids = new Set(live.map(s => s.id));
     const tasks = CHECKLIST.flatMap(g => g.items.map((it, i) => ({ id: it.id, t: it.t, n: it.n || '', sec: g.id, ord: i * 10, who: '', done: false, def: true, ...(st.tasks[it.id] || {}) })));
     Object.entries(st.tasks).forEach(([id, o]) => { if (!tasks.some(t => t.id === id)) tasks.push({ id, t: '', n: '', sec: '', ord: 0, who: '', done: false, ...o }); });
-    return { secs: live, tasks: tasks.filter(t => !t.del && t.t && ids.has(t.sec)).sort((a, b) => a.ord - b.ord) };
+    return { secs: live, tasks: tasks.filter(t => !t.del && t.t && ids.has(t.sec)).map(bothDone).sort((a, b) => a.ord - b.ord) };
   }
   const prepProgress = () => { const { tasks } = prepModel(); return { total: tasks.length, done: tasks.filter(t => t.done).length }; };
+  // změna osoby drží stav: hotový úkol Toma je po přepnutí na Oba hotový u Toma, z Oba na jednoho platí jeho checkbox
+  const whoPatch = (t, who) => t.who === who ? {} : who === 'oba'
+    ? { who, 'by/tom': t.done && t.who !== 'misa', 'by/misa': t.done && t.who !== 'tom' }
+    : { who, ...(t.who === 'oba' ? { done: who ? !!t.by[who] : t.done } : {}) };
   const nextOrd = (tasks, sec) => Math.max(-10, ...tasks.filter(t => t.sec === sec).map(t => t.ord)) + 10;
   // odškrtnutí ze staré verze (jen v telefonu) jednou přenést do sdílených úkolů
   function migrateChecks() {
@@ -863,9 +869,10 @@
 
   const taskRow = t => `<li class="task ${t.done ? 'is-done' : ''}" data-task="${t.id}">
       <span class="task__grip" data-grip aria-hidden="true">${icon('grip')}</span>
-      <label class="task__check"><input type="checkbox" data-taskdone="${t.id}" ${t.done ? 'checked' : ''} aria-label="Hotovo: ${esc(t.t)}"></label>
+      ${t.who === 'oba' ? `<span class="task__checks">${Object.entries(WHO).map(([k, n]) => `<label class="task__check task__check--who" data-p="${k}"><input type="checkbox" data-taskby="${t.id}|${k}" ${t.by[k] ? 'checked' : ''} aria-label="${n} hotovo: ${esc(t.t)}"><small aria-hidden="true">${n}</small></label>`).join('')}</span>`
+        : `<label class="task__check"><input type="checkbox" data-taskdone="${t.id}" ${t.done ? 'checked' : ''} aria-label="Hotovo: ${esc(t.t)}"></label>`}
       <button class="task__main" data-taskedit="${t.id}"><span>${esc(t.t)}</span>${t.n.trim() ? `<small>${esc(t.n)}</small>` : ''}</button>
-      <button class="who${t.who ? '' : ' is-empty'}" data-who="${t.id}" data-whoval="${t.who}" aria-label="${t.who ? 'Úkol má ' + WHO[t.who] + ', změnit' : 'Přiřadit osobu'}">${t.who ? WHO[t.who] : icon('user')}</button>
+      <button class="who${t.who ? '' : ' is-empty'}" data-who="${t.id}" data-whoval="${t.who}" aria-label="${t.who === 'oba' ? 'Úkol mají oba, změnit' : t.who ? 'Úkol má ' + WHO[t.who] + ', změnit' : 'Přiřadit osobu'}">${t.who ? ASSIGN[t.who] : icon('user')}</button>
     </li>`;
   function renderChecklist() {
     const { secs, tasks } = prepModel();
@@ -882,7 +889,7 @@
         </div>
       </div>
       ${secs.map(s => {
-        const list = tasks.filter(t => t.sec === s.id), shown = list.filter(t => !f || t.who === f);
+        const list = tasks.filter(t => t.sec === s.id), shown = list.filter(t => !f || t.who === f || t.who === 'oba');
         return `<section class="psect" aria-label="${esc(s.title)}">
           <div class="psect__head"><h3>${esc(s.title)}</h3><span class="psect__n">${list.filter(t => t.done).length}/${list.length}</span>
             <button class="ibtn" data-secedit="${s.id}" aria-label="Upravit sekci ${esc(s.title)}">${icon('edit')}</button></div>
@@ -905,7 +912,7 @@
         <label class="field"><span>Název</span><input name="t" required maxlength="200" value="${esc(t.t)}" autocomplete="off"></label>
         <label class="field"><span>Sekce</span><select name="sec" required>${secs.map(s => `<option value="${s.id}"${s.id === t.sec ? ' selected' : ''}>${esc(s.title)}</option>`).join('')}</select></label>
         <fieldset class="field"><legend>Kdo to má <small>nepovinné</small></legend>
-          <div class="seg">${[['', 'Nikdo'], ...Object.entries(WHO)].map(([k, n]) => `<label><input type="radio" name="who" value="${k}"${t.who === k ? ' checked' : ''}><span>${n}</span></label>`).join('')}</div></fieldset>
+          <div class="seg">${[['', 'Nikdo'], ...Object.entries(ASSIGN)].map(([k, n]) => `<label><input type="radio" name="who" value="${k}"${t.who === k ? ' checked' : ''}><span>${n}</span></label>`).join('')}</div></fieldset>
         <label class="field"><span>Popis <small>nepovinné</small></span><textarea name="n" rows="3" maxlength="1000">${esc(t.n.trim())}</textarea></label>
         <div class="btn-row"><button class="btn btn--primary">${id ? 'Uložit' : 'Přidat úkol'}</button><button class="btn" type="button" data-sheetclose>Zrušit</button>
           ${id ? `<button class="btn btn--ghost tform__del" type="button" data-taskdel="${id}">Smazat úkol</button>` : ''}</div>
@@ -935,7 +942,7 @@
     const cur = id && tasks.find(x => x.id === id);
     // prázdný popis se u výchozího úkolu uloží jako mezera, jinak by se vrátil text z CHECKLIST
     const n = (v.n || '').trim() || (cur && cur.def ? ' ' : '');
-    if (cur) PLAN.setTask(id, { t, n, who, sec, ...(cur.sec !== sec ? { ord: nextOrd(tasks, sec) } : {}) });
+    if (cur) PLAN.setTask(id, { t, n, sec, ...whoPatch(cur, who), ...(cur.sec !== sec ? { ord: nextOrd(tasks, sec) } : {}) });
     else PLAN.setTask(PLAN.newId('u-'), { t, n, who, sec, ord: nextOrd(tasks, sec), done: false });
     closeSheet(); renderInfo();
   }
@@ -954,7 +961,7 @@
     closeSheet(); renderInfo();
     toast(`Smazáno: ${esc(t.t)}`, () => {
       if (t.def) PLAN.setTask(id, { del: null });
-      else PLAN.setTask(id, { t: t.t, n: t.n, who: t.who, sec: t.sec, ord: t.ord, done: t.done });
+      else PLAN.setTask(id, { t: t.t, n: t.n, who: t.who, sec: t.sec, ord: t.ord, done: t.done, by: t.by });
       renderInfo();
     }, false);
   }
@@ -1254,11 +1261,15 @@
       const open = $('.whomenu');
       $$('.whomenu').forEach(m => m.remove());
       if (open && open.dataset.for === d.who) return flushRemote();
-      t.closest('.task').insertAdjacentHTML('beforeend', `<div class="whomenu" data-for="${d.who}" role="menu">${Object.entries(WHO).map(([k, n]) =>
+      t.closest('.task').insertAdjacentHTML('beforeend', `<div class="whomenu" data-for="${d.who}" role="menu">${Object.entries(ASSIGN).map(([k, n]) =>
         `<button role="menuitem" data-setwho="${d.who}|${k}" aria-pressed="${d.whoval === k}">${n}</button>`).join('')}${d.whoval ? `<button role="menuitem" data-setwho="${d.who}|">Nikdo</button>` : ''}</div>`);
       return;
     }
-    if (d.setwho) { const [id, who] = d.setwho.split('|'); PLAN.setTask(id, { who }); return renderInfo(); }
+    if (d.setwho) {
+      const [id, who] = d.setwho.split('|'), cur = prepModel().tasks.find(x => x.id === id);
+      if (cur) PLAN.setTask(id, whoPatch(cur, who));
+      return renderInfo();
+    }
     // Info a ostatní
     if (d.info) { state.info = d.info; store.set('info', d.info); return renderInfo(); }
     if ('showAddress' in d) { $('#show-driver-text').innerHTML = STAY.addressBig; return $('#show-driver').showModal(); }
@@ -1304,6 +1315,7 @@
     if ('fsort' in e.target.dataset) { state.f.sort = e.target.value; saveF(); return renderTrips(); }
     if ('ffsort' in e.target.dataset) { state.ff.sort = e.target.value; saveFF(); return renderFood(); }
     if (e.target.dataset.taskdone) { PLAN.setTask(e.target.dataset.taskdone, { done: e.target.checked }); return renderInfo(); }
+    if (e.target.dataset.taskby) { const [id, who] = e.target.dataset.taskby.split('|'); PLAN.setTask(id, { [`by/${who}`]: e.target.checked }); return renderInfo(); }
   });
 
   /* Změny plánu z druhého telefonu: překreslit, ale nikdy pod rukama při psaní poznámky, tažení úkolu nebo výběru osoby */
