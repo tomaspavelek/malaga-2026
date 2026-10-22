@@ -306,6 +306,10 @@ details.fold[open] > summary svg { transform: rotate(90deg); }
 .tl__card details > summary { cursor: pointer; font-weight: 700; color: var(--mar); font-size: 14.5px; min-height: 32px; display: flex; align-items: center; }
 .tl__card details[open] > summary { margin-bottom: 4px; }
 .tl__card img { width: 100%; border-radius: 10px; border: 1px solid var(--linea); background: #fff; }
+/* široký obrázek (mapka) přes celou šířku, mimo sloupec s časy */
+.tl__wide { position: relative; background: var(--papel); border: 1px solid var(--linea); border-radius: 14px; padding: 6px 8px 8px; margin: 2px 0 10px; }
+.tl__wide summary { cursor: pointer; font-weight: 700; color: var(--mar); font-size: 14.5px; min-height: 32px; display: flex; align-items: center; padding: 0 6px; }
+.tl__wide img { display: block; width: 100%; height: auto; border-radius: 8px; background: #fff; }
 
 /* ---------- Checklist ---------- */
 .progress { height: 8px; border-radius: 999px; background: var(--linea); overflow: hidden; }
@@ -338,6 +342,16 @@ details.fold[open] > summary svg { transform: rotate(90deg); }
 .contact:first-child { border-top: 0; }
 .contact .btn { flex: none; white-space: nowrap; font-family: var(--f-mono); font-weight: 500; }
 .contact b { display: block; }
+.contact__btns { display: grid; gap: 6px; justify-items: end; }
+/* řidička: fotka, aby šla v hale poznat; klepnutím se zvětší */
+.driver { display: grid; grid-template-columns: 88px 1fr; gap: 12px; align-items: center; margin-top: 10px; padding: 10px; border-radius: 14px; background: var(--cal); }
+.driver__photo { padding: 0; border: 0; background: none; cursor: zoom-in; border-radius: 12px; overflow: hidden; }
+.driver__photo img { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; }
+.driver b { display: block; font-size: 17px; }
+.driver small { display: block; color: var(--tinta-2); font-size: 13px; white-space: nowrap; }
+.driver .btn-row { margin-top: 8px; }
+.driver.is-big { grid-template-columns: 1fr; }
+.driver.is-big .driver__photo { cursor: zoom-out; }
 .contact small { color: var(--tinta-2); }
 
 /* ---------- Dialog „Ukázat řidiči“ ---------- */

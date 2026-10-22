@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 452" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title>Letiště Málaga, terminál T3: z příletů nahoru k odletům</title>
+  <desc>Schéma podle interaktivní mapy Aeny (10/2026), poměry přibližné. Molo D a T3 vlevo, T2 vpravo, silnice nahoře.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#0B5D8E"/></marker>
+    <symbol id="star" viewBox="-10 -10 20 20"><path d="M0-9.5 2.8-3 9.5-3 4.2 1.4 6.1 8.6 0 4.6-6.1 8.6-4.2 1.4-9.5-3-2.8-3z" fill="#B03547" stroke="#fff" stroke-width="1.2"/></symbol>
+  </defs>
+  <rect width="360" height="452" fill="#fff"/>
+
+  <!-- ===== PATRO 1 ===== -->
+  <text x="12" y="16" font-size="12" font-weight="700" fill="#12263A">PATRO 1 · ODLETOVÁ HALA</text>
+  <rect x="264" y="3" width="84" height="18" rx="4" fill="#E1EEF6" stroke="#0B5D8E"/>
+  <text x="306" y="15.5" font-size="10" font-weight="700" fill="#0B5D8E" text-anchor="middle">P Express (P2)</text>
+  <rect x="10" y="24" width="340" height="14" fill="#DCE3E9"/>
+  <text x="140" y="34" font-size="9.5" fill="#4B6074" text-anchor="middle">silnice odletů: auta tu nestaví</text>
+  <rect x="10" y="38" width="340" height="134" rx="2" fill="#F6F9FB" stroke="#B9C7D2"/>
+  <!-- Julia z parkoviště -->
+  <path d="M306 21V44M306 44H300C290 44 284 72 270 72H110" fill="none" stroke="#8A9BAA" stroke-width="1.6" stroke-dasharray="1.5 3.5" stroke-linecap="round"/>
+  <text x="300" y="56" font-size="9" fill="#4B6074" text-anchor="end">vstup od parkoviště</text>
+  <!-- Ryanair -->
+  <rect x="18" y="46" width="62" height="44" rx="4" fill="#FBEFD6" stroke="#C98A1B"/>
+  <text x="49" y="60" font-size="9.5" font-weight="700" fill="#12263A" text-anchor="middle">Ryanair</text>
+  <text x="49" y="72" font-size="9" fill="#12263A" text-anchor="middle">363–386</text>
+  <text x="49" y="84" font-size="9" fill="#12263A" text-anchor="middle">bag drop</text>
+  <text x="18" y="104" font-size="9" fill="#4B6074">WC</text>
+  <!-- bezpečnostní kontrola -->
+  <rect x="34" y="128" width="96" height="20" rx="4" fill="#F9E3E6" stroke="#B03547"/>
+  <text x="82" y="141.5" font-size="9.5" fill="#12263A" text-anchor="middle">bezpečnostní kontrola</text>
+  <text x="82" y="162" font-size="9" fill="#4B6074" text-anchor="middle">← brány D</text>
+  <!-- přepážky -->
+  <g font-size="9" fill="#12263A" text-anchor="middle">
+    <rect x="142" y="146" width="34" height="13" rx="3" fill="#DCE3E9"/><text x="159" y="155.5">341–362</text>
+    <rect x="180" y="146" width="34" height="13" rx="3" fill="#DCE3E9"/><text x="197" y="155.5">321–340</text>
+    <rect x="235" y="146" width="34" height="13" rx="3" fill="#DCE3E9"/><text x="252" y="155.5">300–320</text>
+  </g>
+  <text x="344" y="166" font-size="9" fill="#4B6074" text-anchor="end">T2 →</text>
+  <text x="196" y="104" font-size="9" fill="#4B6074">Starbucks</text>
+  <text x="250" y="124" font-size="9" fill="#4B6074" text-anchor="middle">dětský koutek</text>
+  <!-- výtah A nahoře a záložní cesta -->
+  <path d="M176 115C150 118 124 112 111 99" fill="none" stroke="#0B5D8E" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+  <circle cx="184" cy="112" r="8" fill="#fff" stroke="#0B5D8E" stroke-width="2"/>
+  <text x="184" y="115.5" font-size="10" font-weight="700" fill="#0B5D8E" text-anchor="middle">A</text>
+  <!-- výtah B nahoře a místo setkání -->
+  <path d="M102 62V80" fill="none" stroke="#0B5D8E" stroke-width="3.5" stroke-linecap="round" marker-end="url(#arr)"/>
+  <circle cx="102" cy="54" r="8" fill="#0B5D8E"/>
+  <text x="102" y="57.5" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">B</text>
+  <text x="114" y="57.5" font-size="9" fill="#0B5D8E" font-weight="700">sem vyjedete</text>
+  <use href="#star" x="91" y="80" width="22" height="22"/>
+  <text x="116" y="88" font-size="10" font-weight="700" fill="#B03547">TADY POČKEJTE</text>
+  <text x="116" y="99" font-size="9" fill="#12263A">informace Aena</text>
+
+  <!-- přechod mezi patry -->
+  <text x="180" y="190" font-size="9.5" fill="#4B6074" text-anchor="middle">▲ výtahem o patro výš ▲</text>
+
+  <!-- ===== PATRO 0 ===== -->
+  <text x="12" y="212" font-size="12" font-weight="700" fill="#12263A">PATRO 0 · PŘÍLETY</text>
+  <rect x="10" y="218" width="340" height="14" fill="#DCE3E9"/>
+  <text x="250" y="228" font-size="9.5" fill="#4B6074" text-anchor="middle">ven: autobus A, taxi, vlak C1</text>
+  <rect x="10" y="232" width="340" height="76" rx="2" fill="#F6F9FB" stroke="#B9C7D2"/>
+  <text x="16" y="303" font-size="9" fill="#4B6074">← molo D</text>
+  <text x="344" y="303" font-size="9" fill="#4B6074" text-anchor="end">T2 →</text>
+  <text x="58" y="262" font-size="9" fill="#4B6074">WC</text>
+  <text x="148" y="258" font-size="9" fill="#4B6074" text-anchor="middle">dětský koutek</text>
+  <text x="168" y="276" font-size="9" fill="#4B6074" text-anchor="end">La Manon</text>
+  <circle cx="190" cy="272" r="7" fill="#E1EEF6" stroke="#0B5D8E" stroke-width="1.2"/>
+  <text x="190" y="275.5" font-size="10" font-weight="700" fill="#0B5D8E" text-anchor="middle">i</text>
+  <text x="228" y="256" font-size="9" fill="#4B6074" text-anchor="middle">turistické info</text>
+  <!-- výdej zavazadel -->
+  <rect x="26" y="308" width="246" height="50" rx="2" fill="#EEF3F5" stroke="#B9C7D2"/>
+  <text x="34" y="322" font-size="9.5" font-weight="700" fill="#12263A">výdej zavazadel T3</text>
+  <g fill="#C9D6DF"><rect x="104" y="328" width="10" height="22" rx="5"/><rect x="122" y="328" width="10" height="22" rx="5"/><rect x="140" y="328" width="10" height="22" rx="5"/><rect x="158" y="328" width="10" height="22" rx="5"/></g>
+  <text x="74" y="344" font-size="9" fill="#12263A" text-anchor="middle">pásy 35–41</text>
+  <text x="236" y="352" font-size="9" fill="#4B6074" text-anchor="middle">celnice, východ</text>
+  <!-- výtah A dole -->
+  <circle cx="176" cy="299" r="7" fill="#fff" stroke="#0B5D8E" stroke-width="2"/>
+  <text x="176" y="302.5" font-size="10" font-weight="700" fill="#0B5D8E" text-anchor="middle">A</text>
+  <!-- trasa: pás → celnice → hala → výtah B -->
+  <path d="M170 339H236V312L214 288H102V259" fill="none" stroke="#0B5D8E" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arr)"/>
+  <circle cx="102" cy="246" r="8" fill="#0B5D8E"/>
+  <text x="102" y="249.5" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">B</text>
+  <text x="86" y="249.5" font-size="9" font-weight="700" fill="#0B5D8E" text-anchor="end">výtah B</text>
+
+  <!-- ===== legenda ===== -->
+  <g font-size="10" fill="#12263A">
+    <path d="M14 378H40" stroke="#0B5D8E" stroke-width="3.5" stroke-linecap="round"/>
+    <text x="48" y="381.5">s kočárkem: výtah B, od pásu 10–15 minut</text>
+    <use href="#star" x="17" y="388" width="20" height="20"/>
+    <text x="48" y="401.5">Julia vyzvedne u odletů, jinak čekejte tady</text>
+    <circle cx="27" cy="418" r="7" fill="#fff" stroke="#0B5D8E" stroke-width="2"/><text x="27" y="421.5" font-size="9" font-weight="700" fill="#0B5D8E" text-anchor="middle">A</text>
+    <text x="48" y="421.5">záloha: výtah A, vyjede ke Starbucks</text>
+    <path d="M14 438H40" stroke="#8A9BAA" stroke-width="1.6" stroke-dasharray="1.5 3.5" stroke-linecap="round"/>
+    <text x="48" y="441.5">auta u odletů: Parking Express přes silnici</text>
+  </g>
+</svg>

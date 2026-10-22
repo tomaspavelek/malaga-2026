@@ -824,6 +824,16 @@
       </div>
       ${seg === 'tipy' ? tipsBody() : seg === 'pred' ? renderChecklist() : itineraryBody(ITINERARY[seg] || ITINERARY.tam)}`;
   }
+  // řidička: fotka (klepnutím zvětšit, ať ji v hale poznáte), volat a WhatsApp; data jsou v data/secret.js zašifrovaná
+  function driverCard() {
+    const d = PRIVATE.driver;
+    if (!d) return '<p class="muted">Kontakt na řidičku se nepodařilo rozšifrovat. Odemkněte stránku znovu kódem.</p>';
+    return `<div class="driver">
+      <button class="driver__photo" data-driverzoom aria-label="Zvětšit fotku"><img src="${d.photo}" alt="Fotka řidičky ${d.name}" width="96" height="96"></button>
+      <div><b>${d.name}</b><small class="mono">${d.tel}</small>
+        <div class="btn-row"><a class="btn btn--sm btn--primary" href="tel:${d.tel.replace(/\s/g, '')}">Volat</a><a class="btn btn--sm" href="https://wa.me/${d.tel.replace(/\D/g, '')}" target="_blank" rel="noopener">WhatsApp</a></div></div>
+    </div>`;
+  }
   function itineraryBody(it) {
     return `
       ${passCard(it.pass)}
@@ -835,10 +845,12 @@
             <p class="tl__title">${x.title}</p>
             ${x.text ? `<p class="tl__text">${x.text}</p>` : ''}
             ${x.more ? `<details><summary>Podrobnosti</summary><div class="tl__text">${x.more}</div></details>` : ''}
-            ${x.img ? `<details><summary>${x.img.label}</summary><a href="${x.img.src}" target="_blank" rel="noopener"><img src="${x.img.src}" alt="${x.img.alt}" loading="lazy"></a></details>` : ''}
+            ${x.driver ? driverCard() : ''}
+            ${x.img && !x.img.wide ? `<details><summary>${x.img.label}</summary><a href="${x.img.src}" target="_blank" rel="noopener"><img src="${x.img.src}" alt="${x.img.alt}" loading="lazy"></a></details>` : ''}
             ${x.links ? `<div class="btn-row">${x.links.map(([l, u], i) => `<a class="btn btn--sm ${i === 0 ? 'btn--primary' : ''}" href="${u}" target="_blank" rel="noopener">${l}</a>`).join('')}</div>` : ''}
           </div>
-        </li>`).join('')}</ol>`;
+        </li>${x.img && x.img.wide ? `
+        <li class="tl__wide"><details${x.img.open ? ' open' : ''}><summary>${x.img.label}</summary><a href="${x.img.src}" target="_blank" rel="noopener"><img src="${x.img.src}" alt="${x.img.alt}" loading="lazy"></a></details></li>` : ''}`).join('')}</ol>`;
   }
   function passCard(p) {
     return `<article class="pass" aria-label="Let ${p.flight}">
@@ -1058,9 +1070,9 @@
       </section>
       ${only ? '' : `<section class="card" aria-label="Kontakty">
         <h3>Důležité kontakty</h3>
-        <div>${CONTACTS.map(c => `
+        <div>${CONTACTS.map(c => { const tel = c.secret ? (PRIVATE[c.secret] || {}).tel : c.tel; return `
           <div class="contact"><div><b>${c.name}</b><small>${c.note || ''}</small></div>
-          ${c.tel ? `<a class="btn btn--sm" href="tel:${c.tel.replace(/\s/g, '')}">${c.tel}</a>` : c.url ? `<a class="btn btn--sm" href="${c.url}" target="_blank" rel="noopener">Otevřít</a>` : ''}</div>`).join('')}</div>
+          ${tel ? `<span class="contact__btns"><a class="btn btn--sm" href="tel:${tel.replace(/\s/g, '')}">${tel}</a>${c.secret ? `<a class="btn btn--sm" href="https://wa.me/${tel.replace(/\D/g, '')}" target="_blank" rel="noopener">WhatsApp</a>` : ''}</span>` : c.url ? `<a class="btn btn--sm" href="${c.url}" target="_blank" rel="noopener">Otevřít</a>` : ''}</div>`; }).join('')}</div>
       </section>`}
       ${secs.map(s => `
         <details class="acc"${only ? ' open' : ''}>
@@ -1205,6 +1217,7 @@
       PLAN.setStars(kind, id, who, cur === +i ? 0 : +i);
       return refreshSlots();
     }
+    if ('driverzoom' in d) { t.closest('.driver').classList.toggle('is-big'); return; }
     if (d.done) { state.done[d.done] = !state.done[d.done]; if (!state.done[d.done]) delete state.done[d.done]; store.set('done', state.done); return renderers[state.tab](); }
     // filtry výletů
     if (d.fwx) { state.f.wx = d.fwx; saveF(); return renderTrips(); }
@@ -1375,11 +1388,22 @@
     return true;
   }
 
+  /* Osobní kontakty (řidička) jsou v data/secret.js zašifrované klíčem plánu, protože repo je veřejné */
+  let PRIVATE = {};
+  async function openSecret() {
+    try {
+      const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+      const key = await crypto.subtle.importKey('raw', new Uint8Array(await sha256('malaga-2026:tajne:' + PLAN.code())), 'AES-GCM', false, ['decrypt']);
+      PRIVATE = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(SECRET.iv) }, key, b64(SECRET.ct))));
+    } catch { PRIVATE = {}; }
+  }
+
   /* ---------- Start ---------- */
   let started = false;
-  function start() {
+  async function start() {
     if (started) return;
     started = true;
+    await openSecret();
     document.body.classList.remove('is-locked');
     migrateChecks();
     go(state.tab, { scroll: false });

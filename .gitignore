@@ -4,6 +4,8 @@ tasks/
 CLAUDE.md
 CONTEXT.md
 PRD.md
+# osobní kontakty v čitelné podobě (do repa jde jen zašifrovaný data/secret.js)
+private/
 
 public/
 node_modules/
