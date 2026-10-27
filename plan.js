@@ -173,7 +173,7 @@ const PLAN = (() => {
     },
     setMeal: (date, meal, id) => write(`days/${date}/meals/${meal}`, id || null),
     setNote: (date, who, text) => write(`days/${date}/notes/${who}`, String(text).slice(0, 2000)),
-    // Příprava: { tasks: { id: { t, n, sec, who, done, by: { tom, misa }, ord, del } }, secs: { id: { title, ord, del } } }
+    // Příprava: { tasks: { id: { t, n, sec, who, done, by: { tom, misa }, due, ord, del } }, secs: { id: { title, ord, del } } }
     prep: () => ({ tasks: { ...((data.prep || {}).tasks || {}) }, secs: { ...((data.prep || {}).secs || {}) } }),
     setTask: (id, obj) => writeAll(fields(`prep/tasks/${id}`, obj)),
     setSec: (id, obj) => writeAll(fields(`prep/secs/${id}`, obj)),

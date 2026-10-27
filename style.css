@@ -38,6 +38,8 @@
   --granada-claro: #F9E3E6;
   --jacaranda: #6B4FA0;    /* fialové jakarandy v Málaze: co radí Miloťáci */
   --jacaranda-claro: #EFE9F8;
+  --naranja: #C2560A;      /* pomeranče z Andalusie: úkol na dnes */
+  --due-ink: #FFFFFF;      /* text na oranžovém a červeném štítku termínu */
   --sun: #F2B33D;
   --cloud: #FFFFFF;
   --rain: #3E8FD0;
@@ -60,6 +62,7 @@
     --biznaga: #63C496; --biznaga-claro: #133325;
     --granada: #EE8492; --granada-claro: #3C1A20;
     --jacaranda: #BCA6EA; --jacaranda-claro: #261E3B;
+    --naranja: #F59A4E; --due-ink: #1B1208;
     --cloud: #DCE6EE; --rain: #6DB4EC;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 22px rgba(0,0,0,.25);
     color-scheme: dark;
@@ -640,6 +643,34 @@ body.is-locked .top, body.is-locked main, body.is-locked .tabbar { display: none
 .task.is-placeholder { opacity: .35; }
 .task--ghost { position: fixed; z-index: 60; pointer-events: none; margin: 0; box-shadow: 0 12px 28px rgba(0,0,0,.25); }
 body.is-dragging { user-select: none; -webkit-user-select: none; cursor: grabbing; }
+/* termín úkolu: dnes oranžově, po termínu červeně */
+.due { display: flex; width: max-content; max-width: 100%; align-items: center; gap: 4px; margin-top: 4px; padding: 2px 8px 2px 6px; border-radius: 999px;
+  background: var(--cal); color: var(--tinta-2); font: 700 12.5px/1.35 var(--f-body); }
+.due svg { width: 13px; height: 13px; flex: none; }
+.task.due-today { border-color: var(--naranja); }
+.task.due-today .due { background: var(--naranja); color: var(--due-ink); }
+.task.due-late { border-color: var(--granada); }
+.task.due-late .due { background: var(--granada); color: var(--due-ink); }
+.prep-when .chip { padding: 5px 10px; font-size: 14px; }
+.chip__n { display: inline-grid; place-items: center; min-width: 20px; height: 20px; margin-right: -3px; padding: 0 5px; border-radius: 999px;
+  background: var(--naranja); color: var(--due-ink); font: 700 12px var(--f-body); }
+.chip__n.is-late { background: var(--granada); }
+.chip__n.is-soft { background: var(--linea); color: var(--tinta); }
+.duepick { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.duepick__d { display: grid; justify-items: center; gap: 1px; padding: 7px 2px; border-radius: 12px; border: 1px solid var(--linea);
+  background: var(--cal); color: var(--tinta); font: 700 15px var(--f-body); cursor: pointer; }
+.duepick__d small { font: 500 12.5px var(--f-mono); color: var(--tinta-2); }
+.duepick__d[aria-pressed="true"] { background: var(--mar); border-color: var(--mar); color: #fff; }
+.duepick__d[aria-pressed="true"] small { color: inherit; }
+@media (prefers-color-scheme: dark) { .duepick__d[aria-pressed="true"] { color: #08202F; } }
+.duepick__row { display: flex; align-items: center; gap: 8px; }
+.duepick__other { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: var(--tinta-2); }
+.duepick__other span { white-space: nowrap; }
+.duepick__other input { flex: 1; min-width: 0; }
+.duepick__other input::-webkit-date-and-time-value { text-align: left; }
+.duepick__none { min-height: 46px; padding: 6px 12px; border-radius: 12px; border: 1px solid var(--linea); background: var(--papel); color: var(--tinta);
+  font: 700 14px var(--f-body); cursor: pointer; white-space: nowrap; }
+.duepick__none[aria-pressed="true"] { background: var(--tinta); border-color: var(--tinta); color: var(--papel); }
 .tform { display: grid; gap: 14px; }
 .field { display: grid; gap: 6px; border: 0; padding: 0; margin: 0; min-width: 0; }
 .field > span, .field > legend { font-weight: 700; font-size: 14px; color: var(--tinta-2); padding: 0; }

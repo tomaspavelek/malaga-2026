@@ -26,6 +26,7 @@
     pick: null,                       // výběr z Plánu: { kind: 'act' | 'meal', date, meal }
     done: store.get('done', {}),
     prepWho: store.get('prepWho', ''),  // filtr úkolů v Přípravě: '' = všichni, 'tom', 'misa'
+    prepWhen: store.get('prepWhen', ''),  // filtr podle termínu: '' = vše, 'now' = dnes a zmeškané, 'future' = později
     tipsMilo: store.get('tipsMilo', false),  // v Tipech jen to, co radí Miloťáci
     wx: store.get('wx2', null),       // { ts, fc, sea }
     wxLoading: false,
@@ -878,13 +879,29 @@
     const ids = new Set(live.map(s => s.id));
     const tasks = CHECKLIST.flatMap(g => g.items.map((it, i) => ({ id: it.id, t: it.t, n: it.n || '', sec: g.id, ord: i * 10, who: '', done: false, def: true, ...(st.tasks[it.id] || {}) })));
     Object.entries(st.tasks).forEach(([id, o]) => { if (!tasks.some(t => t.id === id)) tasks.push({ id, t: '', n: '', sec: '', ord: 0, who: '', done: false, ...o }); });
-    return { secs: live, tasks: tasks.filter(t => !t.del && t.t && ids.has(t.sec)).map(bothDone).sort((a, b) => a.ord - b.ord) };
+    return { secs: live, tasks: tasks.filter(t => !t.del && t.t && ids.has(t.sec)).map(t => bothDone({ ...t, due: isDate(t.due) ? t.due : '' })).sort((a, b) => a.ord - b.ord) };
   }
   const prepProgress = () => { const { tasks } = prepModel(); return { total: tasks.length, done: tasks.filter(t => t.done).length }; };
   // změna osoby drží stav: hotový úkol Toma je po přepnutí na Oba hotový u Toma, z Oba na jednoho platí jeho checkbox
   const whoPatch = (t, who) => t.who === who ? {} : who === 'oba'
     ? { who, 'by/tom': t.done && t.who !== 'misa', 'by/misa': t.done && t.who !== 'tom' }
     : { who, ...(t.who === 'oba' ? { done: who ? !!t.by[who] : t.done } : {}) };
+  /* Termín úkolu (due = 'YYYY-MM-DD', bez termínu chybí): dnes oranžově, po termínu červeně, hotové bez barvy */
+  const isDate = v => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
+  const dueState = t => !t.due ? '' : t.done ? 'done' : t.due < todayStr() ? 'late' : t.due === todayStr() ? 'today' : 'later';
+  function dueLabel(due) {
+    const n = dayDiff(todayStr(), due);
+    return n === 0 ? 'Dnes' : n === 1 ? 'Zítra' : n === -1 ? 'Včera' : n < 0 ? `${fmtS(due)} · před ${-n} dny` : fmtS(due);
+  }
+  // filtr Kdy: dnes a zmeškané = termín dnes (i hotové) nebo dřív a nehotové; odškrtnuté v tomhle filtru nezmizí hned pod prstem
+  const prepKeep = new Set();
+  const whenFits = (t, w) => !w || (!!t.due && (w === 'future' ? t.due > todayStr()
+    : t.due === todayStr() || (t.due < todayStr() && !t.done) || prepKeep.has(t.id)));
+  const quickDays = () => [0, 1, 2, 3, 4].map(i => addDays(todayStr(), i));
+  function syncDue(form) {
+    const v = form.elements.due.value;
+    $$('[data-duepick]', form).forEach(b => b.setAttribute('aria-pressed', b.dataset.duepick === v));
+  }
   const nextOrd = (tasks, sec) => Math.max(-10, ...tasks.filter(t => t.sec === sec).map(t => t.ord)) + 10;
   // odškrtnutí ze staré verze (jen v telefonu) jednou přenést do sdílených úkolů
   function migrateChecks() {
@@ -895,16 +912,21 @@
     store.set('checksMoved', true);
   }
 
-  const taskRow = t => `<li class="task ${t.done ? 'is-done' : ''}" data-task="${t.id}">
+  const taskRow = t => `<li class="task ${t.done ? 'is-done' : ''}${t.due ? ' due-' + dueState(t) : ''}" data-task="${t.id}">
       <span class="task__grip" data-grip aria-hidden="true">${icon('grip')}</span>
       ${t.who === 'oba' ? `<span class="task__checks">${Object.entries(WHO).map(([k, n]) => `<label class="task__check task__check--who" data-p="${k}"><input type="checkbox" data-taskby="${t.id}|${k}" ${t.by[k] ? 'checked' : ''} aria-label="${n} hotovo: ${esc(t.t)}"><small aria-hidden="true">${n}</small></label>`).join('')}</span>`
         : `<label class="task__check"><input type="checkbox" data-taskdone="${t.id}" ${t.done ? 'checked' : ''} aria-label="Hotovo: ${esc(t.t)}"></label>`}
-      <button class="task__main" data-taskedit="${t.id}"><span>${esc(t.t)}</span>${t.n.trim() ? `<small>${esc(t.n)}</small>` : ''}</button>
+      <button class="task__main" data-taskedit="${t.id}"><span>${esc(t.t)}</span>${t.due ? `<time class="due" datetime="${t.due}">${icon('cal')}${dueLabel(t.due)}</time>` : ''}${t.n.trim() ? `<small>${esc(t.n)}</small>` : ''}</button>
       <button class="who${t.who ? '' : ' is-empty'}" data-who="${t.id}" data-whoval="${t.who}" aria-label="${t.who === 'oba' ? 'Úkol mají oba, změnit' : t.who ? 'Úkol má ' + WHO[t.who] + ', změnit' : 'Přiřadit osobu'}">${t.who ? ASSIGN[t.who] : icon('user')}</button>
     </li>`;
   function renderChecklist() {
     const { secs, tasks } = prepModel();
-    const f = state.prepWho, done = tasks.filter(t => t.done).length;
+    const f = state.prepWho, w = state.prepWhen, done = tasks.filter(t => t.done).length;
+    const forWho = t => !f || t.who === f || t.who === 'oba';
+    const open = tasks.filter(t => forWho(t) && t.due && !t.done), today = todayStr();
+    const nNow = open.filter(t => t.due <= today).length, nLate = open.filter(t => t.due < today).length, nFut = open.filter(t => t.due > today).length;
+    const count = (n, cls) => n ? `<span class="chip__n ${cls}">${n}</span>` : '';
+    const shownIn = s => tasks.filter(t => t.sec === s.id && forWho(t) && whenFits(t, w));
     return `
       <div class="card card--flat prep-head">
         <div class="sec-head"><h2 class="h-sec">Před odjezdem<small>${done} z ${tasks.length} hotovo. Úkoly vidí oba telefony.</small></h2></div>
@@ -915,9 +937,14 @@
           </div>
           <button class="btn btn--sm btn--primary" data-taskadd="">${icon('plus')} Úkol</button>
         </div>
+        <div class="chips prep-when" role="group" aria-label="Podle termínu">
+          ${chip('data-prepwhen', 'vse', 'Vše', !w)}${chip('data-prepwhen', 'now', 'Dnes a zmeškané' + count(nNow, nLate ? 'is-late' : ''), w === 'now')}${chip('data-prepwhen', 'future', 'Budoucí' + count(nFut, 'is-soft'), w === 'future')}
+        </div>
       </div>
+      ${w && !secs.some(s => shownIn(s).length) ? `<div class="empty"><p>${w === 'now' ? 'Na dnes nic a nic zmeškaného.' : 'Žádný úkol s pozdějším termínem.'}</p><button class="btn btn--sm" data-prepwhen="vse">Zobrazit všechny úkoly</button></div>` : ''}
       ${secs.map(s => {
-        const list = tasks.filter(t => t.sec === s.id), shown = list.filter(t => !f || t.who === f || t.who === 'oba');
+        const list = tasks.filter(t => t.sec === s.id), shown = shownIn(s);
+        if (w && !shown.length) return '';
         return `<section class="psect" aria-label="${esc(s.title)}">
           <div class="psect__head"><h3>${esc(s.title)}</h3><span class="psect__n">${list.filter(t => t.done).length}/${list.length}</span>
             <button class="ibtn" data-secedit="${s.id}" aria-label="Upravit sekci ${esc(s.title)}">${icon('edit')}</button></div>
@@ -932,7 +959,7 @@
   function taskSheet(id, secId) {
     const { secs, tasks } = prepModel();
     if (!secs.length) return secSheet();
-    const t = id ? tasks.find(x => x.id === id) : { t: '', n: '', sec: secId || secs[0].id, who: state.prepWho || '' };
+    const t = id ? tasks.find(x => x.id === id) : { t: '', n: '', sec: secId || secs[0].id, who: state.prepWho || '', due: state.prepWhen === 'now' ? todayStr() : '' };
     if (!t) return;
     openSheet(`
       <p class="sheet__eyebrow">${id ? 'Upravit úkol' : 'Nový úkol'}</p>
@@ -941,6 +968,10 @@
         <label class="field"><span>Sekce</span><select name="sec" required>${secs.map(s => `<option value="${s.id}"${s.id === t.sec ? ' selected' : ''}>${esc(s.title)}</option>`).join('')}</select></label>
         <fieldset class="field"><legend>Kdo to má <small>nepovinné</small></legend>
           <div class="seg">${[['', 'Nikdo'], ...Object.entries(ASSIGN)].map(([k, n]) => `<label><input type="radio" name="who" value="${k}"${t.who === k ? ' checked' : ''}><span>${n}</span></label>`).join('')}</div></fieldset>
+        <fieldset class="field"><legend>Termín <small>nepovinné</small></legend>
+          <div class="duepick">${quickDays().map(d => `<button type="button" class="duepick__d" data-duepick="${d}" aria-pressed="${t.due === d}"><b>${d === todayStr() ? 'Dnes' : DOW_S[dow(d)].replace(/^./, c => c.toUpperCase())}</b><small>${fmtD(d)}</small></button>`).join('')}</div>
+          <div class="duepick__row"><label class="duepick__other"><span>Jiný den</span><input type="date" name="due" value="${t.due}" data-duein></label>
+            <button type="button" class="duepick__none" data-duepick="" aria-pressed="${!t.due}">Bez termínu</button></div></fieldset>
         <label class="field"><span>Popis <small>nepovinné</small></span><textarea name="n" rows="3" maxlength="1000">${esc(t.n.trim())}</textarea></label>
         <div class="btn-row"><button class="btn btn--primary">${id ? 'Uložit' : 'Přidat úkol'}</button><button class="btn" type="button" data-sheetclose>Zrušit</button>
           ${id ? `<button class="btn btn--ghost tform__del" type="button" data-taskdel="${id}">Smazat úkol</button>` : ''}</div>
@@ -964,14 +995,14 @@
   }
   function saveTaskForm(form) {
     const id = form.dataset.taskform, v = Object.fromEntries(new FormData(form));
-    const t = (v.t || '').trim(), sec = v.sec, who = v.who || '';
+    const t = (v.t || '').trim(), sec = v.sec, who = v.who || '', due = isDate(v.due) ? v.due : '';
     if (!t || !sec) return;
     const { tasks } = prepModel();
     const cur = id && tasks.find(x => x.id === id);
     // prázdný popis se u výchozího úkolu uloží jako mezera, jinak by se vrátil text z CHECKLIST
     const n = (v.n || '').trim() || (cur && cur.def ? ' ' : '');
-    if (cur) PLAN.setTask(id, { t, n, sec, ...whoPatch(cur, who), ...(cur.sec !== sec ? { ord: nextOrd(tasks, sec) } : {}) });
-    else PLAN.setTask(PLAN.newId('u-'), { t, n, who, sec, ord: nextOrd(tasks, sec), done: false });
+    if (cur) PLAN.setTask(id, { t, n, sec, ...whoPatch(cur, who), ...(cur.sec !== sec ? { ord: nextOrd(tasks, sec) } : {}), ...(cur.due !== due ? { due: due || null } : {}) });
+    else PLAN.setTask(PLAN.newId('u-'), { t, n, who, sec, ord: nextOrd(tasks, sec), done: false, ...(due ? { due } : {}) });
     closeSheet(); renderInfo();
   }
   function saveSecForm(form) {
@@ -989,7 +1020,7 @@
     closeSheet(); renderInfo();
     toast(`Smazáno: ${esc(t.t)}`, () => {
       if (t.def) PLAN.setTask(id, { del: null });
-      else PLAN.setTask(id, { t: t.t, n: t.n, who: t.who, sec: t.sec, ord: t.ord, done: t.done, by: t.by });
+      else PLAN.setTask(id, { t: t.t, n: t.n, who: t.who, sec: t.sec, ord: t.ord, done: t.done, by: t.by, due: t.due });
       renderInfo();
     }, false);
   }
@@ -1284,6 +1315,8 @@
     if (d.jumpplan) { go('plan', { scroll: false }); const el = $('#pday-' + d.jumpplan); return el && el.scrollIntoView({ block: 'start' }); }
     // Příprava
     if (d.prepwho) { state.prepWho = d.prepwho === 'vse' ? '' : d.prepwho; store.set('prepWho', state.prepWho); return renderInfo(); }
+    if (d.prepwhen) { state.prepWhen = d.prepwhen === 'vse' ? '' : d.prepwhen; store.set('prepWhen', state.prepWhen); prepKeep.clear(); return renderInfo(); }
+    if ('duepick' in d) { const f = t.closest('form'); f.elements.due.value = d.duepick; return syncDue(f); }
     if ('taskadd' in d) return taskSheet(null, d.taskadd);
     if (d.taskedit) return taskSheet(d.taskedit);
     if (d.taskdel) return deleteTask(d.taskdel);
@@ -1308,7 +1341,7 @@
       return renderInfo();
     }
     // Info a ostatní
-    if (d.info) { state.info = d.info; store.set('info', d.info); return renderInfo(); }
+    if (d.info) { state.info = d.info; store.set('info', d.info); prepKeep.clear(); return renderInfo(); }
     if ('showAddress' in d) { $('#show-driver-text').innerHTML = STAY.addressBig; return $('#show-driver').showModal(); }
     if ('close' in d) return t.closest('dialog').close();
     if (d.showcard) {
@@ -1342,6 +1375,7 @@
   const saveNote = el => { const [date, who] = el.dataset.note.split('|'); clearTimeout(noteTimers[el.dataset.note]); PLAN.setNote(date, who, el.value); };
   document.addEventListener('input', e => {
     const el = e.target;
+    if ('duein' in el.dataset) return syncDue(el.form);
     if (!el.dataset.note) return;
     if (el.scrollHeight > el.clientHeight) el.rows = Math.min(10, el.rows + 1);
     clearTimeout(noteTimers[el.dataset.note]);
@@ -1349,10 +1383,11 @@
   });
   document.addEventListener('change', e => {
     if (e.target.dataset.note) return saveNote(e.target);
+    if ('duein' in e.target.dataset) return syncDue(e.target.form);
     if ('fsort' in e.target.dataset) { state.f.sort = e.target.value; saveF(); return renderTrips(); }
     if ('ffsort' in e.target.dataset) { state.ff.sort = e.target.value; saveFF(); return renderFood(); }
-    if (e.target.dataset.taskdone) { PLAN.setTask(e.target.dataset.taskdone, { done: e.target.checked }); return renderInfo(); }
-    if (e.target.dataset.taskby) { const [id, who] = e.target.dataset.taskby.split('|'); PLAN.setTask(id, { [`by/${who}`]: e.target.checked }); return renderInfo(); }
+    if (e.target.dataset.taskdone) { prepKeep.add(e.target.dataset.taskdone); PLAN.setTask(e.target.dataset.taskdone, { done: e.target.checked }); return renderInfo(); }
+    if (e.target.dataset.taskby) { const [id, who] = e.target.dataset.taskby.split('|'); prepKeep.add(id); PLAN.setTask(id, { [`by/${who}`]: e.target.checked }); return renderInfo(); }
   });
 
   /* Změny plánu z druhého telefonu: překreslit, ale nikdy pod rukama při psaní poznámky, tažení úkolu nebo výběru osoby */
