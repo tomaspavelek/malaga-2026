@@ -605,6 +605,9 @@ body.is-locked .top, body.is-locked main, body.is-locked .tabbar { display: none
 
 /* ---------- Příprava: úkoly ---------- */
 .prep-head { display: grid; gap: 12px; }
+.prep-prog { display: flex; align-items: center; gap: 14px; }
+.prep-prog .progress { flex: 1; }
+.prep-prog .linkish { flex: none; min-height: 36px; padding: 0; }
 .prep-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 .psect { display: grid; gap: 8px; }
 .psect__head { display: flex; align-items: center; gap: 8px; }

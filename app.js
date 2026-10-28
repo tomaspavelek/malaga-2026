@@ -27,6 +27,7 @@
     done: store.get('done', {}),
     prepWho: store.get('prepWho', ''),  // filtr úkolů v Přípravě: '' = všichni, 'tom', 'misa'
     prepWhen: store.get('prepWhen', ''),  // filtr podle termínu: '' = vše, 'now' = dnes a zmeškané, 'future' = později
+    prepShowDone: store.get('prepShowDone', false),  // hotové úkoly v Přípravě: výchozí skryté, volba jen v telefonu
     tipsMilo: store.get('tipsMilo', false),  // v Tipech jen to, co radí Miloťáci
     wx: store.get('wx2', null),       // { ts, fc, sea }
     wxLoading: false,
@@ -893,7 +894,8 @@
     const n = dayDiff(todayStr(), due);
     return n === 0 ? 'Dnes' : n === 1 ? 'Zítra' : n === -1 ? 'Včera' : n < 0 ? `${fmtS(due)} · před ${-n} dny` : fmtS(due);
   }
-  // filtr Kdy: dnes a zmeškané = termín dnes (i hotové) nebo dřív a nehotové; odškrtnuté v tomhle filtru nezmizí hned pod prstem
+  // filtr Kdy: dnes a zmeškané = termín dnes (i hotové) nebo dřív a nehotové; odškrtnuté v tomhle filtru
+  // ani při skrytých hotových nezmizí hned pod prstem, ale až po přepnutí filtru nebo odchodu z Přípravy
   const prepKeep = new Set();
   const whenFits = (t, w) => !w || (!!t.due && (w === 'future' ? t.due > todayStr()
     : t.due === todayStr() || (t.due < todayStr() && !t.done) || prepKeep.has(t.id)));
@@ -926,11 +928,17 @@
     const open = tasks.filter(t => forWho(t) && t.due && !t.done), today = todayStr();
     const nNow = open.filter(t => t.due <= today).length, nLate = open.filter(t => t.due < today).length, nFut = open.filter(t => t.due > today).length;
     const count = (n, cls) => n ? `<span class="chip__n ${cls}">${n}</span>` : '';
-    const shownIn = s => tasks.filter(t => t.sec === s.id && forWho(t) && whenFits(t, w));
+    // sekce se skrývá jen filtrem Kdy; když jsou v ní všechny hotové a hotové jsou skryté, zůstane vidět
+    const fitIn = s => tasks.filter(t => t.sec === s.id && forWho(t) && whenFits(t, w));
+    const visible = t => state.prepShowDone || !t.done || prepKeep.has(t.id);
+    const nHidden = tasks.filter(t => forWho(t) && whenFits(t, w) && !visible(t)).length;
     return `
       <div class="card card--flat prep-head">
         <div class="sec-head"><h2 class="h-sec">Před odjezdem<small>${done} z ${tasks.length} hotovo. Úkoly vidí oba telefony.</small></h2></div>
-        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="${tasks.length}" aria-valuenow="${done}"><i style="width:${tasks.length ? done / tasks.length * 100 : 0}%"></i></div>
+        <div class="prep-prog">
+          <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="${tasks.length}" aria-valuenow="${done}"><i style="width:${tasks.length ? done / tasks.length * 100 : 0}%"></i></div>
+          ${done ? `<button class="linkish" data-prepdone>${state.prepShowDone ? 'Skrýt hotové' : `Zobrazit hotové${nHidden ? ` (${nHidden})` : ''}`}</button>` : ''}
+        </div>
         <div class="prep-bar">
           <div class="chips" role="group" aria-label="Čí úkoly">
             ${chip('data-prepwho', 'vse', 'Všichni', !f)}${Object.entries(WHO).map(([k, n]) => chip('data-prepwho', k, n, f === k)).join('')}
@@ -941,15 +949,15 @@
           ${chip('data-prepwhen', 'vse', 'Vše', !w)}${chip('data-prepwhen', 'now', 'Dnes a zmeškané' + count(nNow, nLate ? 'is-late' : ''), w === 'now')}${chip('data-prepwhen', 'future', 'Budoucí' + count(nFut, 'is-soft'), w === 'future')}
         </div>
       </div>
-      ${w && !secs.some(s => shownIn(s).length) ? `<div class="empty"><p>${w === 'now' ? 'Na dnes nic a nic zmeškaného.' : 'Žádný úkol s pozdějším termínem.'}</p><button class="btn btn--sm" data-prepwhen="vse">Zobrazit všechny úkoly</button></div>` : ''}
+      ${w && !secs.some(s => fitIn(s).length) ? `<div class="empty"><p>${w === 'now' ? 'Na dnes nic a nic zmeškaného.' : 'Žádný úkol s pozdějším termínem.'}</p><button class="btn btn--sm" data-prepwhen="vse">Zobrazit všechny úkoly</button></div>` : ''}
       ${secs.map(s => {
-        const list = tasks.filter(t => t.sec === s.id), shown = shownIn(s);
-        if (w && !shown.length) return '';
+        const list = tasks.filter(t => t.sec === s.id), fit = fitIn(s), shown = fit.filter(visible);
+        if (w && !fit.length) return '';
         return `<section class="psect" aria-label="${esc(s.title)}">
           <div class="psect__head"><h3>${esc(s.title)}</h3><span class="psect__n">${list.filter(t => t.done).length}/${list.length}</span>
             <button class="ibtn" data-secedit="${s.id}" aria-label="Upravit sekci ${esc(s.title)}">${icon('edit')}</button></div>
           <ul class="tasks" data-sec="${s.id}">${shown.map(taskRow).join('')}</ul>
-          ${f && !shown.length ? `<p class="psect__empty">${WHO[f]} tady nic nemá.</p>` : ''}
+          ${shown.length ? '' : fit.length ? `<p class="psect__empty">${f ? `${WHO[f]} tady má všechno hotovo.` : 'Všechno hotovo.'}</p>` : f ? `<p class="psect__empty">${WHO[f]} tady nic nemá.</p>` : ''}
           <button class="addline" data-taskadd="${s.id}">${icon('plus')} Přidat úkol</button>
         </section>`;
       }).join('')}
@@ -1220,7 +1228,7 @@
   function go(tab, { scroll = true } = {}) {
     if (!renderers[tab]) tab = 'dnes';
     if (state.pick && !((state.pick.kind === 'act' && tab === 'vylety') || (state.pick.kind === 'meal' && tab === 'jidlo'))) state.pick = null;
-    state.tab = tab; store.set('tab', tab);
+    state.tab = tab; store.set('tab', tab); prepKeep.clear();
     $$('.panel').forEach(p => { p.hidden = p.dataset.tab !== tab; });
     $$('.tabbar__btn').forEach(b => b.setAttribute('aria-current', b.dataset.go === tab ? 'page' : 'false'));
     renderers[tab]();
@@ -1316,6 +1324,7 @@
     // Příprava
     if (d.prepwho) { state.prepWho = d.prepwho === 'vse' ? '' : d.prepwho; store.set('prepWho', state.prepWho); return renderInfo(); }
     if (d.prepwhen) { state.prepWhen = d.prepwhen === 'vse' ? '' : d.prepwhen; store.set('prepWhen', state.prepWhen); prepKeep.clear(); return renderInfo(); }
+    if ('prepdone' in d) { state.prepShowDone = !state.prepShowDone; store.set('prepShowDone', state.prepShowDone); prepKeep.clear(); return renderInfo(); }
     if ('duepick' in d) { const f = t.closest('form'); f.elements.due.value = d.duepick; return syncDue(f); }
     if ('taskadd' in d) return taskSheet(null, d.taskadd);
     if (d.taskedit) return taskSheet(d.taskedit);
