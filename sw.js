@@ -1,6 +1,6 @@
 /* Offline režim: aplikace a obrázky z cache, počasí vždy ze sítě (záložní kopie je v localStorage).
    Sdílený plán (Firebase) jde mimo service worker, cizí domény se tu neobsluhují. */
-const CACHE = 'malaga-v12';
+const CACHE = 'malaga-v13';
 const SHELL = [
   './', 'index.html', 'style.css', 'app.js', 'plan.js', 'data/trip.js', 'data/activities.js', 'data/tips.js', 'data/food.js', 'data/calendar.js', 'data/secret.js', 'manifest.webmanifest',
   'icons/icon.svg', 'icons/icon-180.png', 'icons/icon-192.png', 'img/parking-ostrava.png', 'img/letiste-agp.svg',

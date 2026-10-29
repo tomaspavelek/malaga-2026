@@ -122,9 +122,28 @@ const CHECKLIST = [
   ] },
 ];
 
+/* Cestovní pojištění v Info → Tipy, podle kartiček ČPP (pojistka přes ČPZP). Repo je veřejné, proto bez jmen,
+   rodných čísel a adresy pojistníka: kartičky s nimi mají Tom a Míša v PDF v telefonu. */
+const INSURANCE = {
+  name: 'Česká podnikatelská pojišťovna (ČPP), sjednané přes ČPZP',
+  policy: '1611786509',
+  valid: 'Platí 31. 10.–9. 11. 2026 pro všechny 4, celá Evropa.',
+  tel: '+420 266 799 788',
+  mail: 'dispecink@1220.cz',
+  first: 'Než půjdete k lékaři, volejte asistenci Global Assistance (nonstop, česky). Řekne vám, kam jít, a ošetření zaplatí. V ohrožení života volejte nejdřív 112 a asistenci hned, jak to půjde.',
+  say: [
+    'jméno, příjmení a rodné číslo toho, komu se něco stalo (rodná čísla jsou na kartičkách v PDF)',
+    'číslo smlouvy 1611786509',
+    'kde jste a číslo telefonu, ze kterého voláte',
+    'pokud vás už ošetřili: číslo na lékaře, název a adresu zařízení',
+  ],
+  covers: 'léčebné výlohy do 10 000 000 Kč (i ošetření po úrazu), odpovědnost za škodu, kterou způsobíte jiným, do 4 000 000 Kč, a asistenci.',
+  not: 'úrazové pojištění, zavazadla a storno cesty. Ukradené věci pojištění nenahradí, ztracený kufr hlaste u Ryanairu (Azul Handling, kontakt níž).',
+  more: 'Když platíte sami, třeba v lékárně, schovejte účty a lékařské zprávy. Kartičky v PDF mají i anglický text, v nemocnici je ukažte jako doklad o pojištění.',
+};
+
 const CONTACTS = [
   { name: 'Tísňová linka', note: 'Vše (záchranka, policie, hasiči), mluví i anglicky', tel: '112' },
-  { name: 'Asistence pojištění ČPZP', note: 'Global Assistance, nonstop, česky. Volat jako první.', tel: '+420 266 799 788' },
   { name: 'Julia, řidička (tam i zpět)', note: 'Slovenka, pište česky nebo slovensky, nejlíp WhatsApp. Fotka je v Info → Tam u příletu.', secret: 'driver' },
   { name: 'Taxi Unión Málaga', note: 'Ve městě smí vézt děti bez sedačky vzadu', tel: '+34 952 04 04 04' },
   { name: 'Unitaxi Málaga', note: '', tel: '+34 952 33 33 33' },

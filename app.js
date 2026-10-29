@@ -1095,6 +1095,20 @@
   };
   document.addEventListener('pointerup', dragEnd);
   document.addEventListener('pointercancel', dragEnd);
+  // cestovní pojištění: číslo smlouvy, asistence a co jí říct, když se něco stane (bez rodných čísel, ta jsou v PDF)
+  function insuranceCard() {
+    const I = INSURANCE;
+    return `<section class="card ins" aria-label="Cestovní pojištění">
+      <div><h3>Cestovní pojištění</h3><small class="ins__sub">${I.name}. ${I.valid}</small></div>
+      <div class="ins__no"><div><small>Číslo smlouvy</small><b>${I.policy}</b></div><button class="btn btn--sm" data-copy="${I.policy}">Kopírovat</button></div>
+      <a class="btn btn--primary" href="tel:${I.tel.replace(/\s/g, '')}">Volat asistenci <span class="mono">${I.tel}</span></a>
+      <p>${I.first}</p>
+      <div><h4>Co říct operátorovi</h4><ol>${I.say.map(x => `<li>${x}</li>`).join('')}</ol></div>
+      <p><b>Kryje</b> ${I.covers}</p>
+      <p><b>Nesjednané:</b> ${I.not}</p>
+      <p class="ins__more">${I.more} E-mail asistence: <a href="mailto:${I.mail}">${I.mail}</a></p>
+    </section>`;
+  }
   function tipsBody() {
     const only = state.tipsMilo;
     const secs = only ? TIPS.filter(s => s.items && s.items.some(t => t.milo)).map(s => ({ ...s, items: s.items.filter(t => t.milo) })) : TIPS;
@@ -1107,6 +1121,7 @@
           <a href="tel:112"><span class="q-ico">🆘</span>Tísňová linka 112</a>
         </div>
       </section>
+      ${only ? '' : insuranceCard()}
       ${only ? '' : `<section class="card" aria-label="Kontakty">
         <h3>Důležité kontakty</h3>
         <div>${CONTACTS.map(c => { const tel = c.secret ? (PRIVATE[c.secret] || {}).tel : c.tel; return `
@@ -1352,6 +1367,10 @@
     // Info a ostatní
     if (d.info) { state.info = d.info; store.set('info', d.info); prepKeep.clear(); return renderInfo(); }
     if ('showAddress' in d) { $('#show-driver-text').innerHTML = STAY.addressBig; return $('#show-driver').showModal(); }
+    if (d.copy) {
+      if (navigator.clipboard) navigator.clipboard.writeText(d.copy).then(() => toast(`Zkopírováno: ${d.copy}`, null, false), () => {});
+      return;
+    }
     if ('close' in d) return t.closest('dialog').close();
     if (d.showcard) {
       e.preventDefault();

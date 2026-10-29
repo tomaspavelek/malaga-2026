@@ -356,6 +356,17 @@ details.fold[open] > summary svg { transform: rotate(90deg); }
 .driver.is-big { grid-template-columns: 1fr; }
 .driver.is-big .driver__photo { cursor: zoom-out; }
 .contact small { color: var(--tinta-2); }
+/* cestovní pojištění: číslo smlouvy velké, ať jde přečíst do telefonu */
+.ins p, .ins li { font-size: 15.5px; line-height: 1.5; }
+.ins h4 { font-size: 16px; margin-bottom: 2px; }
+.ins ol { display: grid; gap: 3px; }
+.ins__sub { display: block; margin-top: 2px; color: var(--tinta-2); font-size: 14px; line-height: 1.4; }
+.ins__no { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--mar-claro); }
+.ins__no small { display: block; font-size: 13px; color: var(--tinta-2); }
+.ins__no b { font: 500 26px/1.15 var(--f-mono); font-feature-settings: "tnum"; letter-spacing: .03em; }
+.ins .btn--primary .mono { font-weight: 500; }
+.ins__more { color: var(--tinta-2); }
+.ins__more a { color: var(--mar); font-weight: 700; overflow-wrap: anywhere; }
 
 /* ---------- Dialog „Ukázat řidiči“ ---------- */
 .sheet { border: 0; padding: 0; width: min(560px, 100vw - 24px); border-radius: 22px; background: var(--papel); color: var(--tinta); }

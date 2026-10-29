@@ -211,7 +211,7 @@ const TIPS = [
     icon: '🩺', title: 'Zdraví a bezpečnost', sub: 'Pohotovost, lékárny, léky, kapsáři',
     items: [
       { h: 'Když je dítě nemocné', ul: [
-        'Nejdřív volejte asistenci pojišťovny Global Assistance +420 266 799 788 (nonstop, česky). Nasměruje vás a zaplatí ošetření.',
+        'Nejdřív volejte asistenci pojišťovny Global Assistance +420 266 799 788 (nonstop, česky). Nasměruje vás a zaplatí ošetření. Co jí říct a číslo smlouvy najdete v kartě Cestovní pojištění nahoře.',
         'Veřejná dětská pohotovost: Hospital Materno-Infantil, Av. Arroyo de los Ángeles (asi 5 km). Tady platí modrá kartička EHIC; řekněte, že chcete veřejnou péči.',
         'Soukromá: Quirónsalud Málaga, Av. Imperio Argentina 1 (asi 2 km), pohotovost 24 h i pro děti. EHIC tam neplatí, jen cestovní pojištění.',
         'Zdravotní informační linka Salud Responde 955 545 060, záchranka 061, vše 112.',
